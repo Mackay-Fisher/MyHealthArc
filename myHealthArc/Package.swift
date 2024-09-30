@@ -31,6 +31,17 @@ let package = Package(
             ],
             swiftSettings: swiftSettings
         ),
+        .executableTarget(
+            name: "MongoTest",
+            dependencies: [
+                .product(name: "Fluent", package: "fluent"),
+                .product(name: "FluentMongoDriver", package: "fluent-mongo-driver"),
+                .product(name: "Vapor", package: "vapor"),
+            ],
+            path: "Sources/App",
+            sources: ["MongoTest.swift"],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "AppTests",
             dependencies: [

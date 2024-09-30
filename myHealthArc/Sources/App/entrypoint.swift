@@ -2,10 +2,14 @@ import Vapor
 import Logging
 import NIOCore
 import NIOPosix
+import DotEnv
 
 @main
 enum Entrypoint {
     static func main() async throws {
+        let path = ".env"
+        let environment = try DotEnv.read(path: path)
+        environment.load()
         var env = try Environment.detect()
         try LoggingSystem.bootstrap(from: &env)
         

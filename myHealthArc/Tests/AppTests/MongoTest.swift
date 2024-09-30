@@ -11,7 +11,7 @@ final class MongoTest: XCTestCase {
 
     // The setUp() function sets up the test environment before each test and connects to the MongoDB database.
     override func setUp() async throws {
-        app = Application(.testing)
+        app = try await Application.make(.testing)
         try await configure(app)
         guard let databaseURL = Environment.get("DATABASE_URL") else {
             XCTFail("DATABASE_URL not set")
@@ -22,8 +22,8 @@ final class MongoTest: XCTestCase {
     }
 
     // The tearDown() function clean up resources and shut down app.
-    override func tearDown() {
-        app.shutdown()
+    override func tearDown() async throws {
+        try await app.asyncShutdown()
     }
 
     // The testInsertUser() function inserts a user into the MongoDB database and then fetches the user to verify that the user was inserted successfully.
@@ -49,12 +49,12 @@ final class MongoTest: XCTestCase {
                         XCTAssertNotNil(fetchedUser)
                         XCTAssertEqual(fetchedUser?["name"] as? String, user.name)
                         XCTAssertEqual(fetchedUser?["email"] as? String, user.email)
-                    case .failure(let error):
+                    case .failure(_):
                         XCTFail("Failed to fetch user")
                     }
                     expectation.fulfill()
                 }
-            case .failure(let error):
+            case .failure(_):
                 XCTFail("Failed to insert user")
                 expectation.fulfill()
             }

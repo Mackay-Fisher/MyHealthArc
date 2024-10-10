@@ -11,7 +11,7 @@ import SwiftUI
 struct myHealthArc_frontendApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            LoginView()
         }
     }
 }

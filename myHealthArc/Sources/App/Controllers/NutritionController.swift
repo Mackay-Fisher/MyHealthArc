@@ -1,37 +1,48 @@
-// import Vapor
+import Vapor
 
-// struct NutritionController: RouteCollection {
-//     func boot(routes: RoutesBuilder) throws {
-//         let nutrition = routes.grouped("nutrition")
-//         nutrition.get("info", use: self.getNutritionInfo)
-//     }
+struct NutritionController: RouteCollection {
+    func boot(routes: RoutesBuilder) throws {
+        let nutrition = routes.grouped("nutrition")
+        nutrition.get("info", use: self.getNutritionInfo)
+    }
 
-//     func getNutritionInfo(req: Request) async throws -> NutritionData {
-//         // Decode the food name from query parameter
-//         guard let foodName = try? req.query.get(String.self, at: "query") else {
-//             throw Abort(.badRequest, reason: "A 'query' parameter is required.")
-//         }
-
-//         // Build the API request URL
-//         let apiKey = Environment.get("FOOD_DATA_API_KEY") ?? "Your_API_Key"
-//         let url = "https://api.nal.usda.gov/fdc/v1/foods/search?query=\(foodName)&pageSize=1&api_key=\(apiKey)"
-
-//         // Make the HTTP request
-//         let response = try await req.client.get(URI(string: url))
-
-//         guard let body = response.body,
-//               let bodyData = body.getData(at: 0, length: body.readableBytes) else {
-//             throw Abort(.internalServerError, reason: "Failed to get data from FoodData Central API.")
-//         }
-
-//         // Parse the response JSON
-//         let nutritionData = try JSONDecoder().decode(FoodDataResponse.self, from: bodyData)
+    func getNutritionInfo(req: Request) async throws -> [NutritionData] {
+        // Decode the list of food names from query parameter
+        guard let foodNamesParam = try? req.query.get(String.self, at: "query") else {
+            throw Abort(.badRequest, reason: "A 'query' parameter is required, with comma-separated food names.")
+        }
         
-//         // Return the first food item data
-//         guard let firstItem = nutritionData.foods.first else {
-//             throw Abort(.notFound, reason: "No nutrition information found for \(foodName).")
-//         }
+        // Split the comma-separated food names
+        let foodNames = foodNamesParam.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
         
-//         return firstItem
-//     }
-// }
+        // API Key for the FoodData Central API
+        let apiKey = Environment.get("FOOD_DATA_API_KEY") ?? "DEMO_KEY"
+        // Placeholder for results
+        var nutritionResults: [NutritionData] = []
+
+        // Loop through each food name and fetch its nutrition information
+        for foodName in foodNames {
+            // Build the API request URL
+            let url = "https://api.nal.usda.gov/fdc/v1/foods/search?query=\(foodName)&pageSize=1&api_key=\(apiKey)"
+            
+            // Make the HTTP request
+            let response = try await req.client.get(URI(string: url))
+            guard let body = response.body,
+                  let bodyData = body.getData(at: 0, length: body.readableBytes) else {
+                throw Abort(.internalServerError, reason: "Failed to get data for \(foodName) from FoodData Central API.")
+            }
+
+            // Parse the response JSON
+            let foodDataResponse = try JSONDecoder().decode(FoodDataResponse.self, from: bodyData)
+            
+            // Check if there is at least one result and add it to the results array
+            if let firstItem = foodDataResponse.foods.first {
+                nutritionResults.append(firstItem)
+            }
+        }
+
+        // Return the list of nutrition data
+        return nutritionResults
+    }
+}
+

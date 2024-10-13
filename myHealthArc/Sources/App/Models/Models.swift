@@ -42,20 +42,21 @@ struct FormattedInteractionResponse: Content {
     let interactionsBySeverity: [String: [FormattedInteraction]]
 }
 
+// Response model for the food data search
+struct FoodDataResponse: Content {
+    let foods: [NutritionData]
+}
 
-// Response Data Structure for FoodData Central API
-// struct FoodDataResponse: Decodable {
-//     let foods: [NutritionData]
-// }
+// Individual food item structure
+struct NutritionData: Content {
+    let description: String
+    let foodNutrients: [Nutrient]
+}
 
-// // Individual Food Item Structure
-// struct NutritionData: Content, Decodable {
-//     let description: String
-//     let foodNutrients: [Nutrient]
-    
-//     struct Nutrient: Decodable {
-//         let nutrientName: String
-//         let value: Double
-//         let unitName: String
-//     }
-// }
+// Nutrient structure for details on each nutrient
+struct Nutrient: Content {
+    let nutrientName: String
+    let unitName: String
+    let value: Double
+}
+

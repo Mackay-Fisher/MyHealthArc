@@ -1,3 +1,7 @@
+
+
+
+
 import Vapor
 
 struct MedicationCheckerController: RouteCollection {
@@ -20,23 +24,6 @@ struct MedicationCheckerController: RouteCollection {
         }
     }
 
-
-
-
-
-    // // Function to check interactions
-    // func checkInteractions(req: Request) async throws -> String {
-    //     let medications = try req.query.decode([String].self) // Expecting a list of medication names as query params
-    //     let ids = try await getRxNormIds(for: medications, client: req.client)
-        
-    //     if ids.count > 1 {
-    //         let interactions = try await getInteractionData(ids, client: req.client)
-    //         return interactions
-    //     } else {
-    //         return "Not enough medication IDs found for interaction check."
-    //     }
-    // }
-    
     // Fetch RxNorm IDs
     private func getRxNormIds(for drugs: [String], client: Client) async throws -> [String] {
         var ids: [String] = []

@@ -7,39 +7,83 @@
 
 import SwiftUI
 
+//move this to a common file later
+extension Color {
+    init(hex: String) {
+        let scanner = Scanner(string: hex)
+        scanner.charactersToBeSkipped = CharacterSet(charactersIn: "#")
+        var rgb: UInt64 = 0
+        scanner.scanHexInt64(&rgb)
+        
+        let red = Double((rgb >> 16) & 0xFF) / 255.0
+        let green = Double((rgb >> 8) & 0xFF) / 255.0
+        let blue = Double(rgb & 0xFF) / 255.0
+        
+        self.init(.sRGB, red: red, green: green, blue: blue, opacity: 1.0)
+    }
+}
+
+
 struct LoginView: View {
     @State private var username = ""
     @State private var password = ""
     
     var body: some View {
         VStack {
-            Image("logo") // Ensure "logo" is the correct name in your assets
-                .resizable() // Allows the image to be resized
-                .aspectRatio(contentMode: .fit) // Maintain aspect ratio
-                .frame(width: 200, height: 200) // Set desired width and height
-            
+            Image("logo")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 200, height: 200)
+                
             Text("myHealthArc")
                 .font(.largeTitle)
-                .padding()
+                .fontWeight(.semibold)
+                .padding(.top, -20)
+                .padding(.bottom, 30)
+                
             
             TextField("Username", text: $username)
+                .font(.system(size: 18))
                 .padding()
-                .background(Color(.secondarySystemBackground))
-                .cornerRadius(8) // Optional: Add corner radius for better aesthetics
+                .background(Color.white)
+                .cornerRadius(10)
+                .overlay( // Black border overlay
+                    RoundedRectangle(cornerRadius: 50)
+                        .stroke(Color.black, lineWidth: 0.5)
+                )
+                .padding(.horizontal)
+                .frame(width: 250, height: 50)
+                .multilineTextAlignment(.center)
+                .padding(.bottom, 5)
+            
+            
             
             SecureField("Password", text: $password)
+                .font(.system(size: 18))
                 .padding()
-                .background(Color(.secondarySystemBackground))
-                .cornerRadius(8) // Optional: Add corner radius for better aesthetics
+                .background(Color.white)
+                .cornerRadius(10)
+                .overlay( // Black border overlay
+                    RoundedRectangle(cornerRadius: 50)
+                        .stroke(Color.black, lineWidth: 0.5)
+                )
+                .padding(.horizontal)
+                .frame(width: 250, height: 50)
+                .multilineTextAlignment(.center)
+                        
             
             Button("Login") {
                 // Navigation action to go to the next screen
-                // Add navigation logic here
+                //testing if input is being taken
+                print("Username: \(username), Password: \(password)")
             }
-            .frame(width: 200, height: 50)
-            .background(Color.blue)
+            //dont allow login button click without input
+            .frame(width: 100, height: 50)
+            .background(username.isEmpty || password.isEmpty ? Color.gray : Color(hex:"#C197D2"))
+            .cornerRadius(50)
             .foregroundColor(.white)
-            .cornerRadius(10)
+            .padding(.top)
+            .disabled(username.isEmpty || password.isEmpty)
         }
         .padding()
     }

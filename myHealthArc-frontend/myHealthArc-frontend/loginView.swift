@@ -28,6 +28,9 @@ struct LoginView: View {
     @State private var username = ""
     @State private var password = ""
     
+    // Environment variable to access current color scheme
+        @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         VStack {
             Image("logo")
@@ -45,11 +48,11 @@ struct LoginView: View {
             TextField("Username", text: $username)
                 .font(.system(size: 18))
                 .padding()
-                .background(Color.white)
+                .background(Color(.systemBackground))
                 .cornerRadius(10)
                 .overlay( // Black border overlay
                     RoundedRectangle(cornerRadius: 50)
-                        .stroke(Color.black, lineWidth: 0.5)
+                        .stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 0.5)
                 )
                 .padding(.horizontal)
                 .frame(width: 250, height: 50)
@@ -61,11 +64,11 @@ struct LoginView: View {
             SecureField("Password", text: $password)
                 .font(.system(size: 18))
                 .padding()
-                .background(Color.white)
+                .background(Color(.systemBackground))
                 .cornerRadius(10)
                 .overlay( // Black border overlay
                     RoundedRectangle(cornerRadius: 50)
-                        .stroke(Color.black, lineWidth: 0.5)
+                        .stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 0.5)
                 )
                 .padding(.horizontal)
                 .frame(width: 250, height: 50)

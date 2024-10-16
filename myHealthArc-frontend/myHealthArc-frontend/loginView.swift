@@ -27,7 +27,8 @@ extension Color {
 struct LoginView: View {
     @State private var username = ""
     @State private var password = ""
-    
+    @Binding var isLoggedIn: Bool
+
     // Environment variable to access current color scheme
         @Environment(\.colorScheme) var colorScheme
     
@@ -79,6 +80,7 @@ struct LoginView: View {
                 // Navigation action to go to the next screen
                 //testing if input is being taken
                 print("Username: \(username), Password: \(password)")
+                isLoggedIn = true
             }
             //dont allow login button click without input
             .frame(width: 100, height: 50)

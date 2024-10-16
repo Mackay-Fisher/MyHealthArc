@@ -7,27 +7,10 @@
 
 import SwiftUI
 
-//move this to a common file later
-extension Color {
-    init(hex: String) {
-        let scanner = Scanner(string: hex)
-        scanner.charactersToBeSkipped = CharacterSet(charactersIn: "#")
-        var rgb: UInt64 = 0
-        scanner.scanHexInt64(&rgb)
-        
-        let red = Double((rgb >> 16) & 0xFF) / 255.0
-        let green = Double((rgb >> 8) & 0xFF) / 255.0
-        let blue = Double(rgb & 0xFF) / 255.0
-        
-        self.init(.sRGB, red: red, green: green, blue: blue, opacity: 1.0)
-    }
-}
-
 struct SettingsView: View {
-    @State private var appleHealth = false
-    @State private var appleFitness = false
-    // Environment variable to access current color scheme
-        @Environment(\.colorScheme) var colorScheme
+    @State private var appleHealth: Bool = false
+    @State private var appleFitness: Bool = false
+
 
     var body: some View {
         VStack {
@@ -35,15 +18,11 @@ struct SettingsView: View {
                 .font(.largeTitle)
                 .padding()
             
-            Toggle("Apple Health", isOn: $appleHealth){
-                Text("Enables integration with Apple Health")
-            }
+            Toggle("Apple Health", isOn: $appleHealth)
                 .toggleStyle(.switch)
                 .padding()
             
-            Toggle("Apple Fitness", isOn: $appleFitness){
-                Text("Enables integration with Apple Fitness")
-            }
+            Toggle("Apple Fitness", isOn: $appleFitness)
                 .toggleStyle(.switch)
                 .padding()
             

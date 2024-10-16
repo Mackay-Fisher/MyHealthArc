@@ -95,5 +95,12 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView(isLogedIn)
+    struct Preview: View {
+        @Binding var isLoggedIn: Bool = false
+        var body: some View {
+            LoginView(isLoggedIn: $isLoggedIn)
+        }
+    }
+    
+    return Preview()
 }

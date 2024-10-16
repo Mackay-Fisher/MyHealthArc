@@ -96,7 +96,7 @@ struct LoginView: View {
 
 #Preview {
     struct Preview: View {
-        @Binding var isLoggedIn: Bool = false
+        @State var isLoggedIn: Bool = false
         var body: some View {
             LoginView(isLoggedIn: $isLoggedIn)
         }

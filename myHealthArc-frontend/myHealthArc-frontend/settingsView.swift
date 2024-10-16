@@ -24,20 +24,32 @@ extension Color {
 }
 
 struct SettingsView: View {
+    @State private var appleHealth = false
+    @State private var appleFitness = false
+    // Environment variable to access current color scheme
+        @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         VStack {
             Text("Settings")
                 .font(.largeTitle)
                 .padding()
             
-            Toggle("Apple Health", isOn: .constant(true))
+            Toggle("Apple Health", isOn: $appleHealth){
+                Text("Enables integration with Apple Health")
+            }
+                .toggleStyle(.switch)
                 .padding()
             
-            Toggle("Apple Fitness", isOn: .constant(false))
+            Toggle("Apple Fitness", isOn: $appleFitness){
+                Text("Enables integration with Apple Fitness")
+            }
+                .toggleStyle(.switch)
                 .padding()
             
             Button("Delete Account") {
                 // Handle delete account action
+                print("Account Deleted")
             }
             .frame(width: 200, height: 50)
             .background(Color.red)

@@ -8,23 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State var isLoggedIn = false
+
     var body: some View {
-        TabView {
-            ContentView()
-                .tabItem {
-                    Image(systemName: "house")
-                    Text("Home")
-                }
-            ServicesView()
-                .tabItem {
-                    Image(systemName: "heart")
-                    Text("Services")
-                }
-            SettingsView()
-                .tabItem {
-                    Image(systemName: "gear")
-                    Text("Settings")
-                }
+        if isLoggedIn {
+            MainView()
+        } else {
+            LoginView(isLoggedIn: $isLoggedIn)
         }
     }
 }

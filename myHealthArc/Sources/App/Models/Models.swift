@@ -1,7 +1,6 @@
 import Vapor
 import Foundation
 
-// Adjusted model for RxNorm ID response
 struct ResponseData: Decodable {
     let types: [InteractionType]
 
@@ -14,7 +13,6 @@ struct ResponseData: Decodable {
     }
 }
 
-// Adjusted response data structure for interaction data
 struct InteractionResponse: Decodable {
     let errorCode: Int
     let multiInteractions: [MultiInteraction]?
@@ -29,7 +27,6 @@ struct InteractionResponse: Decodable {
     }
 }
 
-// Struct for each interaction detail
 struct FormattedInteraction: Content {
     let severity: String
     let interaction: String
@@ -37,23 +34,19 @@ struct FormattedInteraction: Content {
     let note: String?
 }
 
-// Struct for the final formatted JSON response grouped by severity
 struct FormattedInteractionResponse: Content {
     let interactionsBySeverity: [String: [FormattedInteraction]]
 }
 
-// Response model for the food data search
 struct FoodDataResponse: Content {
     let foods: [NutritionData]
 }
 
-// Individual food item structure
 struct NutritionData: Content {
     let description: String
     let foodNutrients: [Nutrient]
 }
 
-// Nutrient structure for details on each nutrient
 struct Nutrient: Content {
     let nutrientName: String
     let unitName: String

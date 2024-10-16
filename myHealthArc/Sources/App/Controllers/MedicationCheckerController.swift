@@ -44,19 +44,14 @@ struct MedicationCheckerController: RouteCollection {
             let data = Data(bodyString.utf8)
             let responseData = try JSONDecoder().decode(ResponseData.self, from: data)
             
-            // Extract IDs from the first 'types' element if available
+            // Extract IDs from the first 'types' element if available this is the id for querying interactions
             if let firstType = responseData.types.first {
                 let extractedIds = firstType.references.map { $0.id }
-                print("Extracted IDs for \(drug):", extractedIds) // Print IDs for debugging
-                
                 if let firstId = extractedIds.first {
-                    ids.append(firstId) // Add only the first ID to the result list
+                    ids.append(firstId)
                 }
             }
         }
-        
-        // Print all collected IDs for debugging
-        print("All IDs:", ids)
         return ids
     }
 

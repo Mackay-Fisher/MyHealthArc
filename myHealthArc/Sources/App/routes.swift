@@ -5,6 +5,7 @@ func routes(_ app: Application) throws {
     // Register individual controllers
     try app.register(collection: MedicationCheckerController())
     try app.register(collection: NutritionController())
+    try app.register(collection: HealthDataController())
 
     // Any other routes can also be added here
     app.get { req async throws in

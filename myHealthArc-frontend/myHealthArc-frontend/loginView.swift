@@ -28,79 +28,77 @@ struct LoginView: View {
     @State private var username = ""
     @State private var password = ""
     @Binding var isLoggedIn: Bool
-
-    // Environment variable to access current color scheme
-        @Environment(\.colorScheme) var colorScheme
+    
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        VStack {
-            Image("logo")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 200, height: 200)
+        NavigationStack {
+            VStack {
+                Image("logo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 200, height: 200)
                 
-            Text("myHealthArc")
-                .font(.largeTitle)
-                .fontWeight(.semibold)
-                .padding(.top, -20)
-                .padding(.bottom, 30)
+                Text("myHealthArc")
+                    .font(.largeTitle)
+                    .fontWeight(.semibold)
+                    .padding(.top, -20)
+                    .padding(.bottom, 30)
                 
-            
-            TextField("Username", text: $username)
-                .font(.system(size: 18))
-                .padding()
-                .background(Color(.systemBackground))
-                .cornerRadius(10)
-                .overlay( // Black border overlay
-                    RoundedRectangle(cornerRadius: 50)
-                        .stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 0.5)
-                )
-                .padding(.horizontal)
-                .frame(width: 250, height: 50)
-                .multilineTextAlignment(.center)
-                .padding(.bottom, 5)
-            
-            
-            
-            SecureField("Password", text: $password)
-                .font(.system(size: 18))
-                .padding()
-                .background(Color(.systemBackground))
-                .cornerRadius(10)
-                .overlay( // Black border overlay
-                    RoundedRectangle(cornerRadius: 50)
-                        .stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 0.5)
-                )
-                .padding(.horizontal)
-                .frame(width: 250, height: 50)
-                .multilineTextAlignment(.center)
-                        
-            
-            Button("Login") {
-                // Navigation action to go to the next screen
-                //testing if input is being taken
-                print("Username: \(username), Password: \(password)")
-                isLoggedIn = true
+                TextField("Username", text: $username)
+                    .font(.system(size: 18))
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 50)
+                            .stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 0.5)
+                    )
+                    .padding(.horizontal)
+                    .frame(width: 250, height: 50)
+                    .multilineTextAlignment(.center)
+                    .padding(.bottom, 5)
+                
+                SecureField("Password", text: $password)
+                    .font(.system(size: 18))
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 50)
+                            .stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 0.5)
+                    )
+                    .padding(.horizontal)
+                    .frame(width: 250, height: 50)
+                    .multilineTextAlignment(.center)
+                
+                    
+                Button("Login") {
+                    // Login logic and navigation trigger
+                    if !username.isEmpty && !password.isEmpty {
+                        isLoggedIn = true
+                    }
+                    print("Username: \(username), Password: \(password)")
+                }
+                .frame(width: 100, height: 50)
+                .background(username.isEmpty || password.isEmpty ? Color.gray : Color(hex: "#C197D2"))
+                .cornerRadius(50)
+                .foregroundColor(.white)
+                .padding(.top)
+                .disabled(username.isEmpty || password.isEmpty)
             }
-            //dont allow login button click without input
-            .frame(width: 100, height: 50)
-            .background(username.isEmpty || password.isEmpty ? Color.gray : Color(hex:"#C197D2"))
-            .cornerRadius(50)
-            .foregroundColor(.white)
-            .padding(.top)
-            .disabled(username.isEmpty || password.isEmpty)
+            
+            .navigationDestination(isPresented: $isLoggedIn) {
+                        ServicesView() // Destination view
+            }
+            .padding()
         }
-        .padding()
     }
 }
 
 #Preview {
-    struct Preview: View {
-        @State var isLoggedIn: Bool = false
-        var body: some View {
-            LoginView(isLoggedIn: $isLoggedIn)
-        }
-    }
-    
-    return Preview()
+
+    @Previewable @State var isLoggedIn: Bool = false
+    LoginView(isLoggedIn: $isLoggedIn)
+        
 }

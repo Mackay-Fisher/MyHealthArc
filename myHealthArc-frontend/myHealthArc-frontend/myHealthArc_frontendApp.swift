@@ -11,7 +11,8 @@ import SwiftUI
 struct myHealthArc_frontendApp: App {
     var body: some Scene {
         WindowGroup {
-            LoginView(isLoggedIn: .constant(false))
+            @State var isLoggedIn: Bool = false
+            LoginView(isLoggedIn: $isLoggedIn)
         }
     }
 }

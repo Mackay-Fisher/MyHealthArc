@@ -89,7 +89,7 @@ struct LoginView: View {
             }
             
             .navigationDestination(isPresented: $isLoggedIn) {
-                        ServicesView() // Destination view
+                    ContentView() // Destination view
             }
             .padding()
         }

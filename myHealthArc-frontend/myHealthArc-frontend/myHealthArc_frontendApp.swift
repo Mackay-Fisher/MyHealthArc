@@ -4,15 +4,23 @@
 //
 //  Created by Anjali Hole on 10/9/24.
 //
-
 import SwiftUI
 
 @main
 struct myHealthArc_frontendApp: App {
+    // Declare the state variable outside of the body
+    @State private var isLoggedIn: Bool = false
+
     var body: some Scene {
         WindowGroup {
-            @State var isLoggedIn: Bool = false
-            LoginView(isLoggedIn: $isLoggedIn)
+            
+            if isLoggedIn {
+                
+                MainView()
+            } else {
+                LoginView(isLoggedIn: $isLoggedIn)
+            }
         }
     }
 }
+

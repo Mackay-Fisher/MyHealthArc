@@ -9,18 +9,31 @@ import SwiftUI
 
 struct ContentView: View {
     @State var isLoggedIn = false
-
+    
     var body: some View {
-        NavigationStack {
+        VStack {
             if isLoggedIn {
-                MainView()
+                // Filler content for when the user is logged in
+                Text("Welcome to MyHealthArc!")
+                    .font(.largeTitle)
+                    .padding()
+                
+                Button("Log Out") {
+                    isLoggedIn = false // Reset login state for testing
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
             } else {
                 LoginView(isLoggedIn: $isLoggedIn)
             }
         }
+        .padding()
     }
 }
 
 #Preview {
     ContentView()
 }
+

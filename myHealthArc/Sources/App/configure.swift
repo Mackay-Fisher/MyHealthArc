@@ -14,6 +14,7 @@ try app.databases.use(DatabaseConfigurationFactory.mongo(
     ), as: .mongo)
 
     app.migrations.add(CreateTodo())
+    app.migrations.add(CreateUser())
 
     app.views.use(.leaf)
 

@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct myHealthArc_new_frontendApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
+    @State private var isLoggedIn = false
+        
+        var body: some Scene {
+            WindowGroup {
+                if isLoggedIn {
+                    ContentView() // Replace with the main view of your app
+                } else {
+                    LoginView(isLoggedIn: $isLoggedIn)
+                }
+            }
         }
-    }
 }

@@ -16,7 +16,8 @@ struct myHealthArc_new_frontendApp: App {
                 if isLoggedIn {
                     Tabs()
                 } else {
-                    LoginView(isLoggedIn: $isLoggedIn)
+                    //LoginView(isLoggedIn: $isLoggedIn)
+                    AppOpenScreen()
                 }
             }
         }

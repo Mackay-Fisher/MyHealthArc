@@ -67,7 +67,7 @@ struct LoginView: View {
                     print("Username: \(username), Password: \(password)")
                 }
                 .frame(width: 100, height: 50)
-                .background(username.isEmpty || password.isEmpty ? Color.gray : Color(hex: "#C197D2"))
+                .background(username.isEmpty || password.isEmpty ? Color.gray : Color.mhaPurple)
                 .cornerRadius(50)
                 .foregroundColor(.white)
                 .padding(.top)

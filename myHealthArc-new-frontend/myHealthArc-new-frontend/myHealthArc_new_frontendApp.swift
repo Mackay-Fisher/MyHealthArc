@@ -8,8 +8,6 @@
 import SwiftUI
 
 //NOTE: can just use this as is across all folders
-//purple: Color(hex: "#C197D2")
-//green: Color(hex:"#5EB229")
 extension Color {
     init(hex: String) {
         let scanner = Scanner(string: hex)
@@ -23,6 +21,9 @@ extension Color {
         
         self.init(.sRGB, red: red, green: green, blue: blue, opacity: 1.0)
     }
+    // Define standard colors
+    static let mhaPurple = Color(hex: "#C197D2")
+    static let mhaGreen = Color(hex: "#5EB229")
 }
 
 @main

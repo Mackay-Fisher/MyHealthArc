@@ -59,7 +59,7 @@ struct SignUpView: View {
                 }
                 HStack {
                     Image(systemName: ageVerified ? "checkmark.square" : "square")
-                        .foregroundColor(ageVerified ? Color(hex:"#5EB229") : .gray) // Change color based on acceptance
+                        .foregroundColor(ageVerified ? Color.mhaGreen : .gray) // Change color based on acceptance
                         .onTapGesture {
                             ageVerified.toggle()
                         }
@@ -70,7 +70,7 @@ struct SignUpView: View {
                 Section {
                     HStack {
                         Image(systemName: acceptedTerms ? "checkmark.square" : "square")
-                            .foregroundColor(acceptedTerms ? Color(hex:"#5EB229") : .gray) // Change color based on acceptance
+                            .foregroundColor(acceptedTerms ? Color.mhaGreen : .gray) // Change color based on acceptance
                             .onTapGesture {
                                 acceptedTerms.toggle()
                             }
@@ -87,7 +87,7 @@ struct SignUpView: View {
                             .frame(maxWidth: .infinity)
                             .foregroundColor(.white)
                             .padding()
-                            .background(formIsValid ? Color(hex: "#C197D2") : Color.gray)
+                            .background(formIsValid ? Color.mhaPurple : Color.gray)
                             .cornerRadius(50)
                     }
                     .disabled(!formIsValid)

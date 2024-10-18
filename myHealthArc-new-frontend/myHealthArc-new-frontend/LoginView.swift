@@ -32,7 +32,7 @@ struct LoginView: View {
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        NavigationStack {
+        //NavigationStack {
             VStack {
                 Image("logo")
                     .resizable()
@@ -92,7 +92,7 @@ struct LoginView: View {
                     View() // Destination view
             }*/
             .padding()
-        }
+       //}
     }
 }
 

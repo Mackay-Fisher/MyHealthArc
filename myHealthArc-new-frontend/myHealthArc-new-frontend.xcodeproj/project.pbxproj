@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		250FC2332CC1F9CF0023AE43 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250FC2322CC1F9CF0023AE43 /* LoginView.swift */; };
+		250FC2372CC200D10023AE43 /* ServicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250FC2362CC200D10023AE43 /* ServicesView.swift */; };
+		250FC2392CC200DF0023AE43 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250FC2382CC200DF0023AE43 /* SettingsView.swift */; };
+		250FC23B2CC201460023AE43 /* Tabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250FC23A2CC201430023AE43 /* Tabs.swift */; };
 		8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */; };
 		8F161C2F2CC1B36200E726E7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C2E2CC1B36200E726E7 /* ContentView.swift */; };
 		8F161C312CC1B36400E726E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8F161C302CC1B36400E726E7 /* Assets.xcassets */; };
@@ -36,6 +39,9 @@
 
 /* Begin PBXFileReference section */
 		250FC2322CC1F9CF0023AE43 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		250FC2362CC200D10023AE43 /* ServicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicesView.swift; sourceTree = "<group>"; };
+		250FC2382CC200DF0023AE43 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		250FC23A2CC201430023AE43 /* Tabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tabs.swift; sourceTree = "<group>"; };
 		8F161C292CC1B36200E726E7 /* myHealthArc-new-frontend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "myHealthArc-new-frontend.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myHealthArc_new_frontendApp.swift; sourceTree = "<group>"; };
 		8F161C2E2CC1B36200E726E7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -99,7 +105,10 @@
 				8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */,
 				8F161C2E2CC1B36200E726E7 /* ContentView.swift */,
 				250FC2322CC1F9CF0023AE43 /* LoginView.swift */,
+				250FC23A2CC201430023AE43 /* Tabs.swift */,
 				8F161C302CC1B36400E726E7 /* Assets.xcassets */,
+				250FC2382CC200DF0023AE43 /* SettingsView.swift */,
+				250FC2362CC200D10023AE43 /* ServicesView.swift */,
 				8F161C322CC1B36400E726E7 /* Preview Content */,
 			);
 			path = "myHealthArc-new-frontend";
@@ -260,7 +269,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				250FC23B2CC201460023AE43 /* Tabs.swift in Sources */,
+				250FC2372CC200D10023AE43 /* ServicesView.swift in Sources */,
 				250FC2332CC1F9CF0023AE43 /* LoginView.swift in Sources */,
+				250FC2392CC200DF0023AE43 /* SettingsView.swift in Sources */,
 				8F161C2F2CC1B36200E726E7 /* ContentView.swift in Sources */,
 				8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */,
 			);

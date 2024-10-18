@@ -4,16 +4,19 @@
 //
 //  Created by Anjali Hole on 10/17/24.
 //
-
+//TODO: need to add checks to ensure the information being entered is of correct input type
 import SwiftUI
 
 struct SignUpView: View {
     @State private var name: String = ""
     @State private var email: String = ""
     @State private var password: String = ""
+    @State private var password2: String = ""
     @State private var age: String = ""
     @State private var dob: Date = Date()
     @State private var acceptedTerms: Bool = false
+    @State private var ageVerified: Bool = false
+    @State private var showDatePicker: Bool = false
     
     var body: some View {
         NavigationView {
@@ -27,17 +30,39 @@ struct SignUpView: View {
                         .autocapitalization(.none)
                     SecureField("Password", text: $password)
                         .textContentType(.newPassword)
+                    SecureField("Re-Enter Password", text: $password2)
+                        .textContentType(.newPassword)
                     TextField("Age", text: $age)
                         .keyboardType(.numberPad)
-                    
-                    // Manually adding a label using HStack
-                    HStack {
-                        Text("Date of Birth")
-                        Spacer()
-                        DatePicker("", selection: $dob, displayedComponents: .date)
-                            .datePickerStyle(.wheel)
-                            .labelsHidden()
+                    // Button to show DatePicker
+                    Button(action: {
+                        showDatePicker.toggle()
+                    }) {
+                        HStack {
+                            Text("Date of Birth")
+                                .foregroundColor(.black)
+                            Spacer()
+                            Text(dob, style: .date) // Display the selected date
+                                .foregroundColor(.gray)
+                        }
                     }
+                    
+                    // Show DatePicker conditionally
+                    if showDatePicker {
+                        DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
+                            .datePickerStyle(.wheel)
+
+                    }
+                    
+                }
+                HStack {
+                    Image(systemName: ageVerified ? "checkmark.square" : "square")
+                        .foregroundColor(ageVerified ? Color(hex:"#5EB229") : .gray) // Change color based on acceptance
+                        .onTapGesture {
+                            ageVerified.toggle()
+                        }
+                        Text("I confirm I am above 18 years of age")
+
                 }
                 
                 Section {
@@ -54,11 +79,6 @@ struct SignUpView: View {
                     }
                 }
 
-                
-                Section {
-                    
-                }
-                
                 Section {
                     Button(action: signUp) {
                         Text("Sign Up")

@@ -1,9 +1,3 @@
-//
-//  ContentView.swift
-//  myHealthArc-new-frontend
-//
-//  Created by Vancura, Christiana Elaine on 10/17/24.
-//
 //this is the dashboard page
 import SwiftUI
 
@@ -132,7 +126,6 @@ struct UserProfileView: View {
     }
 }
 
-// Preview for ContentView
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()

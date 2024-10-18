@@ -20,6 +20,8 @@ struct SignUpView: View {
     @State private var showDatePicker: Bool = false
     @Binding var isLoggedIn: Bool
     
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         NavigationView {
             Form {
@@ -42,7 +44,7 @@ struct SignUpView: View {
                     }) {
                         HStack {
                             Text("Date of Birth")
-                                .foregroundColor(.black)
+                                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                             Spacer()
                             Text(dob, style: .date) // Display the selected date
                                 .foregroundColor(.gray)

@@ -24,6 +24,9 @@ extension Color {
     // Define standard colors
     static let mhaPurple = Color(hex: "#C197D2")
     static let mhaGreen = Color(hex: "#5EB229")
+    static let mhaGray = Color(hex: "#292828")
+    static let lightbackground = Color(hex: "#f2f2f2")
+    
 }
 
 @main

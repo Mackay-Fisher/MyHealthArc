@@ -55,7 +55,6 @@ struct SignUpView: View {
                     if showDatePicker {
                         DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
                             .datePickerStyle(.wheel)
-
                     }
                     
                 }
@@ -66,7 +65,6 @@ struct SignUpView: View {
                             ageVerified.toggle()
                         }
                         Text("I confirm I am above 18 years of age")
-
                 }
                 
                 Section {

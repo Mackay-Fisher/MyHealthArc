@@ -5,6 +5,7 @@
 //  Created by Anjali Hole on 10/17/24.
 //
 //TODO: need to add checks to ensure the information being entered is of correct input type
+//TODO: figure out how to store info
 import SwiftUI
 
 struct SignUpView: View {
@@ -17,6 +18,7 @@ struct SignUpView: View {
     @State private var acceptedTerms: Bool = false
     @State private var ageVerified: Bool = false
     @State private var showDatePicker: Bool = false
+    @Binding var isLoggedIn: Bool
     
     var body: some View {
         NavigationView {
@@ -89,6 +91,7 @@ struct SignUpView: View {
                             .cornerRadius(50)
                     }
                     .disabled(!formIsValid)
+                    .listRowBackground(Color.clear)
                 }
             }
             .navigationTitle("Sign Up")
@@ -98,6 +101,7 @@ struct SignUpView: View {
     private func signUp() {
         // Handle sign up action
         print("User Signed Up!")
+        isLoggedIn = true
     }
     
     private var formIsValid: Bool {
@@ -107,6 +111,7 @@ struct SignUpView: View {
 
 struct SignUpView_Previews: PreviewProvider {
     static var previews: some View {
-        SignUpView()
+        @Previewable @State var isLoggedIn: Bool = false
+        SignUpView(isLoggedIn: $isLoggedIn)
     }
 }

@@ -12,7 +12,7 @@
 //
 //  Created by Anjali Hole on 10/9/24.
 //
-
+//TODO: add logout method
 import SwiftUI
 
 struct SettingsView: View {

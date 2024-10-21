@@ -1,14 +1,14 @@
 import Fluent
 import Vapor
 
-final class User: Model, Content {
+final class User: Model, Content, @unchecked Sendable {
     static let schema = "users"
     
     @ID(key: .id)
     var id: UUID?
     
-    @Field(key: "name")
-    var name: String
+    @Field(key: "fullName")
+    var fullName: String
     
     @Field(key: "email")
     var email: String
@@ -21,9 +21,9 @@ final class User: Model, Content {
     
     init() { }
     
-    init(id: UUID? = nil, name: String, email: String, passwordHash: String, userHash: String) {
+    init(id: UUID? = nil, fullName: String, email: String, passwordHash: String, userHash: String) {
         self.id = id
-        self.name = name
+        self.fullName = fullName
         self.email = email
         self.passwordHash = passwordHash
         self.userHash = userHash

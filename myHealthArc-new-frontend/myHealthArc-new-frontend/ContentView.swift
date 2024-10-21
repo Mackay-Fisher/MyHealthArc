@@ -42,7 +42,7 @@ struct ContentView: View {
                         WidgetView(title: "Medication Reminder", detail: "Next Dose: 2:00 PM")
                     }
                     .padding()
-                 
+                    .shadow(radius: 5)
                 }
             }
             .background(colorScheme == .dark ? Color(.systemBackground) : Color.lightbackground)
@@ -71,7 +71,9 @@ struct WidgetView: View {
             Text(title)
                 .font(.headline)
                 .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                .padding()
+                .padding(.top)
+            Divider()
+                .frame(width: UIScreen.main.bounds.width * 0.80)
             Text(detail)
                 .font(.subheadline)
                 .foregroundColor(colorScheme == .dark ? Color.white : Color.black)

@@ -30,6 +30,10 @@ struct Tabs: View {
     }
 }
 
-#Preview {
-   Tabs()
+struct Tabs_Previews: PreviewProvider {
+    static var previews: some View {
+        // @Previewable
+        Tabs()
+    }
 }
+

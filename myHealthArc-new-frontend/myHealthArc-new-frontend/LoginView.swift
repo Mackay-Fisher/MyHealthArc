@@ -79,9 +79,10 @@ struct LoginView: View {
     }
 }
 
-#Preview {
-
-    @Previewable @State var isLoggedIn: Bool = false
-    LoginView(isLoggedIn: $isLoggedIn)
-        
+struct LoginView_Previews: PreviewProvider {
+    static var previews: some View {
+        // @Previewable
+        @State var isLoggedIn: Bool = false
+        LoginView(isLoggedIn: $isLoggedIn)
+    }
 }

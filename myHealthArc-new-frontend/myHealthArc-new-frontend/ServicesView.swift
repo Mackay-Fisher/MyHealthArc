@@ -88,6 +88,9 @@ struct ServiceButton: View {
     }
 }
 
-#Preview {
-    ServicesView()
+struct ServicesView_Previews: PreviewProvider {
+    static var previews: some View {
+        // @Previewable
+        ServicesView()
+    }
 }

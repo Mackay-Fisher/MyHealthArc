@@ -54,7 +54,8 @@ struct AppOpenScreen: View {
 
 struct AppOpenScreen_Previews: PreviewProvider {
     static var previews: some View {
-        @Previewable @State var isLoggedIn: Bool = false
+        // @Previewable
+        @State var isLoggedIn: Bool = false
         AppOpenScreen(isLoggedIn: $isLoggedIn)
     }
 }

@@ -1,2 +1,2 @@
 # MyHealthArc
-This is our awesome capstone porject 
+This is our awesome capstone project 

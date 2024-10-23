@@ -77,6 +77,27 @@ struct LoginView: View {
             .padding()
        //}
     }
+
+    func login() {
+        guard let url = URL(string: "http://localhost:8080/users/login") else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let loginDTO = LoginDTO(email: username, password: password)
+        guard let httpBody = try? JSONEncoder().encode(loginDTO) else { return }
+        request.httpBody = httpBody
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let data = data {
+                if let user = try? JSONDecoder().decode(User.self, from: data) {
+                    DispatchQueue.main.async {
+                        isLoggedIn = true
+                    }
+                }
+            }
+        }.resume()
+    }
 }
 
 struct LoginView_Previews: PreviewProvider {

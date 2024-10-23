@@ -8,6 +8,20 @@
 //TODO: figure out how to store info
 import SwiftUI
 
+struct UserDTO: Codable {
+    var fullName: String
+    var email: String
+    var password: String
+}
+
+struct User: Codable {
+    var id: UUID?
+    var fullName: String
+    var email: String
+    var passwordHash: String
+    var userHash: String
+}
+
 struct SignUpView: View {
     @State private var name: String = ""
     @State private var email: String = ""

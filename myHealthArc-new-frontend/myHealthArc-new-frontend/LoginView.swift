@@ -62,11 +62,7 @@ struct LoginView: View {
                 
                     
                 Button("Login") {
-                    // Login logic and navigation trigger
-                    if !username.isEmpty && !password.isEmpty {
-                        isLoggedIn = true
-                    }
-                    print("Username: \(username), Password: \(password)")
+                    login()
                 }
                 .frame(width: 100, height: 50)
                 .background(username.isEmpty || password.isEmpty ? Color.gray : Color.mhaPurple)
@@ -84,20 +80,21 @@ struct LoginView: View {
     }
 
     func login() {
-        guard let url = URL(string: "http://localhost:8080/users/login") else { return }
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: URL(string: "http://localhost:8080/users/login")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
         let loginDTO = LoginDTO(email: username, password: password)
         guard let httpBody = try? JSONEncoder().encode(loginDTO) else { return }
         request.httpBody = httpBody
-        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let data = data {
                 if let user = try? JSONDecoder().decode(User.self, from: data) {
                     DispatchQueue.main.async {
                         isLoggedIn = true
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        isLoggedIn = false
                     }
                 }
             }

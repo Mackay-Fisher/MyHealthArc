@@ -6,12 +6,22 @@ struct UserController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let users = routes.grouped("users")
         users.post("signup", use: self.signup)
+        users.post("login", use: self.login)
     }
 
     @Sendable
     func signup(req: Request) async throws -> User {
         let userDTO = try req.content.decode(UserDTO.self)
-        let user = userDTO.toModel()
+        let passwordHash = try Bcrypt.hash(userDTO.password)
+        let userHash = SHA256.hash(data: Data(userDTO.email.utf8)).hexEncodedString()
+        
+        let user = User(
+            fullName: userDTO.fullName,
+            email: userDTO.email,
+            passwordHash: passwordHash,
+            userHash: userHash
+        )
+        
         try await user.save(on: req.db)
         return user
     }
@@ -20,7 +30,7 @@ struct UserController: RouteCollection {
     func login(req: Request) async throws -> User {
         let loginDTO = try req.content.decode(LoginDTO.self)
         guard let user = try await User.query(on: req.db)
-            .filter(\.$email == loginDTO.email)
+            .filter(\.$email == loginDTO.email.lowercased())
             .first() else {
             throw Abort(.unauthorized, reason: "Invalid email or password")
         }

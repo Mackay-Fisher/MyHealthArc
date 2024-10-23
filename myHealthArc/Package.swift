@@ -40,7 +40,7 @@ let package = Package(
                 .product(name: "XCTVapor", package: "vapor"),
             ],
             path: "Tests/AppTests",
-            sources: ["MongoTest.swift"]
+            sources: ["MongoTest.swift", "SchemaTests.swift", "InsertUsersTest.swift", "CreateMedicationsTest.swift", "CreateNutritionsTest.swift", "CreateHealthKitsTest.swift"]
         )
     ]
 )

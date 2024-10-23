@@ -10,6 +10,7 @@ import SwiftUI
 
 struct AppOpenScreen: View {
     @Binding var isLoggedIn: Bool
+    @Binding var hasSignedUp: Bool
     var body: some View {
         NavigationView {
             VStack {
@@ -29,7 +30,7 @@ struct AppOpenScreen: View {
                 //Spacer()
                 
                 // Sign Up Button
-                NavigationLink(destination: SignUpView(isLoggedIn: $isLoggedIn)) {
+                NavigationLink(destination: SignUpView(isLoggedIn: $isLoggedIn, hasSignedUp:$hasSignedUp)) {
                     Text("Sign Up")
                         .frame(width: 150, height: 50)
                         .background(Color(hex: "#C197D2"))
@@ -56,6 +57,7 @@ struct AppOpenScreen_Previews: PreviewProvider {
     static var previews: some View {
         // @Previewable
         @State var isLoggedIn: Bool = false
-        AppOpenScreen(isLoggedIn: $isLoggedIn)
+        @State var hasSignedUp: Bool = false
+        AppOpenScreen(isLoggedIn: $isLoggedIn, hasSignedUp:$hasSignedUp)
     }
 }

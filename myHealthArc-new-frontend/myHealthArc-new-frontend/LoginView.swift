@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+struct LoginDTO: Codable {
+    var email: String
+    var password: String
+}
+
 struct LoginView: View {
     @State private var username = ""
     @State private var password = ""

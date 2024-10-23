@@ -99,7 +99,7 @@ struct SignUpView: View {
     }
     
     private func signUp() {
-        URL(string: "http://localhost:8080/users/signup") else { return }
+        guard let url = URL(string: "http://localhost:8080/users/signup") else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

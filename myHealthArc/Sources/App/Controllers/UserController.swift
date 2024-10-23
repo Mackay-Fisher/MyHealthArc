@@ -5,14 +5,13 @@ import Crypto
 struct UserController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let users = routes.grouped("users")
-        users.post(use: self.signup)
+        users.post("signup", use: self.signup)
     }
 
     @Sendable
     func signup(req: Request) async throws -> User {
         let userDTO = try req.content.decode(UserDTO.self)
         let user = userDTO.toModel()
-        
         try await user.save(on: req.db)
         return user
     }

@@ -61,7 +61,7 @@ struct ServicesView: View {
                     Text("Continue")
                         .frame(width: 200, height: 50)
                         .background(Color.mhaPurple)
-                        .foregroundColor(.white)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                         .cornerRadius(25)
                 }
                 .padding(.bottom, 30)
@@ -98,18 +98,20 @@ struct ServiceButton: View {
         Button(action: action) {
             VStack(spacing: 10) {
                 HStack {
-                    Circle()
-                        .stroke(Color.gray, lineWidth: 2)
+                    Image(systemName: isChecked ? "checkmark.circle":"circle")
+                        .fixedSize()
                         .background(Circle().fill(isChecked ? Color.mhaGreen : Color.clear))
+                        .foregroundColor(colorScheme == .dark ? .white : isChecked ? .white : .gray)
                         .frame(width: 20, height: 20)
-                        .padding(.top, 35 )
-                        .padding(.leading, 15)
+                        .offset(x:15)
+                        .offset(y:20)
+                    
+                        
                     Spacer()
                 }
                 
-
                 
-                Image(service) // Placeholder for custom icons
+                Image(service) //custom icons
                     .resizable()
                     .frame(width: 75, height: 75)
                     .shadow(radius: 1)
@@ -124,7 +126,7 @@ struct ServiceButton: View {
             .frame(width: 160, height: 160)
             .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
             .cornerRadius(30)
-            .shadow(radius: 3)
+            .shadow(radius: 1)
         }
     }
 }

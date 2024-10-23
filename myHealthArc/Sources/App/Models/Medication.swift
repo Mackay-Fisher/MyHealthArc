@@ -1,7 +1,7 @@
 import Fluent
 import Vapor
 
-final class Medication: Model, Content, @unchecked Sendable {
+final class Medication: Model, Content {
     static let schema = "medications"
     
     @ID(key: .id)
@@ -9,27 +9,20 @@ final class Medication: Model, Content, @unchecked Sendable {
     
     @Field(key: "userHash")
     var userHash: String
-    
-    @Field(key: "name")
-    var name: String
-    
-    @Field(key: "dosage")
-    var dosage: String
-    
-    @Field(key: "frequency")
-    var frequency: String
-    
-    @Field(key: "conflicts")
-    var conflicts: [String]
-    
+
+    // Array of dictionaries to store medication details
+    @Field(key: "medications")
+    var medications: [[String: String]] // Each dictionary contains name, dosage, frequency
+
+    @Field(key: "interactions")
+    var interactions: [String: [String]] // Interactions stored by medication name
+
     init() { }
-    
-    init(id: UUID? = nil, userHash: String, name: String, dosage: String, frequency: String, conflicts: [String] = []) {
+
+    init(id: UUID? = nil, userHash: String, medications: [[String: String]], interactions: [String: [String]]) {
         self.id = id
         self.userHash = userHash
-        self.name = name
-        self.dosage = dosage
-        self.frequency = frequency
-        self.conflicts = conflicts
+        self.medications = medications
+        self.interactions = interactions
     }
 }

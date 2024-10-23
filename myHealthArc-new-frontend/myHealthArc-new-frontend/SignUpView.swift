@@ -86,7 +86,7 @@ struct SignUpView: View {
                         }
                     }
                 }
-                NavigationLink(destination: ServicesView()){
+                NavigationLink(destination: ServicesView(isLoggedIn: $isLoggedIn)){
                     Button(action: signUp) {
                         Text("Sign Up")
                             .frame(width: 200, height: 30)

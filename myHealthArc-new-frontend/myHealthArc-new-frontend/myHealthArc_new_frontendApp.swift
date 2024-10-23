@@ -40,7 +40,7 @@ struct myHealthArc_new_frontendApp: App {
                     Tabs()
                 }
                 else if hasSignedUp {
-                    ServicesView()
+                    ServicesView(isLoggedIn: $isLoggedIn)
                 }
                 else {
                     //LoginView(isLoggedIn: $isLoggedIn)

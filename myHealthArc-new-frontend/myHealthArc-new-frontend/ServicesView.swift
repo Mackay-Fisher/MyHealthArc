@@ -7,6 +7,7 @@
 import SwiftUI
 
 struct ServicesView: View {
+    @Binding var isLoggedIn: Bool
     @State private var selectedServices: Set<String> = []
     @Environment(\.colorScheme) var colorScheme
     @State private var userName: String = "User Name" // Placeholder for user name
@@ -56,7 +57,8 @@ struct ServicesView: View {
                 Spacer()
                 
                 Button(action: {
-                    // TODO: Continue button action
+                    isLoggedIn = true;
+                    
                 }) {
                     Text("Continue")
                         .frame(width: 200, height: 50)
@@ -133,6 +135,7 @@ struct ServiceButton: View {
 
 struct ServicesView_Previews: PreviewProvider {
     static var previews: some View {
-        ServicesView()
+        @State var isLoggedIn: Bool = false
+        ServicesView(isLoggedIn: $isLoggedIn)
     }
 }

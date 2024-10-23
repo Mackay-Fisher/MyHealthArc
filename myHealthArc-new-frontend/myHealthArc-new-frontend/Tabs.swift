@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct Tabs: View {
+    @State private var isLoggedIn = false
     var body: some View {
         
         TabView {
@@ -16,7 +17,7 @@ struct Tabs: View {
                     Image(systemName: "house")
                     Text("Home")
                 }
-            ServicesView()
+            ServicesView(isLoggedIn: $isLoggedIn)
                 .tabItem {
                     Image(systemName: "heart")
                     Text("Services")

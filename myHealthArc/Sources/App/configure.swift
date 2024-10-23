@@ -22,8 +22,3 @@ public func configure(_ app: Application) async throws {
     // register routes
     try routes(app)
 }
-
-func routes(_ app: Application) throws {
-    let userController = UserController()
-    try app.register(collection: userController)
-}

@@ -5,7 +5,7 @@ import Crypto
 struct UserController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let users = routes.grouped("users")
-        users.post(use: self.create)
+        users.post(use: self.signup)
     }
 
     @Sendable

@@ -6,6 +6,7 @@ struct NutritionController: RouteCollection {
         nutrition.get("info", use: self.getNutritionInfo)
     }
 
+    @Sendable
     func getNutritionInfo(req: Request) async throws -> [NutritionData] {
         // Decode the list of food names from query parameter
         guard let foodNamesParam = try? req.query.get(String.self, at: "query") else {

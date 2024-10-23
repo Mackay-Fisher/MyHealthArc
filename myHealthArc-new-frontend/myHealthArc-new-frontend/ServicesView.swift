@@ -102,17 +102,17 @@ struct ServiceButton: View {
                         .stroke(Color.gray, lineWidth: 2)
                         .background(Circle().fill(isChecked ? Color.mhaGreen : Color.clear))
                         .frame(width: 20, height: 20)
-                        .padding(.top, 25 )
+                        .padding(.top, 35 )
                         .padding(.leading, 15)
                     Spacer()
                 }
                 
 
                 
-                Image(systemName: service) // Placeholder for custom icons
+                Image(service) // Placeholder for custom icons
                     .resizable()
-                    .frame(width: 50, height: 50)
-                    .padding(.bottom, 10)
+                    .frame(width: 75, height: 75)
+                    .shadow(radius: 1)
                 
                 Text(service)
                     .font(.headline)

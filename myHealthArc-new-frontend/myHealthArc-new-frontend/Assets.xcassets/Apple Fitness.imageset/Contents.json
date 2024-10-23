@@ -1,17 +1,14 @@
 {
   "images" : [
     {
-      "filename" : "Untitled design-2.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Untitled design-3.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Untitled design-4.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

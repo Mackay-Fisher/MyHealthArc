@@ -14,7 +14,7 @@ struct NutritionWidgetView: View {
     @State private var showFoodInfo: Bool = false
 
     var body: some View {
-        NavigationLink(destination: NutritionView()) { 
+        NavigationLink(destination: NutritionView()) {
             VStack {
                 Text("Nutrition Search")
                     .font(.headline)
@@ -30,7 +30,7 @@ struct NutritionWidgetView: View {
                     Button(action: fetchFoodInfo) {
                         Image(systemName: "magnifyingglass") // Search icon
                             .foregroundColor(.white)
-                            .padding()
+                            .padding(5)
                             .background(Color.mhaPurple)
                             .clipShape(Circle())
                     }

@@ -56,7 +56,7 @@ struct MedicationWidget: View {
                     Text("Compare")
                         .padding()
                         .frame(width: 150)
-                        .background(Color.mhaGreen)
+                        .background(Color.mhaPurple)
                         .foregroundColor(.white)
                         .cornerRadius(50)
                 }

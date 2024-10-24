@@ -88,6 +88,11 @@ struct MedicationsView: View {
         }
         .padding()
         .background(colorScheme == .dark ? Color.black : Color.white)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                SettingsButton(showSettings: $showSettings)
+            }
+        }
     }
 
     private func addMedication() {

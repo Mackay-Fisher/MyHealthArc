@@ -94,9 +94,22 @@ struct MedicationCheckerController: RouteCollection {
             throw Abort(.badRequest, reason: "User hash not provided.")
         }
         
-        // Get medications from the query and make them case-insensitive
+         // Get medications from the query and convert them to lowercase
         let medicationsParam = try req.query.get(String.self, at: "medications")
-        let medications = medicationsParam.split(separator: ",").map { $0.lowercased() }
+        let queryMedications = medicationsParam.split(separator: ",").map { $0.lowercased() }
+
+
+        let existingMedication = try await Medication.query(on: req.db)
+        .filter(\.$userHash == userHash)
+        .first()
+
+        // Combine existing medications with the passed-in ones, making sure they are unique
+        let medications: [String]
+        if let storedMeds = existingMedication?.medications {
+            medications = Array(Set(storedMeds.map { $0.lowercased() } + queryMedications))
+        } else {
+            medications = queryMedications
+        }
 
         // Sort medications for consistent lookup
         let sortedMedications = medications.sorted()
@@ -253,22 +266,6 @@ struct MedicationCheckerController: RouteCollection {
         
         return FormattedInteractionResponse(interactionsBySeverity: interactionsBySeverity)
     }
-
-    // @Sendable
-    // func addMedications(req: Request) async throws -> HTTPStatus {
-    //     let userHash = try req.content.get(String.self, at: "userHash")
-    //     let medications = try req.content.get([[String: String]].self, at: "medications") // Array of dictionaries
-
-    //     // Extract medication names for interaction fetching
-    //     let medicationNames = medications.compactMap { $0["name"] }
-    //     let ids = try await getRxNormIds(for: medicationNames, client: req.client)
-    //     let interactions = try await getInteractionData(ids, client: req.client)
-
-    //     // Update medications and interactions in the database
-    //     try await saveOrUpdateMedications(medications, userHash: userHash, conflicts: interactions, db: req.db)
-
-    //     return .ok
-    // }
 
     // @Sendable
     // func removeMedications(req: Request) async throws -> HTTPStatus {

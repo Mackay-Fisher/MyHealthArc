@@ -100,18 +100,23 @@ struct SignUpView: View {
                         }
                     }
                 }
-                NavigationLink(destination: ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)){
-                    Button(action: signUp) {
+                if formIsValid {
+                        NavigationLink(destination: ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)) {
+                            Text("Sign Up")
+                                .frame(width: 200, height: 30)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.mhaPurple)
+                                .cornerRadius(50)
+                        }
+                    } else {
                         Text("Sign Up")
                             .frame(width: 200, height: 30)
                             .foregroundColor(.white)
                             .padding()
-                            .background(formIsValid ? Color.mhaPurple : Color.gray)
+                            .background(Color.gray)
                             .cornerRadius(50)
                     }
-                    .disabled(!formIsValid)
-                    .background(Color.clear)
-                }
             }
             .background(colorScheme == .dark ? Color.black : Color.lightbackground)
             .navigationTitle("Sign Up")
@@ -132,6 +137,7 @@ struct SignUpView: View {
                 if let user = try? JSONDecoder().decode(User.self, from: data) {
                     DispatchQueue.main.async {
                         isLoggedIn = true
+                        
                     }
                 }
             }
@@ -139,7 +145,7 @@ struct SignUpView: View {
     }
     
     private var formIsValid: Bool {
-        return !name.isEmpty && !email.isEmpty && !password.isEmpty && !age.isEmpty && acceptedTerms
+        return !name.isEmpty && !email.isEmpty && !password.isEmpty && !age.isEmpty && acceptedTerms && ageVerified
     }
 }
 

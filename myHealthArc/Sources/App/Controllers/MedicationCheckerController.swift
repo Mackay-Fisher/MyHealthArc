@@ -1,9 +1,9 @@
 import Vapor
-import Fluent
+import Fluentimport Fluent
 struct MedicationCheckerController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let drugInteraction = routes.grouped("medicationChecker")
-        drugInteraction.get("check", use: self.checkInteractions)
+        // drugInteraction.get("check", use: self.checkInteractions)
         drugInteraction.post("add", use: self.addMedications)
         drugInteraction.post("remove", use: self.removeMedications)
         drugInteraction.get("load", use: self.loadUserMedications)
@@ -194,65 +194,65 @@ struct MedicationCheckerController: RouteCollection {
             bodyString = bodyString.replacingOccurrences(of: "MDICshowResults(", with: "")
                 .replacingOccurrences(of: ");", with: "")
             
-            let data = Data(bodyString.utf8)
-            let responseData = try JSONDecoder().decode(ResponseData.self, from: data)
+    //         let data = Data(bodyString.utf8)
+    //         let responseData = try JSONDecoder().decode(ResponseData.self, from: data)
             
-            // Extract IDs from the first 'types' element if available this is the id for querying interactions
-            if let firstType = responseData.types.first {
-                let extractedIds = firstType.references.map { $0.id }
-                if let firstId = extractedIds.first {
-                    ids.append(firstId)
-                }
-            }
-        }
-        return ids
-    }
+    //         // Extract IDs from the first 'types' element if available this is the id for querying interactions
+    //         if let firstType = responseData.types.first {
+    //             let extractedIds = firstType.references.map { $0.id }
+    //             if let firstId = extractedIds.first {
+    //                 ids.append(firstId)
+    //             }
+    //         }
+    //     }
+    //     return ids
+    // }
 
-    // Parse and fetch interaction data
-    private func getInteractionData(_ ids: [String], client: Client) async throws -> FormattedInteractionResponse {
-        let query = ids.joined(separator: ",")
-        let url = "https://reference.medscape.com/druginteraction.do?action=getMultiInteraction&ids=\(query)"
-        let response = try await client.get(URI(string: url))
+    // // Parse and fetch interaction data
+    // private func getInteractionData(_ ids: [String], client: Client) async throws -> FormattedInteractionResponse {
+    //     let query = ids.joined(separator: ",")
+    //     let url = "https://reference.medscape.com/druginteraction.do?action=getMultiInteraction&ids=\(query)"
+    //     let response = try await client.get(URI(string: url))
         
-        guard let body = response.body,
-            let bodyData = body.getData(at: 0, length: body.readableBytes) else {
-            throw Abort(.internalServerError, reason: "Error retrieving interaction data")
-        }
+    //     guard let body = response.body,
+    //         let bodyData = body.getData(at: 0, length: body.readableBytes) else {
+    //         throw Abort(.internalServerError, reason: "Error retrieving interaction data")
+    //     }
         
-        let interactionData = try JSONDecoder().decode(InteractionResponse.self, from: bodyData)
+    //     let interactionData = try JSONDecoder().decode(InteractionResponse.self, from: bodyData)
         
-        // Format and return all interactions as JSON
-        return formatInteractions(interactionData)
-    }
+    //     // Format and return all interactions as JSON
+    //     return formatInteractions(interactionData)
+    // }
 
-    private func formatInteractions(_ interactionData: InteractionResponse) -> FormattedInteractionResponse {
-        var interactionsBySeverity: [String: [FormattedInteraction]] = [:]
+    // private func formatInteractions(_ interactionData: InteractionResponse) -> FormattedInteractionResponse {
+    //     var interactionsBySeverity: [String: [FormattedInteraction]] = [:]
         
-        if interactionData.errorCode == 1, let interactions = interactionData.multiInteractions {
-            for interaction in interactions {
-                // Extract a note from the text if present
-                let note: String?
-                if let commentRange = interaction.text.range(of: "Comment:") {
-                    note = String(interaction.text[commentRange.upperBound...]).trimmingCharacters(in: .whitespacesAndNewlines)
-                } else {
-                    note = nil
-                }
+    //     if interactionData.errorCode == 1, let interactions = interactionData.multiInteractions {
+    //         for interaction in interactions {
+    //             // Extract a note from the text if present
+    //             let note: String?
+    //             if let commentRange = interaction.text.range(of: "Comment:") {
+    //                 note = String(interaction.text[commentRange.upperBound...]).trimmingCharacters(in: .whitespacesAndNewlines)
+    //             } else {
+    //                 note = nil
+    //             }
                 
-                let formattedInteraction = FormattedInteraction(
-                    severity: interaction.severity,
-                    interaction: "\(interaction.subject) and \(interaction.object)",
-                    description: interaction.text,
-                    note: note
-                )
+    //             let formattedInteraction = FormattedInteraction(
+    //                 severity: interaction.severity,
+    //                 interaction: "\(interaction.subject) and \(interaction.object)",
+    //                 description: interaction.text,
+    //                 note: note
+    //             )
                 
-                // Append the interaction to the appropriate severity level
-                if interactionsBySeverity[interaction.severity] != nil {
-                    interactionsBySeverity[interaction.severity]?.append(formattedInteraction)
-                } else {
-                    interactionsBySeverity[interaction.severity] = [formattedInteraction]
-                }
-            }
-        }
+    //             // Append the interaction to the appropriate severity level
+    //             if interactionsBySeverity[interaction.severity] != nil {
+    //                 interactionsBySeverity[interaction.severity]?.append(formattedInteraction)
+    //             } else {
+    //                 interactionsBySeverity[interaction.severity] = [formattedInteraction]
+    //             }
+    //         }
+    //     }
         
         return FormattedInteractionResponse(interactionsBySeverity: interactionsBySeverity)
     }
@@ -295,8 +295,8 @@ struct MedicationCheckerController: RouteCollection {
         // Save the updated medication record
         try await existingMedication.save(on: req.db)
 
-        return .ok
-    }
+    //     return .ok
+    // }
 
 
 

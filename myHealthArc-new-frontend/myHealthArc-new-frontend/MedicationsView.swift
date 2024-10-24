@@ -30,17 +30,34 @@ struct MedicationsView: View {
 
     var body: some View {
         VStack {
-            Text("Interaction Checker")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding()
-
+            HStack{Image ("pills")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(-2)
+                    .frame(width: 30)
+                Text("Medications")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .padding()
+            }
+            
+            Divider()
+                .overlay(
+                    (colorScheme == .dark ? Color.white : Color.gray)
+                )
+            Spacer()
+                .frame(height:20)
             // Input for new medication
             HStack {
                 TextField("Enter medication name", text: $medicationInput)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-                    .cornerRadius(50)
+                    .padding(5)
+                    .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                    )
                 
                 Button("Add") {
                     addMedication()
@@ -51,6 +68,9 @@ struct MedicationsView: View {
                 .cornerRadius(50)
                 .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
             }
+            Text("Your Medications")
+                .font(.title3)
+                .padding()
 
             // List of added medications with checkboxes
             List {

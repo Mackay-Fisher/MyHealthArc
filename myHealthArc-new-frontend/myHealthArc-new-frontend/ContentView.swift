@@ -9,74 +9,76 @@ struct ContentView: View {
     @Binding var hasSignedUp: Bool
 
     var body: some View {
-        ZStack {
-            // Main Content View
-            VStack {
-                // Header with title and profile icon
-                HStack {
-                    Text("myHealthData")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding()
-                    Spacer()
-                    Button(action: {
-                        withAnimation(.easeInOut) {
-                            showSettings.toggle() // Toggle settings view
-                        }
-                    }) {
-                        Image(systemName: "person.circle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 40, height: 40)
-                            .foregroundColor(Color.mhaPurple)
-                    }
-                    .padding()
-                }
-
-                // Widgets Area
-                ScrollView {
-                    VStack(spacing: 20) {
-                        WidgetView(title: "Apple Health", detail: "Sleep: 8 hours")
-                        WidgetView(title: "Apple Fitness", detail: "Steps: 2,000")
-                        NavigationLink(destination: MedicationsView()) {
-                                WidgetView(title: "Medication Checker", detail: "Check for drug interactions")
+        NavigationView {
+            ZStack {
+                VStack {
+                    HStack {
+                        Text("myHealthData")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .padding()
+                        Spacer()
+                        Button(action: {
+                            withAnimation(.easeInOut) {
+                                showSettings.toggle() // Toggle settings view
                             }
-
-                        WidgetView(title: "Nutrition Tracker", detail: "Macros for food")
-                    }
-                    .padding()
-                    .shadow(radius: 0.5)
-                }
-            }
-            .background(colorScheme == .dark ? Color(.systemBackground) : Color.lightbackground)
-            .navigationBarHidden(true)
-
-            // Slide-out Settings View
-            if showSettings {
-                Color.black.opacity(0.4) // Dimmed background when settings is open
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation(.easeInOut) {
-                            showSettings = false // Close settings when clicking outside
+                        }) {
+                            Image(systemName: "person.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 40, height: 40)
+                                .foregroundColor(Color.mhaPurple)
                         }
+                        .padding()
+                    }.padding()
+                    
+                    // Widgets Area
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            WidgetView(title: "Apple Health", detail: "Sleep: 8 hours")
+                            WidgetView(title: "Apple Fitness", detail: "Steps: 2,000")
+                            
+                            MedicationWidget()
+                            
+                            NutritionWidgetView()
+                        }
+                        //.padding()
+                        
+                        .shadow(radius: 0.5)
                     }
-
-                SettingsView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
-                    .frame(width: UIScreen.main.bounds.width * 0.8) // 80% of screen width
-                    .background(colorScheme == .dark ? Color.mhaGray : Color.white)
-                    .cornerRadius(20)
-                    .shadow(radius: 10)
-                    .offset(x: showSettings ? 0 : UIScreen.main.bounds.width) // Slide-in effect
-                    .animation(.easeInOut, value: showSettings)
-                    .gesture(
-                        DragGesture().onEnded { value in
-                            if value.translation.width > 100 { // Detect swipe to close
-                                withAnimation(.easeInOut) {
-                                    showSettings = false
+                }
+                //.padding()
+                .background(colorScheme == .dark ? Color(.systemBackground) : Color.lightbackground)
+                .navigationBarHidden(true)
+                
+                
+                // Slide-out Settings View
+                if showSettings {
+                    Color.black.opacity(0.4) // Dimmed background when settings is open
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(.easeInOut) {
+                                showSettings = false // Close settings when clicking outside
+                            }
+                        }
+                    
+                    SettingsView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
+                        .frame(width: UIScreen.main.bounds.width * 0.8) // 80% of screen width
+                        .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                        .cornerRadius(20)
+                        .shadow(radius: 10)
+                        .offset(x: showSettings ? 0 : UIScreen.main.bounds.width) // Slide-in effect
+                        .animation(.easeInOut, value: showSettings)
+                        .gesture(
+                            DragGesture().onEnded { value in
+                                if value.translation.width > 100 { // Detect swipe to close
+                                    withAnimation(.easeInOut) {
+                                        showSettings = false
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                }
             }
         }
     }
@@ -101,10 +103,11 @@ struct WidgetView: View {
                 .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 .padding(.bottom)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: 350)
         .background(colorScheme == .dark ? Color.mhaGray : Color.white)
         .cornerRadius(25)
     }
+        
 }
 // User Profile View
 struct UserProfileView: View {
@@ -165,3 +168,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
     }
 }
+

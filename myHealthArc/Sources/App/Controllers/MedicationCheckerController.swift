@@ -7,8 +7,37 @@ struct MedicationCheckerController: RouteCollection {
         drugInteraction.post("add", use: self.addMedications)
         drugInteraction.post("remove", use: self.removeMedications)
         drugInteraction.get("load", use: self.loadUserMedications)
-
+        drugInteraction.get("demoCheck", use: self.demoCheckInteractions)
     }
+
+    @Sendable
+    func demoCheckInteractions(req: Request) async throws -> FormattedInteractionResponse {
+        // Get medications from the query and convert to lowercase
+        let medicationsParam = try req.query.get(String.self, at: "medications")
+        let medications = medicationsParam.split(separator: ",").map { $0.lowercased() }
+
+        // Ensure at least two medications are provided
+        guard medications.count >= 2 else {
+            throw Abort(.badRequest, reason: "At least two medications are required for interaction checking.")
+        }
+
+        // Sort medications for consistent lookup
+        let sortedMedications = medications.sorted()
+
+        // Fetch RxNorm IDs for the medications
+        let ids = try await getRxNormIds(for: sortedMedications, client: req.client)
+
+        // Ensure there are enough IDs for interaction checking
+        guard ids.count > 1 else {
+            throw Abort(.badRequest, reason: "Not enough medication IDs found for interaction check.")
+        }
+
+        // Fetch interaction data based on the IDs
+        let interactions = try await getInteractionData(ids, client: req.client)
+
+        return interactions
+    }
+
 
     @Sendable
     func loadUserMedications(req: Request) async throws -> Medication {

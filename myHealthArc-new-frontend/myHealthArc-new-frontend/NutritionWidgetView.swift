@@ -19,6 +19,7 @@ struct NutritionWidgetView: View {
                 Text("Nutrition Search")
                     .font(.headline)
                     .padding(.top)
+                Divider()
 
                 // Food search input with system icon button
                 HStack {

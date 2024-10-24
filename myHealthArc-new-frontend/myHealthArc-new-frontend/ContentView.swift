@@ -1,46 +1,88 @@
 //this is the dashboard page
 import SwiftUI
 
-import SwiftUI
-
 struct ContentView: View {
-    @State private var showSettings: Bool = false
+    @State private var showSettings: Bool = false // Toggle settings visibility
+    @Environment(\.colorScheme) var colorScheme
+    
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
-    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Widgets area
-                    WidgetView(title: "Apple Health", detail: "Sleep: 8 hours")
-                    WidgetView(title: "Apple Fitness", detail: "Steps: 2,000")
-
-                    NavigationLink(destination: MedicationsView()) {
-                        WidgetView(title: "Medication Checker", detail: "Check for drug interactions")
+            ZStack {
+                VStack {
+                    HStack {
+                        Text("myHealthData")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .padding()
+                        Spacer()
+                        Button(action: {
+                            withAnimation(.easeInOut) {
+                                showSettings.toggle() // Toggle settings view
+                            }
+                        }) {
+                            Image(systemName: "person.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 40, height: 40)
+                                .foregroundColor(Color.mhaPurple)
+                        }
+                        .padding()
                     }
-
-                    NutritionWidgetView()
+                    
+                    // Widgets Area
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            WidgetView(title: "Apple Health", detail: "Sleep: 8 hours")
+                            WidgetView(title: "Apple Fitness", detail: "Steps: 2,000")
+                            //TODO: fix the navigation, not working atm
+                            NavigationLink(destination: MedicationsView()) {
+                                WidgetView(title: "Medication Checker", detail: "Check for drug interactions")
+                            }
+                            
+                            NutritionWidgetView()
+                        }
+                        .padding()
+                        .shadow(radius: 0.5)
+                    }
                 }
-                .padding()
+                .background(colorScheme == .dark ? Color(.systemBackground) : Color.lightbackground)
+                .navigationBarHidden(true)
                 
-            }
-            .navigationTitle("myHealthData")
-            .background(colorScheme == .dark ? Color(.systemBackground) : Color.lightbackground)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    SettingsButton(showSettings: $showSettings)
+                // Slide-out Settings View
+                if showSettings {
+                    Color.black.opacity(0.4) // Dimmed background when settings is open
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(.easeInOut) {
+                                showSettings = false // Close settings when clicking outside
+                            }
+                        }
+                    
+                    SettingsView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
+                        .frame(width: UIScreen.main.bounds.width * 0.8) // 80% of screen width
+                        .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                        .cornerRadius(20)
+                        .shadow(radius: 10)
+                        .offset(x: showSettings ? 0 : UIScreen.main.bounds.width) // Slide-in effect
+                        .animation(.easeInOut, value: showSettings)
+                        .gesture(
+                            DragGesture().onEnded { value in
+                                if value.translation.width > 100 { // Detect swipe to close
+                                    withAnimation(.easeInOut) {
+                                        showSettings = false
+                                    }
+                                }
+                            }
+                        )
                 }
             }
         }
-        .withSettingsOverlay(
-            showSettings: $showSettings,
-            isLoggedIn: $isLoggedIn,
-            hasSignedUp: $hasSignedUp
-        )
     }
 }
+
 // Widget View for displaying health data
 struct WidgetView: View {
     var title: String
@@ -124,3 +166,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
     }
 }
+

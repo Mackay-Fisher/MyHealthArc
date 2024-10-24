@@ -34,11 +34,12 @@ struct Tabs: View {
                     Image(systemName: "heart")
                     Text("Services")
                 }
-            SettingsView()
+            */
+            SettingsView(isLoggedIn: $isLoggedIn,hasSignedUp: $hasSignedUp)
                 .tabItem {
                     Image(systemName: "gear")
                     Text("Settings")
-                }*/
+                }
         }
     }
 }

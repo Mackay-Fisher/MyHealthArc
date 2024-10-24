@@ -3,18 +3,18 @@
 //  myHealthArc-new-frontend
 //
 //  Created by Anjali Hole on 10/23/24.
-//
-
 
 import SwiftUI
 
 struct MedicationsView: View {
     @State private var medicationInput: String = ""
     @State private var addedMedications: [String] = []
-    @State private var selectedMedication: String = ""
+    @State private var selectedMedications: Set<String> = [] // Track selected medications
     @State private var interactionResults: String = ""
     @State private var showInteraction: Bool = false
-//TODO: add profile stuff
+    
+    @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         VStack {
             Text("Interaction Checker")
@@ -34,24 +34,29 @@ struct MedicationsView: View {
                 .padding()
             }
 
-            // List of added medications
+            // List of added medications with checkboxes
             List {
                 ForEach(addedMedications, id: \.self) { medication in
-                    Text(medication)
+                    HStack {
+                        // Checkbox for selecting medications
+                        Button(action: {
+                            toggleSelection(for: medication)
+                        }) {
+                            HStack {
+                                Image(systemName: selectedMedications.contains(medication) ? "checkmark.circle.fill" : "circle")
+                                    .foregroundColor(selectedMedications.contains(medication) ? .mhaGreen : .gray)
+                                Text(medication)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                            }
+                        }
+                    }
                 }
                 .onDelete(perform: removeMedication)
             }
+            .listStyle(PlainListStyle())
 
-            // Dropdown for selecting a medication
-            Picker("Select Medication", selection: $selectedMedication) {
-                ForEach(addedMedications, id: \.self) { medication in
-                    Text(medication)
-                }
-            }
-            .pickerStyle(MenuPickerStyle())
-            .padding()
-
-            // Check interactions
+            // Check interactions button
             Button("Check Interactions") {
                 checkInteractions()
             }
@@ -69,6 +74,7 @@ struct MedicationsView: View {
             Spacer()
         }
         .padding()
+        .background(colorScheme == .dark ? Color.black : Color.white)
     }
 
     private func addMedication() {
@@ -78,16 +84,29 @@ struct MedicationsView: View {
     }
 
     private func removeMedication(at offsets: IndexSet) {
+        // Remove medications from the selectedMedications set if they are being deleted
+        for index in offsets {
+            let medicationToRemove = addedMedications[index]
+            selectedMedications.remove(medicationToRemove)
+        }
         addedMedications.remove(atOffsets: offsets)
+    }
+
+    private func toggleSelection(for medication: String) {
+        if selectedMedications.contains(medication) {
+            selectedMedications.remove(medication) // Deselect if already selected
+        } else {
+            selectedMedications.insert(medication) // Select the medication
+        }
     }
 
     private func checkInteractions() {
         // Placeholder for API call to check interactions
-        // Simulating an API call with dummy data
-        if addedMedications.count >= 2 {
-            interactionResults = "\(selectedMedication) may interact with other medications!"
+        if selectedMedications.count >= 2 {
+            // Check interactions between selected medications
+            interactionResults = "\(selectedMedications.joined(separator: ", ")) may interact with each other!"
         } else {
-            interactionResults = "Add more medications to check for interactions."
+            interactionResults = "Select more medications to check for interactions."
         }
         showInteraction = true
     }

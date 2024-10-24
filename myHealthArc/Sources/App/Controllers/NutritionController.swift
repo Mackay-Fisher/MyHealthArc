@@ -31,10 +31,10 @@ struct NutritionController: RouteCollection {
                 // If a match is found, add it to the results
                 let item = matchedItem.item
                 nutritionResults[item.foodItem] = [
-                    "protein": item.protein,
-                    "carbohydrates": item.carbohydrates,
-                    "fats": item.fats,
-                    "calories": Double(item.calories)
+                    "protein": round(item.protein * 10) / 10,
+                    "carbohydrates": round(item.carbohydrates * 10) / 10,
+                    "fats": round(item.fats * 10) / 10,
+                    "calories": round(Double(item.calories) * 10) / 10
                 ]
             } else {
                 // If no match is found, add to the list of missing items
@@ -42,50 +42,74 @@ struct NutritionController: RouteCollection {
             }
         }
 
-        // Fetch missing items from the API and update the database
+        // Fetch missing items from the API concurrently
         if !missingFoodNames.isEmpty {
             let apiKey = Environment.get("FOOD_DATA_API_KEY") ?? "DEMO_KEY"
 
-            for foodName in missingFoodNames {
-                let url = "https://api.nal.usda.gov/fdc/v1/foods/search?query=\(foodName)&pageSize=15&api_key=\(apiKey)"
-                let response = try await req.client.get(URI(string: url))
-
-                guard let body = response.body,
-                      let bodyData = body.getData(at: 0, length: body.readableBytes) else {
-                    throw Abort(.internalServerError, reason: "Failed to get data for \(foodName) from FoodData Central API.")
+            // Fetch nutrition info concurrently for each missing food name
+            await withTaskGroup(of: (String, [String: Double]?).self) { group in
+                for foodName in missingFoodNames {
+                    group.addTask {
+                        await fetchNutritionForFood(foodName: foodName, apiKey: apiKey, req: req)
+                    }
                 }
 
-                let foodDataResponse = try JSONDecoder().decode(FoodDataResponse.self, from: bodyData)
-
-                // Calculate average nutrient values from the first 15 food items
-                if let averagedNutrients = calculateAverageNutrients(from: foodDataResponse.foods) {
-                    let (protein, carbohydrates, fats, calories) = averagedNutrients
-
-                    // If valid nutrient data is found, add to results and update the database
-                    if protein > 0 || carbohydrates > 0 || fats > 0 || calories > 0 {
-                        let foodKey = foodName.lowercased()
-                        nutritionResults[foodKey] = [
-                            "protein": protein,
-                            "carbohydrates": carbohydrates,
-                            "fats": fats,
-                            "calories": Double(calories)
-                        ]
-
-                        // Save the new item to the database
-                        let newNutritionItem = NutritionItem(
-                            foodItem: foodKey,
-                            protein: protein,
-                            carbohydrates: carbohydrates,
-                            fats: fats,
-                            calories: calories
-                        )
-                        try await newNutritionItem.save(on: req.db)
+                // Collect results from all concurrent fetches
+                for await (foodName, nutrition) in group {
+                    if let nutrition = nutrition {
+                        nutritionResults[foodName] = nutrition
                     }
                 }
             }
         }
 
         return nutritionResults
+    }
+
+    // Helper function to fetch nutrition for a food item from the API
+    private func fetchNutritionForFood(foodName: String, apiKey: String, req: Request) async -> (String, [String: Double]?) {
+        let url = "https://api.nal.usda.gov/fdc/v1/foods/search?query=\(foodName)&pageSize=15&api_key=\(apiKey)"
+        
+        do {
+            let response = try await req.client.get(URI(string: url))
+            guard let body = response.body,
+                  let bodyData = body.getData(at: 0, length: body.readableBytes) else {
+                return (foodName, nil)
+            }
+
+            let foodDataResponse = try JSONDecoder().decode(FoodDataResponse.self, from: bodyData)
+
+            // Calculate average nutrient values from the first 15 food items
+            if let averagedNutrients = calculateAverageNutrients(from: foodDataResponse.foods) {
+                let (protein, carbohydrates, fats, calories) = averagedNutrients
+
+                // If valid nutrient data is found, save to the database and return rounded results
+                if protein > 0 || carbohydrates > 0 || fats > 0 || calories > 0 {
+                    let roundedNutrition = [
+                        "protein": round(protein * 10) / 10,
+                        "carbohydrates": round(carbohydrates * 10) / 10,
+                        "fats": round(fats * 10) / 10,
+                        "calories": round(Double(calories) * 10) / 10
+                    ]
+
+                    // Save the new item to the database
+                    let newNutritionItem = NutritionItem(
+                        foodItem: foodName,
+                        protein: protein,
+                        carbohydrates: carbohydrates,
+                        fats: fats,
+                        calories: calories
+                    )
+                    try await newNutritionItem.save(on: req.db)
+
+                    return (foodName, roundedNutrition)
+                }
+            }
+        } catch {
+            return (foodName, nil)
+        }
+
+        return (foodName, nil)
     }
 
     // Helper function to calculate average nutrient values
@@ -97,7 +121,7 @@ struct NutritionController: RouteCollection {
         var count = 0
 
         // Iterate over the first 15 food items
-        for (index, foodItem) in foods.prefix(15).enumerated() {
+        for foodItem in foods.prefix(15) {
             let (protein, carbs, fats, calories) = extractNutrientInfo(from: foodItem)
 
             // Add the nutrient values if they are valid

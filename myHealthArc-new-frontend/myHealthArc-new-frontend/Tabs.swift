@@ -17,7 +17,13 @@ struct Tabs: View {
                 .tabItem {
                     Image(systemName: "house")
                     Text("Home")
-                }
+            }
+            MedicationsView()
+                .tabItem {
+                    Image(systemName: "pills")
+                    Text("Medications")
+            }
+            //TODO: add medication and nutrition here
             /*ServicesView(isLoggedIn: $isLoggedIn)
                 .tabItem {
                     Image(systemName: "heart")

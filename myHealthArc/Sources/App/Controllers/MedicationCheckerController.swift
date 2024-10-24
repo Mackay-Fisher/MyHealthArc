@@ -3,7 +3,7 @@ import Fluent
 struct MedicationCheckerController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let drugInteraction = routes.grouped("medicationChecker")
-        // drugInteraction.get("check", use: self.checkInteractions)
+        drugInteraction.get("check", use: self.checkInteractions)
         drugInteraction.post("add", use: self.addMedications)
         // drugInteraction.post("remove", use: self.removeMedications)
         drugInteraction.get("test", use: self.test)
@@ -87,107 +87,172 @@ struct MedicationCheckerController: RouteCollection {
         }
     }
 
-
-
-
-    // @Sendable
-    // func checkInteractions(req: Request) async throws -> FormattedInteractionResponse {
-    //     let userHash = try req.query.get(String.self, at: "userHash")
-    //     let medicationsParam = try req.query.get(String.self, at: "medications")
-    //     let medications = medicationsParam.split(separator: ",").map(String.init)
-    //     guard let userHash = req.parameters.get("userHash") else {
-    //         throw Abort(.badRequest, reason: "User hash not provided.")
-    //     }
-
-    //     let ids = try await getRxNormIds(for: medications, client: req.client)
+    @Sendable
+    func checkInteractions(req: Request) async throws -> FormattedInteractionResponse {
+        // Get userHash from the query
+        guard let userHash = req.query[String.self, at: "userHash"] else {
+            throw Abort(.badRequest, reason: "User hash not provided.")
+        }
         
-    //     if ids.count > 1 {
-    //         let interactions = try await getInteractionData(ids, client: req.client)
-    //         return interactions
-    //     } else {
-    //         throw Abort(.badRequest, reason: "Not enough medication IDs found for interaction check.")
-    //     }
-    // }
+        // Get medications from the query and make them case-insensitive
+        let medicationsParam = try req.query.get(String.self, at: "medications")
+        let medications = medicationsParam.split(separator: ",").map { $0.lowercased() }
 
-    // // Fetch RxNorm IDs
-    // private func getRxNormIds(for drugs: [String], client: Client) async throws -> [String] {
-    //     var ids: [String] = []
-    //     for drug in drugs {
-    //         let url = "https://www.medscape.com/api/quickreflookup/LookupService.ashx?q=\(drug)&sz=500&type=10417&metadata=has-interactions&format=json&jsonp=MDICshowResults"
-    //         let response = try await client.get(URI(string: url))
+        // Sort medications for consistent lookup
+        let sortedMedications = medications.sorted()
+
+        // Check if interactions already exist for this sorted list of medications (case-insensitive)
+        if let existingInteraction = try await MedicationInteraction.query(on: req.db)
+            .filter(\.$medications == sortedMedications)
+            .first() {
+
+            // Return existing interactions if found
+            return formatStoredInteractions(existingInteraction)
+        }
+
+        // Fetch RxNorm IDs for the sorted medications
+        let ids = try await getRxNormIds(for: sortedMedications, client: req.client)
+        
+        // Ensure there are enough IDs for interaction checking
+        guard ids.count > 1 else {
+            throw Abort(.badRequest, reason: "Not enough medication IDs found for interaction check.")
+        }
+
+        // Fetch interaction data based on the IDs
+        let interactions = try await getInteractionData(ids, client: req.client)
+
+        // Save new interactions in the medication_interactions collection
+        try await saveNewInteractions(medications: sortedMedications, interactions: interactions, db: req.db)
+
+        return interactions
+    }
+
+
+    private func saveNewInteractions(medications: [String], interactions: FormattedInteractionResponse, db: Database) async throws {
+        // Prepare conflicts with severity
+        let formattedConflicts = interactions.interactionsBySeverity.flatMap { (severity, reactions) in
+            reactions.map { "\(severity): \($0.description)" }
+        }
+
+        // Create a new MedicationInteraction record
+        let newInteraction = MedicationInteraction(
+            medications: medications,
+            conflicts: formattedConflicts
+        )
+
+        // Save to the database
+        try await newInteraction.save(on: db)
+    }
+
+
+    private func formatStoredInteractions(_ interaction: MedicationInteraction) -> FormattedInteractionResponse {
+        var interactionsBySeverity: [String: [FormattedInteraction]] = [:]
+
+        for conflict in interaction.conflicts {
+            // Split the conflict string into severity and description
+            let components = conflict.split(separator: ":", maxSplits: 1, omittingEmptySubsequences: true)
+            if components.count == 2 {
+                let severity = String(components[0])
+                let description = String(components[1])
+
+                let formattedInteraction = FormattedInteraction(
+                    severity: severity,
+                    interaction: interaction.medications.joined(separator: ", "),
+                    description: description,
+                    note: nil
+                )
+
+                // Add to the appropriate severity level
+                if interactionsBySeverity[severity] != nil {
+                    interactionsBySeverity[severity]?.append(formattedInteraction)
+                } else {
+                    interactionsBySeverity[severity] = [formattedInteraction]
+                }
+            }
+        }
+
+        return FormattedInteractionResponse(interactionsBySeverity: interactionsBySeverity)
+    }
+
+
+    // Fetch RxNorm IDs
+    private func getRxNormIds(for drugs: [String], client: Client) async throws -> [String] {
+        var ids: [String] = []
+        for drug in drugs {
+            let url = "https://www.medscape.com/api/quickreflookup/LookupService.ashx?q=\(drug)&sz=500&type=10417&metadata=has-interactions&format=json&jsonp=MDICshowResults"
+            let response = try await client.get(URI(string: url))
+
+            guard let body = response.body,
+                var bodyString = body.getString(at: 0, length: body.readableBytes) else {
+                print("Error retrieving ID for \(drug)")
+                continue
+            }            
+            // Remove the wrapper function and parse JSON
+            bodyString = bodyString.replacingOccurrences(of: "MDICshowResults(", with: "")
+                .replacingOccurrences(of: ");", with: "")
             
-    //         guard let body = response.body,
-    //             var bodyString = body.getString(at: 0, length: body.readableBytes) else {
-    //             print("Error retrieving ID for \(drug)")
-    //             continue
-    //         }
+            let data = Data(bodyString.utf8)
+            let responseData = try JSONDecoder().decode(ResponseData.self, from: data)
             
-    //         // Remove the wrapper function and parse JSON
-    //         bodyString = bodyString.replacingOccurrences(of: "MDICshowResults(", with: "")
-    //             .replacingOccurrences(of: ");", with: "")
-            
-    //         let data = Data(bodyString.utf8)
-    //         let responseData = try JSONDecoder().decode(ResponseData.self, from: data)
-            
-    //         // Extract IDs from the first 'types' element if available this is the id for querying interactions
-    //         if let firstType = responseData.types.first {
-    //             let extractedIds = firstType.references.map { $0.id }
-    //             if let firstId = extractedIds.first {
-    //                 ids.append(firstId)
-    //             }
-    //         }
-    //     }
-    //     return ids
-    // }
+            // Extract IDs from the first 'types' element if available this is the id for querying interactions
+            if let firstType = responseData.types.first {
+                let extractedIds = firstType.references.map { $0.id }
+                if let firstId = extractedIds.first {
+                    ids.append(firstId)
+                }
+            }
+        }
+        return ids
+    }
 
-    // // Parse and fetch interaction data
-    // private func getInteractionData(_ ids: [String], client: Client) async throws -> FormattedInteractionResponse {
-    //     let query = ids.joined(separator: ",")
-    //     let url = "https://reference.medscape.com/druginteraction.do?action=getMultiInteraction&ids=\(query)"
-    //     let response = try await client.get(URI(string: url))
+    // Parse and fetch interaction data
+    private func getInteractionData(_ ids: [String], client: Client) async throws -> FormattedInteractionResponse {
+        let query = ids.joined(separator: ",")
+        let url = "https://reference.medscape.com/druginteraction.do?action=getMultiInteraction&ids=\(query)"
+        let response = try await client.get(URI(string: url))
         
-    //     guard let body = response.body,
-    //         let bodyData = body.getData(at: 0, length: body.readableBytes) else {
-    //         throw Abort(.internalServerError, reason: "Error retrieving interaction data")
-    //     }
+        guard let body = response.body,
+            let bodyData = body.getData(at: 0, length: body.readableBytes) else {
+            throw Abort(.internalServerError, reason: "Error retrieving interaction data")
+        }
         
-    //     let interactionData = try JSONDecoder().decode(InteractionResponse.self, from: bodyData)
+        let interactionData = try JSONDecoder().decode(InteractionResponse.self, from: bodyData)
         
-    //     // Format and return all interactions as JSON
-    //     return formatInteractions(interactionData)
-    // }
+        // Format and return all interactions as JSON
+        return formatInteractions(interactionData)
+    }
 
-    // private func formatInteractions(_ interactionData: InteractionResponse) -> FormattedInteractionResponse {
-    //     var interactionsBySeverity: [String: [FormattedInteraction]] = [:]
+    private func formatInteractions(_ interactionData: InteractionResponse) -> FormattedInteractionResponse {
+        var interactionsBySeverity: [String: [FormattedInteraction]] = [:]
         
-    //     if interactionData.errorCode == 1, let interactions = interactionData.multiInteractions {
-    //         for interaction in interactions {
-    //             // Extract a note from the text if present
-    //             let note: String?
-    //             if let commentRange = interaction.text.range(of: "Comment:") {
-    //                 note = String(interaction.text[commentRange.upperBound...]).trimmingCharacters(in: .whitespacesAndNewlines)
-    //             } else {
-    //                 note = nil
-    //             }
+        if interactionData.errorCode == 1, let interactions = interactionData.multiInteractions {
+            for interaction in interactions {
+                // Extract a note from the text if present
+                let note: String?
+                if let commentRange = interaction.text.range(of: "Comment:") {
+                    note = String(interaction.text[commentRange.upperBound...]).trimmingCharacters(in: .whitespacesAndNewlines)
+                } else {
+                    note = nil
+                }
                 
-    //             let formattedInteraction = FormattedInteraction(
-    //                 severity: interaction.severity,
-    //                 interaction: "\(interaction.subject) and \(interaction.object)",
-    //                 description: interaction.text,
-    //                 note: note
-    //             )
+                let formattedInteraction = FormattedInteraction(
+                    severity: interaction.severity,
+                    interaction: "\(interaction.subject) and \(interaction.object)",
+                    description: interaction.text,
+                    note: note
+                )
                 
-    //             // Append the interaction to the appropriate severity level
-    //             if interactionsBySeverity[interaction.severity] != nil {
-    //                 interactionsBySeverity[interaction.severity]?.append(formattedInteraction)
-    //             } else {
-    //                 interactionsBySeverity[interaction.severity] = [formattedInteraction]
-    //             }
-    //         }
-    //     }
+                // Append the interaction to the appropriate severity level
+                if interactionsBySeverity[interaction.severity] != nil {
+                    interactionsBySeverity[interaction.severity]?.append(formattedInteraction)
+                } else {
+                    interactionsBySeverity[interaction.severity] = [formattedInteraction]
+                }
+            }
+        }
         
-    //     return FormattedInteractionResponse(interactionsBySeverity: interactionsBySeverity)
-    // }
+        return FormattedInteractionResponse(interactionsBySeverity: interactionsBySeverity)
+    }
 
     // @Sendable
     // func addMedications(req: Request) async throws -> HTTPStatus {

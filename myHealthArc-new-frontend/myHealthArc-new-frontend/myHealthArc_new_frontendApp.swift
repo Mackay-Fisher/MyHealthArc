@@ -37,10 +37,10 @@ struct myHealthArc_new_frontendApp: App {
         var body: some Scene {
             WindowGroup {
                 if isLoggedIn {
-                    Tabs()
+                    Tabs(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
                 }
                 else if hasSignedUp {
-                    ServicesView(isLoggedIn: $isLoggedIn)
+                    ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
                 }
                 else {
                     //LoginView(isLoggedIn: $isLoggedIn)

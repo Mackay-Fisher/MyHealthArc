@@ -21,8 +21,8 @@ struct SettingsView: View {
     @State private var prescription: Bool = false
     @State private var nutrition: Bool = false
     
-    @State private var isLoggedIn: Bool = true
-    @State private var hasSignedUp: Bool = true
+    @Binding var isLoggedIn: Bool
+    @Binding var hasSignedUp: Bool
 
     @Environment(\.colorScheme) var colorScheme
     
@@ -116,24 +116,30 @@ struct SettingsView: View {
                 
                 Spacer().frame(height: 20)
                 
-                NavigationLink(destination: AppOpenScreen(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)){
-                    Button("Log Out"){}
+                
+                Button("Logout") {
+                    hasSignedUp = false
+                    isLoggedIn = false
                 }
-                .frame(width: 200, height: 50)
                 .fontWeight(.bold)
                 .foregroundColor(.red)
-            }
+                .frame(width: 200, height: 50)
+                }
+            
             .padding()
             
         }
         .background(colorScheme == .dark ? Color.black : Color.lightbackground)
     }
+
     
 }
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         // @Previewable
-        SettingsView()
+        @State var isLoggedIn: Bool = false
+        @State var hasSignedUp: Bool = false
+        SettingsView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
     }
 }
 

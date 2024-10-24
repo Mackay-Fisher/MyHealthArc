@@ -8,6 +8,8 @@ import SwiftUI
 
 struct ServicesView: View {
     @Binding var isLoggedIn: Bool
+    @Binding var hasSignedUp: Bool
+    
     @State private var selectedServices: Set<String> = []
     @Environment(\.colorScheme) var colorScheme
     @State private var userName: String = "User Name" // Placeholder for user name
@@ -73,7 +75,7 @@ struct ServicesView: View {
             .overlay(
                 Group {
                     if showProfile {
-                        UserProfileView(userName: userName, userEmail: userEmail, showProfile: $showProfile)
+                        UserProfileView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp, userName: userName, userEmail: userEmail, showProfile: $showProfile )
                     }
                 }
             )
@@ -136,6 +138,7 @@ struct ServiceButton: View {
 struct ServicesView_Previews: PreviewProvider {
     static var previews: some View {
         @State var isLoggedIn: Bool = false
-        ServicesView(isLoggedIn: $isLoggedIn)
+        @State var hasSignedUp: Bool = false
+        ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
     }
 }

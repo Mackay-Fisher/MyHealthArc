@@ -4,6 +4,9 @@ import SwiftUI
 struct ContentView: View {
     @State private var showSettings: Bool = false // Toggle settings visibility
     @Environment(\.colorScheme) var colorScheme
+    
+    @Binding var isLoggedIn: Bool
+    @Binding var hasSignedUp: Bool
 
     var body: some View {
         ZStack {
@@ -55,7 +58,7 @@ struct ContentView: View {
                         }
                     }
 
-                SettingsView()
+                SettingsView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
                     .frame(width: UIScreen.main.bounds.width * 0.8) // 80% of screen width
                     .background(colorScheme == .dark ? Color.mhaGray : Color.white)
                     .cornerRadius(20)
@@ -102,6 +105,8 @@ struct WidgetView: View {
 }
 // User Profile View
 struct UserProfileView: View {
+    @Binding var isLoggedIn: Bool
+    @Binding var hasSignedUp: Bool
     var userName: String
     var userEmail: String
     @Binding var showProfile: Bool
@@ -135,7 +140,7 @@ struct UserProfileView: View {
             Divider().padding(.horizontal)
 
             // Settings View
-            SettingsView()
+            SettingsView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
 
 
             Spacer()
@@ -152,6 +157,8 @@ struct UserProfileView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        @State var isLoggedIn: Bool = false
+        @State var hasSignedUp: Bool = false
+        ContentView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
     }
 }

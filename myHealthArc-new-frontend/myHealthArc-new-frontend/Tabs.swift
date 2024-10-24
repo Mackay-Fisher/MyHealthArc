@@ -8,16 +8,17 @@
 import SwiftUI
 
 struct Tabs: View {
-    @State private var isLoggedIn = false
+    @Binding var isLoggedIn: Bool
+    @Binding var hasSignedUp: Bool
     var body: some View {
         
         TabView {
-            ContentView()
+            ContentView(isLoggedIn: $isLoggedIn,hasSignedUp: $hasSignedUp)
                 .tabItem {
                     Image(systemName: "house")
                     Text("Home")
                 }
-            ServicesView(isLoggedIn: $isLoggedIn)
+            /*ServicesView(isLoggedIn: $isLoggedIn)
                 .tabItem {
                     Image(systemName: "heart")
                     Text("Services")
@@ -26,7 +27,7 @@ struct Tabs: View {
                 .tabItem {
                     Image(systemName: "gear")
                     Text("Settings")
-                }
+                }*/
         }
     }
 }
@@ -34,7 +35,9 @@ struct Tabs: View {
 struct Tabs_Previews: PreviewProvider {
     static var previews: some View {
         // @Previewable
-        Tabs()
+        @State var isLoggedIn: Bool = false
+        @State var hasSignedUp: Bool = false
+        Tabs(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
     }
 }
 

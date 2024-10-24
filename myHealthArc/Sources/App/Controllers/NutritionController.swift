@@ -14,30 +14,40 @@ struct NutritionController: RouteCollection {
             throw Abort(.badRequest, reason: "A 'query' parameter is required, with comma-separated food names.")
         }
         
-        let foodNames = foodNamesParam.split(separator: ",").map { $0.lowercased().trimmingCharacters(in: .whitespaces) }
+        // Normalize food names for partial matching
+        let foodNames = foodNamesParam.split(separator: ",").map {
+            $0.lowercased().trimmingCharacters(in: .whitespaces)
+        }
         var nutritionResults: [String: [String: Double]] = [:]
 
-        // Query existing items in the database with partial matching
+        // Query existing items in the database with case-insensitive partial matching
         let existingItems = try await NutritionItem.query(on: req.db)
-            .filter(\.$foodItem ~~ foodNames)
             .all()
 
-        let existingFoodNames = existingItems.map { $0.foodItem.lowercased() }
-        let missingFoodNames = foodNames.filter { name in
-            !existingFoodNames.contains { $0.contains(name) }
+        // Normalize existing items for comparison
+        let normalizedExistingItems = existingItems.map { item in
+            (foodItem: item.foodItem.lowercased(), item: item)
         }
 
-        // Add existing nutrition data to results
-        for item in existingItems {
-            nutritionResults[item.foodItem] = [
-                "protein": item.protein,
-                "carbohydrates": item.carbohydrates,
-                "fats": item.fats,
-                "calories": Double(item.calories)
-            ]
+        // Separate found items from missing items
+        var missingFoodNames = [String]()
+        for foodName in foodNames {
+            if let matchedItem = normalizedExistingItems.first(where: { $0.foodItem.contains(foodName) }) {
+                // If a match is found, add it to the results
+                let item = matchedItem.item
+                nutritionResults[item.foodItem] = [
+                    "protein": item.protein,
+                    "carbohydrates": item.carbohydrates,
+                    "fats": item.fats,
+                    "calories": Double(item.calories)
+                ]
+            } else {
+                // If no match is found, add to the list of missing items
+                missingFoodNames.append(foodName)
+            }
         }
 
-        // Fetch missing items from API and update the database
+        // Fetch missing items from the API and update the database
         if !missingFoodNames.isEmpty {
             let apiKey = Environment.get("FOOD_DATA_API_KEY") ?? "DEMO_KEY"
 

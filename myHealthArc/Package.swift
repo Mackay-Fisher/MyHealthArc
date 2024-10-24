@@ -11,12 +11,13 @@ let package = Package(
         .package(url: "https://github.com/vapor/vapor.git", from: "4.99.3"),
         // 🗄 An ORM for SQL and NoSQL databases.
         .package(url: "https://github.com/vapor/fluent.git", from: "4.9.0"),
-        // 🌱 Fluent driver for Mongo.
+        // 🌱 Fluent driver for MongoDB.
         .package(url: "https://github.com/vapor/fluent-mongo-driver.git", from: "1.3.1"),
-        // 🍃 An expressive, performant, and extensible templating language built for Swift.
+        // 🍃 An expressive templating language for Swift.
         .package(url: "https://github.com/vapor/leaf.git", from: "4.3.0"),
-        // 🔵 Non-blocking, event-driven networking for Swift. Used for custom executors
+        // 🔵 SwiftNIO for non-blocking, event-driven networking.
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.65.0"),
+        // 🌍 DotEnv for environment variable management.
         .package(url: "https://github.com/swiftpackages/DotEnv.git", from: "3.0.0"),
     ],
     targets: [
@@ -40,12 +41,21 @@ let package = Package(
                 .product(name: "XCTVapor", package: "vapor"),
             ],
             path: "Tests/AppTests",
-            sources: ["MongoTest.swift"]
+            sources: [
+                "MongoTest.swift",
+                "SchemaTests.swift",
+                "InsertUsersTest.swift",
+                "CreateMedicationsTest.swift",
+                "CreateNutritionsTest.swift",
+                "CreateHealthKitsTest.swift"
+            ]
         )
     ]
 )
 
-var swiftSettings: [SwiftSetting] { [
-    .enableUpcomingFeature("DisableOutwardActorInference"),
-    .enableExperimentalFeature("StrictConcurrency"),
-] }
+var swiftSettings: [SwiftSetting] {
+    [
+        .enableUpcomingFeature("DisableOutwardActorInference"),
+        .enableExperimentalFeature("StrictConcurrency"),
+    ]
+}

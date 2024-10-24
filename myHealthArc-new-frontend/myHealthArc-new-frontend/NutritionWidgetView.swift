@@ -53,7 +53,7 @@ struct NutritionWidgetView: View {
                                 .foregroundColor(.white)
                         }
                         .padding(.top)
-                        .frame(maxWidth: .infinity, alignment: .center) // Center the button
+                        .frame(maxWidth: .infinity, alignment: .center) 
                     }
                     .padding()
                 }

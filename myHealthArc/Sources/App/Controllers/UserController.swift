@@ -17,10 +17,14 @@ struct UserController: RouteCollection {
         
         let user = User(
             fullName: userDTO.fullName,
-            email: userDTO.email,
+            email: userDTO.email.lowercased(),
             passwordHash: passwordHash,
             userHash: userHash
         )
+
+        if try await User.query(on: req.db).filter(\.$email == userDTO.email).first() != nil {
+            throw Abort(.conflict, reason: "Email is already registered.")
+        }
         
         try await user.save(on: req.db)
         return user

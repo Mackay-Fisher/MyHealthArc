@@ -19,12 +19,23 @@ struct MedicationWidget: View {
     var body: some View {
         NavigationLink(destination: MedicationsView()) {
             VStack {
-                Text("Medication Comparison")
-                    .font(.headline)
-                    .padding(.top)
+                HStack{Image ("pills")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(-2)
+                        .frame(width: 30)
+                    Spacer()
+                        .frame(width:15)
+                    Text("Medication Comparison")
+                        .font(.headline)
+                        .padding(.top)
+                        .frame(alignment: .center)
+                }
+                
                 
                 Divider()
-                // Input fields for two medications
+                Spacer()
+                    .frame(height:15)
                 HStack {
                     TextField("Medication 1", text: $firstMedication)
                         .padding(.leading, 2)

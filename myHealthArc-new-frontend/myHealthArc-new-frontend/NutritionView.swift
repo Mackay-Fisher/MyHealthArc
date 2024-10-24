@@ -56,9 +56,10 @@ struct NutritionView: View {
                     addMeal()
                 }
                 .padding()
+                .frame(width: 120, height: 40)
                 .background(Color.mhaGreen)
                 .cornerRadius(50)
-                .foregroundColor(.white)
+                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
             }
             //TODO: figure out why spacing is so messed up
             Spacer()

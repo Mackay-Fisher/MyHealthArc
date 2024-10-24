@@ -33,6 +33,8 @@ struct MedicationsView: View {
                 .overlay(
                     (colorScheme == .dark ? Color.white : Color.gray)
                 )
+            Spacer()
+                .frame(height:20)
             // Input for new medication
             HStack {
                 TextField("Enter medication name", text: $medicationInput)

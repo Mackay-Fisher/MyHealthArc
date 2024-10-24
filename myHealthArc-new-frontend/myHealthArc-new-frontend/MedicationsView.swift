@@ -36,16 +36,14 @@ struct MedicationsView: View {
             // Input for new medication
             HStack {
                 TextField("Enter medication name", text: $medicationInput)
-                    .padding(.leading, 2)
                     .padding(5)
                     .background(colorScheme == .dark ? Color.mhaGray : Color.white)
                     .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                     .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 1)
+                            .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
                     )
-                    .frame(width: 250, height: 100, alignment:.center)
                 
                 Button("Add") {
                     addMedication()

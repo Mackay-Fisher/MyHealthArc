@@ -84,8 +84,8 @@ struct NutritionWidgetView: View {
             .frame(width: 320)
             .padding()
             .background(colorScheme == .dark ? Color.mhaGray : Color.white)
-            .cornerRadius(20)
-            .shadow(radius: 0.5)
+            .cornerRadius(30)
+            .shadow(radius: 0.2)
         }
         .buttonStyle(PlainButtonStyle())
         .padding()

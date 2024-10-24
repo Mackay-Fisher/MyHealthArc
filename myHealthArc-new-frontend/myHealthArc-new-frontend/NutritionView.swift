@@ -15,42 +15,84 @@ struct NutritionView: View {
     @State private var foodSearch: String = ""
     @State private var foodInfo: String = ""
     @State private var showFoodInfo: Bool = false
+    
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         VStack {
-            Text("Nutrition Tracker")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding()
+            HStack{Image ("carrot")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(-2)
+                    .frame(width: 30)
+                Text("Nutrition Tracker")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .padding()
+            }
+            
+            Divider()
+                .overlay(
+                    (colorScheme == .dark ? Color.white : Color.gray)
+                )
+            Spacer()
+                .frame(height:20)
 
             // Meal Input Section
             HStack {
                 TextField("Enter meal", text: $mealInput)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
+                    //.padding(.leading, 2)
+                    .padding(5)
+                    .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                    )
+                    //.frame(width: 250, height: 150, alignment:.center)
 
                 Button("Add Meal") {
                     addMeal()
                 }
                 .padding()
                 .background(Color.mhaGreen)
-                .cornerRadius(8)
+                .cornerRadius(50)
                 .foregroundColor(.white)
             }
+            //TODO: figure out why spacing is so messed up
+            Spacer()
+                .frame(height:10)
 
+            
+            Text("Your Meals")
+                .font(.title3)
+                .padding()
             // List of Recorded Meals
             List(meals, id: \.self) { meal in
                 Text(meal)
             }
             .listStyle(PlainListStyle())
             .padding(.bottom)
+            .padding(.leading, -15)
+
 
             // Food Search Section
             HStack {
+                
                 TextField("Search for food", text: $foodSearch, onCommit: {
                     fetchFoodInfo()
                 })
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(5)
+                .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                )
+                //.frame(width: 250, height: 150, alignment:.center)
+
 
                 Button(action: fetchFoodInfo) {
                     Image(systemName: "magnifyingglass")

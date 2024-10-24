@@ -5,39 +5,29 @@ struct MedicationCheckerController: RouteCollection {
         let drugInteraction = routes.grouped("medicationChecker")
         drugInteraction.get("check", use: self.checkInteractions)
         drugInteraction.post("add", use: self.addMedications)
-        // drugInteraction.post("remove", use: self.removeMedications)
-        drugInteraction.get("test", use: self.test)
+        drugInteraction.post("remove", use: self.removeMedications)
+        drugInteraction.get("load", use: self.loadUserMedications)
+
     }
 
-    func test(req: Request) async throws -> String {
-        let newInteraction = MedicationInteraction(
-            medications: ["Aspirin", "Ibuprofen"],
-            conflicts: ["Increased bleeding risk"]
-        )
-        try await newInteraction.save(on: req.db)
-
+    @Sendable
+    func loadUserMedications(req: Request) async throws -> Medication {
+        // Get userHash from the query
         guard let userHash = req.query[String.self, at: "userHash"] else {
             throw Abort(.badRequest, reason: "User hash not provided.")
         }
 
-        print("User Hash: \(userHash)")
-
-        // Query the database for medications associated with the userHash
-        let userMedications = try await Medication.query(on: req.db)
+        // Retrieve the medication record associated with the userHash
+        guard let existingMedication = try await Medication.query(on: req.db)
             .filter(\.$userHash == userHash)
-            .all()
+            .first() else {
+            throw Abort(.notFound, reason: "No medications found for the given user.")
+        }
 
-        print("User Hash: \(userHash)")
-        print("User Medications: \(userMedications)")
-        // Print all user information (for debugging purposes)
-        // userMedications.forEach { medication in
-        //     print("User Hash: \(medication.userHash)")
-        //     print("Medications: \(medication.medications)")
-        //     print("Interactions: \(medication.interactions)")
-        // }
-
-        return "yippe"
+        // Return the medication record as JSON
+        return existingMedication
     }
+
 
     @Sendable
     func addMedications(req: Request) async throws -> Medication {
@@ -267,80 +257,47 @@ struct MedicationCheckerController: RouteCollection {
         return FormattedInteractionResponse(interactionsBySeverity: interactionsBySeverity)
     }
 
-    // @Sendable
-    // func removeMedications(req: Request) async throws -> HTTPStatus {
-    //     let userHash = try req.content.get(String.self, at: "userHash")
-    //     let medicationsToRemove = try req.content.get([String].self, at: "medications")
+    @Sendable
+    func removeMedications(req: Request) async throws -> HTTPStatus {
+        // Get userHash from the request body
+        let userHash = try req.content.get(String.self, at: "userHash")
 
-    //     if let existingMedication = try await Medication.query(on: req.db)
-    //         .filter(\.$userHash == userHash)
-    //         .first() {
-            
-    //         // Remove specified medications from the list
-    //         existingMedication.medications.removeAll { medication in
-    //             medicationsToRemove.contains(medication["name"] ?? "")
-    //         }
+        // Get medications to remove from the request body and convert to lowercase
+        let medicationsToRemove = try req.content.get([String].self, at: "medications").map { $0.lowercased() }
 
-    //         // Remove interactions related to the removed medications
-    //         for medicationName in medicationsToRemove {
-    //             existingMedication.interactions.removeValue(forKey: medicationName)
-    //         }
+        // Retrieve existing medication record for the user
+        guard var existingMedication = try await Medication.query(on: req.db)
+            .filter(\.$userHash == userHash)
+            .first() else {
+            throw Abort(.notFound, reason: "No medications found for the given user.")
+        }
 
-    //         try await existingMedication.save(on: req.db)
-    //     }
+        // Convert stored medications to lowercase for case-insensitive matching
+        var storedMedications = existingMedication.medications.map { $0.lowercased() }
 
-    //     return .ok
-    // }
+        // Iterate through the medications to remove
+        for med in medicationsToRemove {
+            if let index = storedMedications.firstIndex(of: med) {
+                // Remove the medication and associated dosage and frequency
+                storedMedications.remove(at: index)
+                existingMedication.medications.remove(at: index)
+                existingMedication.dosages.remove(at: index)
+                existingMedication.frequencies.remove(at: index)
+            }
+        }
 
-    // // Format interactions from the database
-    // private func formatDatabaseInteractions(_ medication: Medication, for requestedMeds: [String]) -> FormattedInteractionResponse {
-    //     var interactionsBySeverity: [String: [FormattedInteraction]] = [:]
+        // If no medications are left, delete the record
+        if existingMedication.medications.isEmpty {
+            try await existingMedication.delete(on: req.db)
+            return .ok
+        }
 
-    //     for med in requestedMeds {
-    //         if let conflicts = medication.interactions[med] {
-    //             for conflict in conflicts {
-    //                 let formattedInteraction = FormattedInteraction(
-    //                     severity: "Unknown",
-    //                     interaction: med,
-    //                     description: conflict,
-    //                     note: nil
-    //                 )
-                    
-    //                 if interactionsBySeverity["Unknown"] != nil {
-    //                     interactionsBySeverity["Unknown"]?.append(formattedInteraction)
-    //                 } else {
-    //                     interactionsBySeverity["Unknown"] = [formattedInteraction]
-    //                 }
-    //             }
-    //         }
-    //     }
+        // Save the updated medication record
+        try await existingMedication.save(on: req.db)
 
-    //     return FormattedInteractionResponse(interactionsBySeverity: interactionsBySeverity)
-    // }
+        return .ok
+    }
 
-    // // Save or update medications and interactions in the database
-    // private func saveOrUpdateMedications(_ medications: [[String: String]], userHash: String, conflicts: FormattedInteractionResponse, db: Database) async throws {
-    //     if var existingMedication = try await Medication.query(on: db).filter(\.$userHash == userHash).first() {
-    //         // Add new medications and conflicts
-    //         for medication in medications {
-    //             let medName = medication["name"] ?? ""
 
-    //             // If the medication is not already in the list, add it
-    //             if !existingMedication.medications.contains(where: { $0["name"] == medName }) {
-    //                 existingMedication.medications.append(medication)
-    //             }
-                
-    //             // Update interactions for the medication
-    //             let conflictList = conflicts.interactionsBySeverity.values.flatMap { $0.map { $0.description } }
-    //             existingMedication.interactions[medName] = conflictList
-    //         }
 
-    //         try await existingMedication.save(on: db)
-    //     } else {
-    //         // Create new Medication entry
-    //         let conflictList = conflicts.interactionsBySeverity.values.flatMap { $0.map { $0.description } }
-    //         let newMedication = Medication(userHash: userHash, medications: medications, interactions: [medications.compactMap { $0["name"] }.joined(separator: ","): conflictList])
-    //         try await newMedication.save(on: db)
-    //     }
-    // }
 }

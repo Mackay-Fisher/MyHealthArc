@@ -14,6 +14,8 @@ struct MedicationWidget: View {
     @State private var interactionResults: String = ""
     @State private var showInteraction: Bool = false
 
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         NavigationLink(destination: MedicationsView()) {
             VStack {
@@ -24,13 +26,27 @@ struct MedicationWidget: View {
                 Divider()
                 // Input fields for two medications
                 HStack {
-                    TextField("Medication 1", text: $firstMedication)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding()
+                    TextField("Med 1", text: $firstMedication)
+                        .padding(3)
+                        .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 1)
+                        )
+                        .frame(width: 125)
                     Text ("vs.")
-                    TextField("Medication 2", text: $secondMedication)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding()
+                    TextField("Med 2", text: $secondMedication)
+                        .padding(3)
+                        .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 1)
+                        )
+                        .frame(width: 125)
                 }
                 
                 // Compare Button
@@ -65,12 +81,14 @@ struct MedicationWidget: View {
                     .padding()
                 }
             }
+            .frame(maxWidth: 320)
             .padding()
             .background(Color.white)
-            .cornerRadius(20)
-            .shadow(radius: 0.5)
+            .cornerRadius(30)
+            .shadow(radius: 0.2)
         }
         .buttonStyle(PlainButtonStyle())
+        //.padding()
     }
     private func clearSearch() {
             firstMedication = ""

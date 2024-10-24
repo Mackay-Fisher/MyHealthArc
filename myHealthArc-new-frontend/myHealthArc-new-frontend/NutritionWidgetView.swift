@@ -12,6 +12,8 @@ struct NutritionWidgetView: View {
     @State private var foodSearch: String = ""
     @State private var foodInfo: String = ""
     @State private var showFoodInfo: Bool = false
+    
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationLink(destination: NutritionView()) {
@@ -26,7 +28,19 @@ struct NutritionWidgetView: View {
                     TextField("Search food nutrition info", text: $foodSearch, onCommit: {
                         fetchFoodInfo()
                     })
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding() 
+                    .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 1)
+                    )
+                    .padding()
+                    .frame(width: 300, height: 30)
+                        
+                    
+                    
 
                     Button(action: fetchFoodInfo) {
                         Image(systemName: "magnifyingglass") // Search icon
@@ -58,12 +72,14 @@ struct NutritionWidgetView: View {
                     .padding()
                 }
             }
+            .frame(width: 320)
             .padding()
-            .background(Color.white)
+            .background(colorScheme == .dark ? Color.mhaGray : Color.white)
             .cornerRadius(20)
             .shadow(radius: 0.5)
         }
         .buttonStyle(PlainButtonStyle())
+        .padding()
     }
 
     private func fetchFoodInfo() {

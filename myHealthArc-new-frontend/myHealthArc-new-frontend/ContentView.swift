@@ -30,7 +30,7 @@ struct ContentView: View {
                                 .foregroundColor(Color.mhaPurple)
                         }
                         .padding()
-                    }
+                    }.padding()
                     
                     // Widgets Area
                     ScrollView {
@@ -42,12 +42,15 @@ struct ContentView: View {
                             
                             NutritionWidgetView()
                         }
-                        .padding()
+                        //.padding()
+                        
                         .shadow(radius: 0.5)
                     }
                 }
+                //.padding()
                 .background(colorScheme == .dark ? Color(.systemBackground) : Color.lightbackground)
                 .navigationBarHidden(true)
+                
                 
                 // Slide-out Settings View
                 if showSettings {
@@ -100,10 +103,11 @@ struct WidgetView: View {
                 .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 .padding(.bottom)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: 350)
         .background(colorScheme == .dark ? Color.mhaGray : Color.white)
         .cornerRadius(25)
     }
+        
 }
 // User Profile View
 struct UserProfileView: View {

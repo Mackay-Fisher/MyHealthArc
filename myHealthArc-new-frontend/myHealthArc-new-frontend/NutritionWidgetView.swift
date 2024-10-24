@@ -23,7 +23,7 @@ struct NutritionWidgetView: View {
 
                 // Food search input with system icon button
                 HStack {
-                    TextField("Search for food", text: $foodSearch, onCommit: {
+                    TextField("Search food nutrition info", text: $foodSearch, onCommit: {
                         fetchFoodInfo()
                     })
                     .textFieldStyle(RoundedBorderTextFieldStyle())

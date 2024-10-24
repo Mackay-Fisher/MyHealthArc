@@ -38,14 +38,32 @@ struct FormattedInteractionResponse: Content {
     let interactionsBySeverity: [String: [FormattedInteraction]]
 }
 
-struct FoodDataResponse: Content {
-    let foods: [NutritionData]
+struct FoodDataResponse: Codable {
+    var foods: [FoodItem]
+    
+    struct FoodItem: Codable {
+        var description: String
+        var foodNutrients: [FoodNutrient]
+    }
+    
+    struct FoodNutrient: Codable {
+        var nutrientName: String
+        var value: Double
+        var unitName: String
+    }
 }
 
+
+
 struct NutritionData: Content {
-    let description: String
-    let foodNutrients: [Nutrient]
+    var foodItem: String
+    var protein: Double
+    var carbohydrates: Double
+    var fats: Double
+    var calories: Int
 }
+
+
 
 struct Nutrient: Content {
     let nutrientName: String

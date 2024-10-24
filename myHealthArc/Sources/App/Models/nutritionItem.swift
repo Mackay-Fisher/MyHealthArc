@@ -2,13 +2,14 @@ import Fluent
 import Vapor
 import FluentMongoDriver
 
+@preconcurrency
 final class NutritionItem: Model, Content {
-    static let schema = "nutrition_item"
+    static let schema = "nutrition_items"
 
     @ID(custom: "_id")
     var id: ObjectId?
 
-    @Field(key: "food_item")
+    @Field(key: "foodItem")
     var foodItem: String
 
     @Field(key: "protein")
@@ -23,10 +24,9 @@ final class NutritionItem: Model, Content {
     @Field(key: "calories")
     var calories: Int
 
-    init() { }
+    init() {}
 
-    init(id: ObjectId? = nil, foodItem: String, protein: Double, carbohydrates: Double, fats: Double, calories: Int) {
-        self.id = id
+    init(foodItem: String, protein: Double, carbohydrates: Double, fats: Double, calories: Int) {
         self.foodItem = foodItem
         self.protein = protein
         self.carbohydrates = carbohydrates

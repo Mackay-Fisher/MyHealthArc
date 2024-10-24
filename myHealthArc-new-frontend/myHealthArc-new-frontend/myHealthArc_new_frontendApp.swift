@@ -32,14 +32,19 @@ extension Color {
 @main
 struct myHealthArc_new_frontendApp: App {
     @State private var isLoggedIn = false
+    @State private var hasSignedUp = false
         
         var body: some Scene {
             WindowGroup {
                 if isLoggedIn {
-                    Tabs()
-                } else {
+                    Tabs(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
+                }
+                else if hasSignedUp {
+                    ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
+                }
+                else {
                     //LoginView(isLoggedIn: $isLoggedIn)
-                    AppOpenScreen(isLoggedIn: $isLoggedIn)
+                    AppOpenScreen(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
                 }
             }
         }

@@ -1,35 +1,32 @@
 import Fluent
 import Vapor
+import FluentMongoDriver
 
-final class Medication: Model, Content, @unchecked Sendable {
+final class Medication: Model, Content {
     static let schema = "medications"
-    
-    @ID(key: .id)
-    var id: UUID?
-    
+
+    @ID(custom: "_id")
+    var id: ObjectId?
+
     @Field(key: "userHash")
     var userHash: String
-    
-    @Field(key: "name")
-    var name: String
-    
-    @Field(key: "dosage")
-    var dosage: String
-    
-    @Field(key: "frequency")
-    var frequency: String
-    
-    @Field(key: "conflicts")
-    var conflicts: [String]
-    
+
+    @Field(key: "medications")
+    var medications: [String]
+
+    @Field(key: "dosages")
+    var dosages: [String]
+
+    @Field(key: "frequencies")
+    var frequencies: [Int] // Changed to array of integers
+
     init() { }
-    
-    init(id: UUID? = nil, userHash: String, name: String, dosage: String, frequency: String, conflicts: [String] = []) {
+
+    init(id: ObjectId? = nil, userHash: String, medications: [String], dosages: [String], frequencies: [Int]) {
         self.id = id
         self.userHash = userHash
-        self.name = name
-        self.dosage = dosage
-        self.frequency = frequency
-        self.conflicts = conflicts
+        self.medications = medications
+        self.dosages = dosages
+        self.frequencies = frequencies
     }
 }

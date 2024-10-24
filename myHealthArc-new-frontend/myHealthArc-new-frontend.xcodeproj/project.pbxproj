@@ -14,6 +14,8 @@
 		250FC23D2CC202D10023AE43 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250FC23C2CC202C90023AE43 /* SignUpView.swift */; };
 		250FC23F2CC205900023AE43 /* AppOpenScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250FC23E2CC205900023AE43 /* AppOpenScreen.swift */; };
 		250FC2412CC208C80023AE43 /* TermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250FC2402CC208C80023AE43 /* TermsAndConditionsView.swift */; };
+		2528D6282CC9DA8E000D5852 /* MedicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2528D6272CC9DA8E000D5852 /* MedicationsView.swift */; };
+		25D6E3B92CC9CBD2004A2B1A /* EditProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */; };
 		8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */; };
 		8F161C2F2CC1B36200E726E7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C2E2CC1B36200E726E7 /* ContentView.swift */; };
 		8F161C312CC1B36400E726E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8F161C302CC1B36400E726E7 /* Assets.xcassets */; };
@@ -48,6 +50,8 @@
 		250FC23C2CC202C90023AE43 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		250FC23E2CC205900023AE43 /* AppOpenScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenScreen.swift; sourceTree = "<group>"; };
 		250FC2402CC208C80023AE43 /* TermsAndConditionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsAndConditionsView.swift; sourceTree = "<group>"; };
+		2528D6272CC9DA8E000D5852 /* MedicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationsView.swift; sourceTree = "<group>"; };
+		25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfilePage.swift; sourceTree = "<group>"; };
 		5AD777E52CC330AF00DC2B8B /* myHealthArc-new-frontend.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "myHealthArc-new-frontend.entitlements"; sourceTree = "<group>"; };
 		8F161C292CC1B36200E726E7 /* myHealthArc-new-frontend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "myHealthArc-new-frontend.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myHealthArc_new_frontendApp.swift; sourceTree = "<group>"; };
@@ -119,6 +123,8 @@
 				250FC2382CC200DF0023AE43 /* SettingsView.swift */,
 				250FC2362CC200D10023AE43 /* ServicesView.swift */,
 				250FC2402CC208C80023AE43 /* TermsAndConditionsView.swift */,
+				25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */,
+				2528D6272CC9DA8E000D5852 /* MedicationsView.swift */,
 				250FC23E2CC205900023AE43 /* AppOpenScreen.swift */,
 				8F161C322CC1B36400E726E7 /* Preview Content */,
 			);
@@ -280,8 +286,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25D6E3B92CC9CBD2004A2B1A /* EditProfilePage.swift in Sources */,
 				250FC23B2CC201460023AE43 /* Tabs.swift in Sources */,
 				250FC23F2CC205900023AE43 /* AppOpenScreen.swift in Sources */,
+				2528D6282CC9DA8E000D5852 /* MedicationsView.swift in Sources */,
 				250FC2412CC208C80023AE43 /* TermsAndConditionsView.swift in Sources */,
 				250FC2372CC200D10023AE43 /* ServicesView.swift in Sources */,
 				250FC2332CC1F9CF0023AE43 /* LoginView.swift in Sources */,
@@ -450,9 +458,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "myHealthArc-new-frontend/myHealthArc-new-frontend.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"myHealthArc-new-frontend/Preview Content\"";
+				DEVELOPMENT_TEAM = K3F2M3VV44;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -468,6 +478,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "myHealthArc.myHealthArc-new-frontend";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -480,9 +491,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "myHealthArc-new-frontend/myHealthArc-new-frontend.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"myHealthArc-new-frontend/Preview Content\"";
+				DEVELOPMENT_TEAM = K3F2M3VV44;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -498,6 +511,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "myHealthArc.myHealthArc-new-frontend";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -511,6 +525,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K3F2M3VV44;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
@@ -530,6 +545,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K3F2M3VV44;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
@@ -548,6 +564,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K3F2M3VV44;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
@@ -566,6 +583,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K3F2M3VV44;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;

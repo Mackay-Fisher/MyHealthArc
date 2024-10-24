@@ -28,7 +28,7 @@ struct Tabs: View {
                     Image(systemName: "carrot")
                     Text("Nutrition")
             }
-            //TODO: add medication and nutrition here
+            
             /*ServicesView(isLoggedIn: $isLoggedIn)
                 .tabItem {
                     Image(systemName: "heart")

@@ -48,7 +48,8 @@ struct NutritionWidgetView: View {
     }
 
     private func fetchFoodInfo() {
-        // Replace with your actual API call to fetch food information
+        // Replace
+        //gpt generated sample
         let urlString = "https://api.example.com/food?name=\(foodSearch)"
         guard let url = URL(string: urlString) else { return }
 

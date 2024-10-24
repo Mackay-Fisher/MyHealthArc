@@ -7,127 +7,84 @@
 
 
 import SwiftUI
-//NOTE: this is for the actual api stuff
-// I created test code for the ui
-//TODO: just uncomment this and comment out the other function
 
-
-/*struct NutritionWidgetView: View {
+struct NutritionWidgetView: View {
     @State private var foodSearch: String = ""
     @State private var foodInfo: String = ""
     @State private var showFoodInfo: Bool = false
 
     var body: some View {
-        VStack {
-            Text("Nutrition Search")
-                .font(.headline)
-                .padding(.top)
+        NavigationLink(destination: NutritionView()) { 
+            VStack {
+                Text("Nutrition Search")
+                    .font(.headline)
+                    .padding(.top)
 
-            // Food search input
-            TextField("Search for food", text: $foodSearch, onCommit: {
-                fetchFoodInfo()
-            })
-            .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding()
+                // Food search input with system icon button
+                HStack {
+                    TextField("Search for food", text: $foodSearch, onCommit: {
+                        fetchFoodInfo()
+                    })
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
 
-            // Display food info
-            if showFoodInfo {
-                Text(foodInfo)
-                    .padding()
-            }
-
-            // Button to navigate to Nutrition page
-            NavigationLink(destination: NutritionView()) {
-                Text("Go to Nutrition Page")
-                    .padding()
-                    .background(Color.mhaGreen)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-            }
-        }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(20)
-        .shadow(radius: 0.5)
-    }
-
-    private func fetchFoodInfo() {
-        // Replace
-        //gpt generated sample
-        let urlString = "https://api.example.com/food?name=\(foodSearch)"
-        guard let url = URL(string: urlString) else { return }
-
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            if let data = data, let decodedData = String(data: data, encoding: .utf8) {
-                DispatchQueue.main.async {
-                    foodInfo = decodedData // Parse the response as needed
-                    showFoodInfo = true
-                }
-            }
-        }.resume()
-    }
-}
-
-struct NutritionWidgetView_Previews: PreviewProvider {
-    static var previews: some View {
-        NutritionWidgetView()
-    }
-}*/
-
-import SwiftUI
-
-struct NutritionWidgetView: View {
-    @State private var foodSearch: String = ""
-    @State private var foodInfo: FoodItem?
-
-    var body: some View {
-        VStack {
-            Text("Nutrition Search")
-                .font(.headline)
-                .padding(.top)
-
-            // Food search input
-            TextField("Search for food", text: $foodSearch, onCommit: {
-                fetchFoodInfo()
-            })
-            .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding()
-
-            // Display food info
-            if let foodInfo = foodInfo {
-                VStack(alignment: .leading) {
-                    Text("Food: \(foodInfo.name)")
-                        .font(.headline)
-                    Text("Calories: \(foodInfo.calories)")
-                    Text("Protein: \(foodInfo.protein) g")
-                    Text("Carbs: \(foodInfo.carbs) g")
-                    Text("Fats: \(foodInfo.fats) g")
+                    Button(action: fetchFoodInfo) {
+                        Image(systemName: "magnifyingglass") // Search icon
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.mhaPurple)
+                            .clipShape(Circle())
+                    }
                 }
                 .padding()
-            }
 
-            // Button to navigate to Nutrition page
-            NavigationLink(destination: NutritionView()) {
-                Text("Go to Nutrition Page")
+                // Display food info
+                if showFoodInfo {
+                    VStack(alignment: .leading) {
+                        Text(foodInfo)
+                            .font(.headline)
+                            .padding(.bottom, 2)
+
+                        Button(action: clearSearch) {
+                            Text("Clear")
+                                .padding()
+                                .background(Color.mhaGreen)
+                                .cornerRadius(50)
+                                .foregroundColor(.white)
+                        }
+                        .padding(.top)
+                        .frame(maxWidth: .infinity, alignment: .center) // Center the button
+                    }
                     .padding()
-                    .background(Color.mhaGreen)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
+                }
             }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(20)
+            .shadow(radius: 0.5)
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(20)
-        .shadow(radius: 0.5)
+        .buttonStyle(PlainButtonStyle())
     }
 
     private func fetchFoodInfo() {
-        // Simulating an API call with mock data
-        if let food = mockFoodData.first(where: { $0.name.lowercased() == foodSearch.lowercased() }) {
-            foodInfo = food
+        // Simulate API call with mock data
+        let mockData: [String: String] = [
+            "apple": "Apple - Calories: 95, Carbs: 25g, Protein: 0.5g, Fats: 0.3g",
+            "banana": "Banana - Calories: 105, Carbs: 27g, Protein: 1.3g, Fats: 0.4g"
+        ]
+
+        if let info = mockData[foodSearch.lowercased()] {
+            foodInfo = info
+            showFoodInfo = true
         } else {
-            foodInfo = nil // No match found
+            foodInfo = "No information found."
+            showFoodInfo = true
         }
+    }
+
+    private func clearSearch() {
+        foodSearch = ""
+        foodInfo = ""
+        showFoodInfo = false
     }
 }
 
@@ -136,4 +93,3 @@ struct NutritionWidgetView_Previews: PreviewProvider {
         NutritionWidgetView()
     }
 }
-

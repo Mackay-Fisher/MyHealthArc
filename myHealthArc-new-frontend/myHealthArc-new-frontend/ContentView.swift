@@ -1,16 +1,13 @@
 //this is the dashboard page
 import SwiftUI
 
-
 struct ContentView: View {
-    @State private var userName: String = "User Name" // Placeholder for user name
-    @State private var userEmail: String = "user@example.com" // Placeholder for user email
-    @State private var showProfile: Bool = false // To toggle user profile visibility
+    @State private var showSettings: Bool = false // Toggle settings visibility
     @Environment(\.colorScheme) var colorScheme
-    
 
     var body: some View {
-        NavigationView {
+        ZStack {
+            // Main Content View
             VStack {
                 // Header with title and profile icon
                 HStack {
@@ -19,9 +16,10 @@ struct ContentView: View {
                         .fontWeight(.bold)
                         .padding()
                     Spacer()
-                    // Profile icon
                     Button(action: {
-                        showProfile.toggle()
+                        withAnimation(.easeInOut) {
+                            showSettings.toggle() // Toggle settings view
+                        }
                     }) {
                         Image(systemName: "person.circle.fill")
                             .resizable()
@@ -31,30 +29,49 @@ struct ContentView: View {
                     }
                     .padding()
                 }
-                
-                // Widgets area
+
+                // Widgets Area
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Placeholder widgets
-                        WidgetView(title: "Activity Tracker", detail: "Steps: 10,000")
-                        WidgetView(title: "Nutrition Tracker", detail: "Calories: 2,000")
-                        WidgetView(title: "Sleep Tracker", detail: "Hours: 8")
-                        WidgetView(title: "Medication Reminder", detail: "Next Dose: 2:00 PM")
+                        WidgetView(title: "Apple Health", detail: "Sleep: 8 hours")
+                        WidgetView(title: "Apple Fitness", detail: "Steps: 2,000")
+                        WidgetView(title: "Prescription Checker", detail: "ibuprofen vs aspirin")
+                        WidgetView(title: "Nutrition Tracker", detail: "Macros for food")
                     }
                     .padding()
-                    .shadow(radius: 5)
+                    .shadow(radius: 0.5)
                 }
             }
             .background(colorScheme == .dark ? Color(.systemBackground) : Color.lightbackground)
-            .navigationBarHidden(false) // Hide the default navigation bar
-            .overlay(
-                // User Profile Modal
-                Group {
-                    if showProfile {
-                        UserProfileView(userName: userName, userEmail: userEmail, showProfile: $showProfile)
+            .navigationBarHidden(true)
+
+            // Slide-out Settings View
+            if showSettings {
+                Color.black.opacity(0.4) // Dimmed background when settings is open
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(.easeInOut) {
+                            showSettings = false // Close settings when clicking outside
+                        }
                     }
-                }
-            )
+
+                SettingsView()
+                    .frame(width: UIScreen.main.bounds.width * 0.9) // 80% of screen width
+                    .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                    .cornerRadius(20)
+                    .shadow(radius: 10)
+                    .offset(x: showSettings ? 0 : UIScreen.main.bounds.width) // Slide-in effect
+                    .animation(.easeInOut, value: showSettings)
+                    .gesture(
+                        DragGesture().onEnded { value in
+                            if value.translation.width > 100 { // Detect swipe to close
+                                withAnimation(.easeInOut) {
+                                    showSettings = false
+                                }
+                            }
+                        }
+                    )
+            }
         }
     }
 }
@@ -63,9 +80,8 @@ struct ContentView: View {
 struct WidgetView: View {
     var title: String
     var detail: String
-    
     @Environment(\.colorScheme) var colorScheme
-    
+
     var body: some View {
         VStack {
             Text(title)
@@ -73,7 +89,7 @@ struct WidgetView: View {
                 .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 .padding(.top)
             Divider()
-                .frame(width: UIScreen.main.bounds.width * 0.80)
+                .frame(width: UIScreen.main.bounds.width * 0.8)
             Text(detail)
                 .font(.subheadline)
                 .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
@@ -84,7 +100,6 @@ struct WidgetView: View {
         .cornerRadius(25)
     }
 }
-
 // User Profile View
 struct UserProfileView: View {
     var userName: String
@@ -117,7 +132,14 @@ struct UserProfileView: View {
                     .font(.subheadline)
             }
             .padding()
+            Divider().padding(.horizontal)
+
+            // Settings View
+            SettingsView()
+
+
             Spacer()
+
         }
         .frame(maxWidth: .infinity, maxHeight: 300)
         .background(colorScheme == .dark ? Color.mhaGray : Color.white)

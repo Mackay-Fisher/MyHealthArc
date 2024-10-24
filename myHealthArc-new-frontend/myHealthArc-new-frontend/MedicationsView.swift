@@ -1,3 +1,4 @@
+
 //
 //  MedicationsView.swift
 //  myHealthArc-new-frontend
@@ -27,11 +28,16 @@ struct MedicationsView: View {
                 TextField("Enter medication name", text: $medicationInput)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
+                    .cornerRadius(50)
                 
                 Button("Add") {
                     addMedication()
                 }
                 .padding()
+                .frame(width: 80, height: 40)
+                .background(Color.mhaPurple)
+                .cornerRadius(50)
+                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
             }
 
             // List of added medications with checkboxes
@@ -56,22 +62,29 @@ struct MedicationsView: View {
             }
             .listStyle(PlainListStyle())
 
+            if showInteraction {
+
+                Text("Interaction Results:")
+                    .font(.headline)
+                    .padding()
+                Divider()
+                    .overlay(colorScheme == .dark ? Color.white : Color.black)
+                    .frame(width: 200)
+                Text(interactionResults)
+                    .padding()
+                
+            }
+            
             // Check interactions button
             Button("Check Interactions") {
                 checkInteractions()
             }
             .padding()
+            .frame(width: 200)
+            .background(Color.mhaGreen)
+            .cornerRadius(50)
+            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
 
-            // Show results
-            if showInteraction {
-                Text("Interaction Results:")
-                    .font(.headline)
-                    .padding()
-                Text(interactionResults)
-                    .padding()
-            }
-
-            Spacer()
         }
         .padding()
         .background(colorScheme == .dark ? Color.black : Color.white)
@@ -109,6 +122,7 @@ struct MedicationsView: View {
             interactionResults = "Select more medications to check for interactions."
         }
         showInteraction = true
+
     }
 }
 
@@ -117,3 +131,5 @@ struct MedicationsView_Previews: PreviewProvider {
         MedicationsView()
     }
 }
+
+

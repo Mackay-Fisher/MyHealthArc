@@ -56,7 +56,7 @@ struct ContentView: View {
                     }
 
                 SettingsView()
-                    .frame(width: UIScreen.main.bounds.width * 0.9) // 80% of screen width
+                    .frame(width: UIScreen.main.bounds.width * 0.8) // 80% of screen width
                     .background(colorScheme == .dark ? Color.mhaGray : Color.white)
                     .cornerRadius(20)
                     .shadow(radius: 10)

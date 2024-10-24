@@ -120,9 +120,8 @@ struct SettingsView: View {
                     Button("Log Out"){}
                 }
                 .frame(width: 200, height: 50)
-                .background(Color.red)
-                .foregroundColor(.white)
-                .cornerRadius(10)
+                .fontWeight(.bold)
+                .foregroundColor(.red)
             }
             .padding()
             

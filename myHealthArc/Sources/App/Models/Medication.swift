@@ -1,28 +1,32 @@
 import Fluent
 import Vapor
+import FluentMongoDriver
 
 final class Medication: Model, Content {
     static let schema = "medications"
-    
-    @ID(key: .id)
-    var id: UUID?
-    
+
+    @ID(custom: "_id")
+    var id: ObjectId?
+
     @Field(key: "userHash")
     var userHash: String
 
-    // Array of dictionaries to store medication details
     @Field(key: "medications")
-    var medications: [[String: String]] // Each dictionary contains name, dosage, frequency
+    var medications: [String]
 
-    @Field(key: "interactions")
-    var interactions: [String: [String]] // Interactions stored by medication name
+    @Field(key: "dosages")
+    var dosages: [String]
+
+    @Field(key: "frequencies")
+    var frequencies: [Int] // Changed to array of integers
 
     init() { }
 
-    init(id: UUID? = nil, userHash: String, medications: [[String: String]], interactions: [String: [String]]) {
+    init(id: ObjectId? = nil, userHash: String, medications: [String], dosages: [String], frequencies: [Int]) {
         self.id = id
         self.userHash = userHash
         self.medications = medications
-        self.interactions = interactions
+        self.dosages = dosages
+        self.frequencies = frequencies
     }
 }

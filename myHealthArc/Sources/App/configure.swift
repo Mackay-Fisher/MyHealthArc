@@ -15,6 +15,12 @@ try app.databases.use(DatabaseConfigurationFactory.mongo(
 
     app.migrations.add(CreateTodo())
     app.migrations.add(CreateUser())
+    app.migrations.add(CreateMedication())
+    app.migrations.add(CreateNutrition())
+    app.migrations.add(CreateHealthKit())
+    app.migrations.add(CreateMedicationInteractions())
+    app.migrations.add(CreateNutritionItem())
+
 
     app.views.use(.leaf)
 

@@ -5,10 +5,9 @@ struct CreateMedication: AsyncMigration {
         try await database.schema("medications")
             .id()
             .field("userHash", .string, .required)
-            .field("name", .string, .required)
-            .field("dosage", .string, .required)
-            .field("frequency", .string, .required)
-            .field("conflicts", .array(of: .string), .required)
+            .field("medications", .array(of: .string), .required)
+            .field("dosages", .array(of: .string), .required)
+            .field("frequencies", .array(of: .int), .required)
             .create()
     }
 

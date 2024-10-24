@@ -36,16 +36,14 @@ struct NutritionWidgetView: View {
                     TextField("Search food nutrition info", text: $foodSearch, onCommit: {
                         fetchFoodInfo()
                     })
-                    .padding() 
+                    .padding(5)
                     .background(colorScheme == .dark ? Color.mhaGray : Color.white)
                     .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                     .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 1)
+                            .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
                     )
-                    .padding()
-                    .frame(width: 300, height: 30)
                         
   
                     

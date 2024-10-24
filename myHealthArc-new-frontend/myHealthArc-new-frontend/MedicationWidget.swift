@@ -26,8 +26,9 @@ struct MedicationWidget: View {
                 Divider()
                 // Input fields for two medications
                 HStack {
-                    TextField("Med 1", text: $firstMedication)
-                        .padding(3)
+                    TextField("Medication 1", text: $firstMedication)
+                        .padding(.leading, 2)
+                        .padding(5)
                         .background(colorScheme == .dark ? Color.mhaGray : Color.white)
                         .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                         .cornerRadius(12)
@@ -35,10 +36,11 @@ struct MedicationWidget: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 1)
                         )
-                        .frame(width: 125)
+                        .frame(width: 125, alignment:.center)
                     Text ("vs.")
-                    TextField("Med 2", text: $secondMedication)
-                        .padding(3)
+                    TextField("Medication 2", text: $secondMedication)
+                        .padding(.leading, 2)
+                        .padding(5)
                         .background(colorScheme == .dark ? Color.mhaGray : Color.white)
                         .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                         .cornerRadius(12)
@@ -46,12 +48,12 @@ struct MedicationWidget: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 1)
                         )
-                        .frame(width: 125)
+                        .frame(width: 125 , alignment:.center)
                 }
                 
                 // Compare Button
                 Button(action: checkInteractions) {
-                    Text("Compare ")
+                    Text("Compare")
                         .padding()
                         .frame(width: 150)
                         .background(Color.mhaGreen)
@@ -83,7 +85,7 @@ struct MedicationWidget: View {
             }
             .frame(maxWidth: 320)
             .padding()
-            .background(Color.white)
+            .background(colorScheme == .dark ? Color.mhaGray : Color.white)
             .cornerRadius(30)
             .shadow(radius: 0.2)
         }

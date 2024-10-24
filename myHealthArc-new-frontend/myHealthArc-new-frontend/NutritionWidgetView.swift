@@ -39,7 +39,7 @@ struct NutritionWidgetView: View {
                     .padding()
                     .frame(width: 300, height: 30)
                         
-                    
+  
                     
 
                     Button(action: fetchFoodInfo) {
@@ -49,6 +49,7 @@ struct NutritionWidgetView: View {
                             .background(Color.mhaPurple)
                             .clipShape(Circle())
                     }
+                    Spacer()
                 }
                 .padding()
 

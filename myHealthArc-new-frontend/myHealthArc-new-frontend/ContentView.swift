@@ -38,11 +38,12 @@ struct ContentView: View {
                     VStack(spacing: 20) {
                         WidgetView(title: "Apple Health", detail: "Sleep: 8 hours")
                         WidgetView(title: "Apple Fitness", detail: "Steps: 2,000")
+                        //TODO: fix the navigation, not working atm
                         NavigationLink(destination: MedicationsView()) {
                                 WidgetView(title: "Medication Checker", detail: "Check for drug interactions")
                             }
 
-                        WidgetView(title: "Nutrition Tracker", detail: "Macros for food")
+                        NutritionWidgetView()
                     }
                     .padding()
                     .shadow(radius: 0.5)

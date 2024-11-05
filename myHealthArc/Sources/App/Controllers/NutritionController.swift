@@ -79,31 +79,33 @@ struct NutritionController: RouteCollection {
 
             let foodDataResponse = try JSONDecoder().decode(FoodDataResponse.self, from: bodyData)
 
-            // Calculate average nutrient values from the first 15 food items
-            if let averagedNutrients = calculateAverageNutrients(from: foodDataResponse.foods) {
-                let (protein, carbohydrates, fats, calories) = averagedNutrients
+            // Calculate nutrient/macro values from the first 15 food items
+            if let macroRanges = calculateMacroRanges(from: foodDataResponse.foods) {
+                let (proteinMinimum, proteinMaximum, carbohydratesMinimum, carbohydratesMaximum, fatsMinimum, fatsMaximum, caloriesMinimum, caloriesMaximum) = macroRanges
 
                 // If valid nutrient data is found, save to the database and return rounded results
-                if protein > 0 || carbohydrates > 0 || fats > 0 || calories > 0 {
-                    let roundedNutrition = [
-                        "protein": round(protein * 10) / 10,
-                        "carbohydrates": round(carbohydrates * 10) / 10,
-                        "fats": round(fats * 10) / 10,
-                        "calories": round(Double(calories) * 10) / 10
-                    ]
+                let roundedNutrition = [
+                    "proteinMinimum": round(proteinMinimum * 10) / 10,
+                    "proteinMaximum": round(proteinMaximum * 10) / 10,
+                    "carbohydratesMinimum": round(carbohydratesMinimum * 10) / 10,
+                    "carbohydratesMaximum": round(carbohydratesMaximum * 10) / 10,
+                    "fatsMinimum": round(fatsMinimum * 10) / 10,
+                    "fatsMaximum": round(fatsMaximum * 10) / 10,
+                    "caloriesMinimum": round(Double(caloriesMinimum) * 10) / 10,
+                    "caloriesMaximum": round(Double(caloriesMaximum) * 10) / 10
+                ]
 
-                    // Save the new item to the database
-                    let newNutritionItem = NutritionItem(
-                        foodItem: foodName,
-                        protein: protein,
-                        carbohydrates: carbohydrates,
-                        fats: fats,
-                        calories: calories
-                    )
-                    try await newNutritionItem.save(on: req.db)
+                // Save the new item to the database
+                /*let newNutritionItem = NutritionItem(
+                    foodItem: foodName,
+                    protein: proteinMaximum,
+                    carbohydrates: carbohydratesMaximum,
+                    fats: fatsMaximum,
+                    calories: caloriesMaximum
+                )
+                try await newNutritionItem.save(on: req.db)*/
 
-                    return (foodName, roundedNutrition)
-                }
+                return (foodName, roundedNutrition)
             }
         } catch {
             return (foodName, nil)
@@ -112,36 +114,44 @@ struct NutritionController: RouteCollection {
         return (foodName, nil)
     }
 
-    // Helper function to calculate average nutrient values
-    private func calculateAverageNutrients(from foods: [FoodDataResponse.FoodItem]) -> (Double, Double, Double, Int)? {
-        var totalProtein: Double = 0.0
-        var totalCarbs: Double = 0.0
-        var totalFats: Double = 0.0
-        var totalCalories: Int = 0
-        var count = 0
+    // Helper function to calculate nutrient/macro ranges
+    private func calculateMacroRanges(from foods: [FoodDataResponse.FoodItem]) -> (Double, Double, Double, Double, Double, Double, Int, Int)? {
+        var proteinMinimum: Double = Double.greatestFiniteMagnitude
+        var proteinMaximum: Double = 0.0
+        var carbohydratesMinimum: Double = Double.greatestFiniteMagnitude
+        var carbohydratesMaximum: Double = 0.0
+        var fatsMinimum: Double = Double.greatestFiniteMagnitude
+        var fatsMaximum: Double = 0.0
+        var caloriesMinimum: Int = Int.max
+        var caloriesMaximum: Int = 0
 
-        // Iterate over the first 15 food items
         for foodItem in foods.prefix(15) {
             let (protein, carbs, fats, calories) = extractNutrientInfo(from: foodItem)
 
-            // Add the nutrient values if they are valid
-            if protein > 0 || carbs > 0 || fats > 0 || calories > 0 {
-                totalProtein += protein
-                totalCarbs += carbs
-                totalFats += fats
-                totalCalories += calories
-                count += 1
+            if protein > 0 {
+                proteinMinimum = min(proteinMinimum, protein)
+                proteinMaximum = max(proteinMaximum, protein)
+            }
+            if carbs > 0 {
+                carbohydratesMinimum = min(carbohydratesMinimum, carbs)
+                carbohydratesMaximum = max(carbohydratesMaximum, carbs)
+            }
+            if fats > 0 {
+                fatsMinimum = min(fatsMinimum, fats)
+                fatsMaximum = max(fatsMaximum, fats)
+            }
+            if calories > 0 {
+                caloriesMinimum = min(caloriesMinimum, calories)
+                caloriesMaximum = max(caloriesMaximum, calories)
             }
         }
 
-        // Calculate averages
-        guard count > 0 else { return nil }
-        return (
-            totalProtein / Double(count),
-            totalCarbs / Double(count),
-            totalFats / Double(count),
-            totalCalories / count
-        )
+        guard proteinMinimum != Double.greatestFiniteMagnitude,
+              carbohydratesMinimum != Double.greatestFiniteMagnitude,
+              fatsMinimum != Double.greatestFiniteMagnitude,
+              caloriesMinimum != Int.max else { return nil }
+
+        return (proteinMinimum, proteinMaximum, carbohydratesMinimum, carbohydratesMaximum, fatsMinimum, fatsMaximum, caloriesMinimum, caloriesMaximum)
     }
 
     // Helper function to extract nutrient information from a food item

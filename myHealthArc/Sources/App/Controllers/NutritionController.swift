@@ -31,10 +31,14 @@ struct NutritionController: RouteCollection {
                 // If a match is found, add it to the results
                 let item = matchedItem.item
                 nutritionResults[item.foodItem] = [
-                    "protein": round(item.protein * 10) / 10,
-                    "carbohydrates": round(item.carbohydrates * 10) / 10,
-                    "fats": round(item.fats * 10) / 10,
-                    "calories": round(Double(item.calories) * 10) / 10
+                    "proteinMinimum": round(item.proteinMinimum * 10) / 10,
+                    "proteinMaximum": round(item.proteinMaximum * 10) / 10,
+                    "carbohydratesMinimum": round(item.carbohydratesMinimum * 10) / 10,
+                    "carbohydratesMaximum": round(item.carbohydratesMaximum * 10) / 10,
+                    "fatsMinimum": round(item.fatsMinimum * 10) / 10,
+                    "fatsMaximum": round(item.fatsMaximum * 10) / 10,
+                    "caloriesMinimum": round(Double(item.caloriesMinimum) * 10) / 10,
+                    "caloriesMaximum": round(Double(item.caloriesMaximum) * 10) / 10
                 ]
             } else {
                 // If no match is found, add to the list of missing items
@@ -95,15 +99,18 @@ struct NutritionController: RouteCollection {
                     "caloriesMaximum": round(Double(caloriesMaximum) * 10) / 10
                 ]
 
-                // Save the new item to the database
-                /*let newNutritionItem = NutritionItem(
+                let newNutritionItem = NutritionItem(
                     foodItem: foodName,
-                    protein: proteinMaximum,
-                    carbohydrates: carbohydratesMaximum,
-                    fats: fatsMaximum,
-                    calories: caloriesMaximum
+                    proteinMinimum: proteinMinimum,
+                    proteinMaximum: proteinMaximum,
+                    carbohydratesMinimum: carbohydratesMinimum,
+                    carbohydratesMaximum: carbohydratesMaximum,
+                    fatsMinimum: fatsMinimum,
+                    fatsMaximum: fatsMaximum,
+                    caloriesMinimum: caloriesMinimum,
+                    caloriesMaximum: caloriesMaximum
                 )
-                try await newNutritionItem.save(on: req.db)*/
+                try await newNutritionItem.save(on: req.db)
 
                 return (foodName, roundedNutrition)
             }

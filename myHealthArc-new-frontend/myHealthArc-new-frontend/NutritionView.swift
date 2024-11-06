@@ -46,6 +46,8 @@ struct NutritionView: View {
             
             // Meal Input Section
             HStack {
+                Spacer()
+                
                 VStack {
                     Text("Your Meals")
                         .font(.title3)
@@ -72,8 +74,9 @@ struct NutritionView: View {
                     }
                     .padding(.top)
                 }
-                
+
                 Spacer()
+
                 Button(action: {
                         withAnimation {
                             showPopup = true

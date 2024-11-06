@@ -67,6 +67,7 @@ struct NutritionView: View {
                         .padding(12)
                 }
             }
+            .disabled(showPopup)
             //TODO: fix the nutrition search thing
             //TODO: figure out why spacing is so messed up
             Spacer()

@@ -45,35 +45,31 @@ struct NutritionView: View {
                 .frame(height:20)
             
             // Meal Input Section
-            // HStack {
-            //     TextField("Enter meal (comma-separated)", text: $mealInput)
-            //     //.padding(.leading, 2)
-            //         .padding(5)
-            //         .background(colorScheme == .dark ? Color.mhaGray : Color.white)
-            //         .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-            //         .cornerRadius(12)
-            //         .overlay(
-            //             RoundedRectangle(cornerRadius: 12)
-            //                 .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
-            //         )
-            //     //.frame(width: 250, height: 150, alignment:.center)
+            HStack {
+                // TextField("Enter meal (comma-separated)", text: $mealInput)
+                // //.padding(.leading, 2)
+                //     .padding(5)
+                //     .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                //     .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                //     .cornerRadius(12)
+                //     .overlay(
+                //         RoundedRectangle(cornerRadius: 12)
+                //             .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                //     )
+                // //.frame(width: 250, height: 150, alignment:.center)
                 
-            //     Button("Add Meal") {
-            //         addMeal()
-            //     }
-            //     .padding()
-            //     .frame(width: 120, height: 40)
-            //     .background(Color.mhaGreen)
-            //     .cornerRadius(50)
-            //     .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-            // }
-            //TODO: fix the nutrition search thing
-            //TODO: figure out why spacing is so messed up
-            Spacer()
-                .frame(height:20)
-            
-            //hopefully this adds it to the top right????
-            Button(action: {
+                // Button("Add Meal") {
+                //     addMeal()
+                // }
+                // .padding()
+                // .frame(width: 120, height: 40)
+                // .background(Color.mhaGreen)
+                // .cornerRadius(50)
+                // .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+
+                //hopefully this adds it to the top right????
+                Spacer()
+                Button(action: {
                         withAnimation {
                             showPopup = true
                         }
@@ -82,6 +78,12 @@ struct NutritionView: View {
                             .font(.title)
                             .padding()
                     }
+            }
+            //TODO: fix the nutrition search thing
+            //TODO: figure out why spacing is so messed up
+            Spacer()
+                .frame(height:20)
+            
             
             if showPopup {
                 Color.black.opacity(0.4)

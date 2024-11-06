@@ -67,15 +67,39 @@ struct NutritionView: View {
                 .cornerRadius(50)
                 .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
             }
+            //TODO: fix the nutrition search thing
             //TODO: figure out why spacing is so messed up
             Spacer()
                 .frame(height:20)
             
-            if !meals.isEmpty {
-                            Text("Your Meals")
-                                .font(.title3)
-                                .padding(.top)
+            
+            VStack {
+                Text("Your Meals")
+                    .font(.title3)
+                    .padding(.top)
+                
+                // Calendar Week View
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(getCurrentWeek(), id: \.self) { date in
+                            VStack {
+                                Text(date, formatter: DateFormatter.dayOfWeekFormatter)
+                                    .font(.subheadline)
+                                Text(date, formatter: DateFormatter.dayFormatter)
+                                    .font(.title3)
+                                    .fontWeight(isToday(date) ? .bold : .regular)
+                                    .foregroundColor(isToday(date) ? .mhaGreen : .primary)
+                            }
+                            .padding()
+                            .background(isToday(date) ? Color.mhaPurple.opacity(0.2) : Color.clear)
+                            .cornerRadius(50)
                         }
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.top)
+            }
+                        
             List(meals, id: \.name) { meal in
                 VStack(alignment: .leading) {
                     Text(meal.name)
@@ -319,6 +343,32 @@ struct NutritionView: View {
         foodInfo = ""
         showFoodInfo = false
     }
+    // Generate current week dates centered around today
+        private func getCurrentWeek() -> [Date] {
+            let calendar = Calendar.current
+            let today = Date()
+            let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
+            return (0..<7).map { calendar.date(byAdding: .day, value: $0, to: startOfWeek)! }
+        }
+        
+        // Check if the date is today
+        private func isToday(_ date: Date) -> Bool {
+            Calendar.current.isDateInToday(date)
+        }
+}
+// Date Formatters for day and day of week
+extension DateFormatter {
+    static let dayFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d"
+        return formatter
+    }()
+    
+    static let dayOfWeekFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE"
+        return formatter
+    }()
 }
 
 // Preview for SwiftUI Canvas
@@ -327,3 +377,4 @@ struct NutritionView_Previews: PreviewProvider {
         NutritionView()
     }
 }
+

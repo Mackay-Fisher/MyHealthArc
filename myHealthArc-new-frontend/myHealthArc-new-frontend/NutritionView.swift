@@ -85,10 +85,7 @@ struct NutritionView: View {
                 .frame(height:20)
             
             
-            if showPopup {
-                Color.black.opacity(0.4)
-                    .edgesIgnoringSafeArea(.all) // Dim background when popup is shown
-                
+            if showPopup {                
                 VStack(spacing: 20) {
                     HStack {
                         TextField("Enter meal (comma-separated)", text: $mealInput)

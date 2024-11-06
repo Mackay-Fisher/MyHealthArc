@@ -429,48 +429,6 @@ extension DateFormatter {
     }()
 }
 
-struct addItemPopup: View{
-    @Binding var showPopup: Bool
-    @Binding var searchQuery: String
-    @Binding var amount: String
-
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                TextField("Search...", text: $searchQuery)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                
-                TextField("Enter Amount", text: $amount)
-                    .keyboardType(.decimalPad)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-
-                Button(action: {
-                    // Add action to handle submission here
-                    self.showPopup = false
-                }) {
-                    Text("Add Item")
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
-                        .cornerRadius(8)
-                }
-                
-                Spacer()
-            }
-            .padding()
-            .navigationBarTitle("Add Item", displayMode: .inline)
-            .navigationBarItems(leading: Button("Cancel") {
-                self.showPopup = false
-            })
-        }
-    }
-}
-
 // Preview for SwiftUI Canvas
 struct NutritionView_Previews: PreviewProvider {
     static var previews: some View {

@@ -82,7 +82,53 @@ struct NutritionView: View {
                             .font(.title)
                             .padding()
                     }
-                    
+            
+            if showPopup {
+                Color.black.opacity(0.4)
+                    .edgesIgnoringSafeArea(.all) // Dim background when popup is shown
+                
+                VStack(spacing: 20) {
+                    HStack {
+                        TextField("Enter meal (comma-separated)", text: $mealInput)
+                            .padding(5)
+                            .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                            )
+                        
+                        Button("Add Meal") {
+                            addMeal()
+                            withAnimation {
+                                showPopup = false
+                            }
+                        }
+                        .padding()
+                        .frame(width: 120, height: 40)
+                        .background(Color.green)
+                        .cornerRadius(20)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                    }
+
+                    Button(action: {
+                        withAnimation {
+                            showPopup = false
+                        }
+                    }) {
+                        Text("Cancel")
+                            .foregroundColor(.red)
+                    }
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(16)
+                .frame(width: 350)
+                .shadow(radius: 20)
+                .transition(.scale)
+            }
+            
             VStack {
                 Text("Your Meals")
                     .font(.title3)

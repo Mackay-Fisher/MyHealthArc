@@ -72,7 +72,17 @@ struct NutritionView: View {
             Spacer()
                 .frame(height:20)
             
-            
+            //hopefully this adds it to the top right????
+            Button(action: {
+                        withAnimation {
+                            showPopup = true
+                        }
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .font(.title)
+                            .padding()
+                    }
+                    
             VStack {
                 Text("Your Meals")
                     .font(.title3)

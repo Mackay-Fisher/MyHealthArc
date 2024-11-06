@@ -46,37 +46,11 @@ struct NutritionView: View {
             
             // Meal Input Section
             HStack {
-                Spacer()
-                
-                VStack {
-                    Text("Your Meals")
-                        .font(.title3)
-                        .padding(.top)
-                    
-                    // Calendar Week View
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
-                            ForEach(getCurrentWeek(), id: \.self) { date in
-                                VStack {
-                                    Text(date, formatter: DateFormatter.dayOfWeekFormatter)
-                                        .font(.subheadline)
-                                    Text(date, formatter: DateFormatter.dayFormatter)
-                                        .font(.title3)
-                                        .fontWeight(isToday(date) ? .bold : .regular)
-                                        .foregroundColor(isToday(date) ? .mhaGreen : .primary)
-                                }
-                                .padding()
-                                .background(isToday(date) ? Color.mhaPurple.opacity(0.2) : Color.clear)
-                                .cornerRadius(50)
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
+                Text("Your Meals")
+                    .font(.title3)
                     .padding(.top)
-                }
-
+                    
                 Spacer()
-
                 Button(action: {
                         withAnimation {
                             showPopup = true
@@ -134,6 +108,29 @@ struct NutritionView: View {
                 .frame(width: 350)
                 .shadow(radius: 20)
                 .transition(.scale)
+            }
+
+            VStack {
+                // Calendar Week View
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(getCurrentWeek(), id: \.self) { date in
+                            VStack {
+                                Text(date, formatter: DateFormatter.dayOfWeekFormatter)
+                                    .font(.subheadline)
+                                Text(date, formatter: DateFormatter.dayFormatter)
+                                    .font(.title3)
+                                    .fontWeight(isToday(date) ? .bold : .regular)
+                                    .foregroundColor(isToday(date) ? .mhaGreen : .primary)
+                            }
+                            .padding()
+                            .background(isToday(date) ? Color.mhaPurple.opacity(0.2) : Color.clear)
+                            .cornerRadius(50)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.top)
             }
                         
             List(meals, id: \.name) { meal in

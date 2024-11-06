@@ -45,22 +45,27 @@ struct NutritionView: View {
                 .frame(height:20)
             
             // Meal Input Section
-            HStack {
-                Spacer()
-                Text("Your Meals")
-                    .font(.title3)
-                    .padding(.top)
-
-                Spacer()
+            ZStack(alignment: .topTrailing) {
+                HStack {
+                    Spacer()
+                    
+                    Text("Your Meals")
+                        .font(.title3)
+                        .padding(.top)
+                    
+                    Spacer()
+                }
+                .padding(.horizontal)
+                
                 Button(action: {
-                        withAnimation {
-                            showPopup = true
-                        }
-                    }) {
-                        Image(systemName: "plus.circle")
-                            .font(.title)
-                            .padding()
+                    withAnimation {
+                        showPopup = true
                     }
+                }) {
+                    Image(systemName: "plus.circle")
+                        .font(.title)
+                        .padding()
+                }
             }
             //TODO: fix the nutrition search thing
             //TODO: figure out why spacing is so messed up

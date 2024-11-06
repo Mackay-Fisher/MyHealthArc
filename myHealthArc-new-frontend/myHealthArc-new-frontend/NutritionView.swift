@@ -46,28 +46,33 @@ struct NutritionView: View {
             
             // Meal Input Section
             HStack {
-                // TextField("Enter meal (comma-separated)", text: $mealInput)
-                // //.padding(.leading, 2)
-                //     .padding(5)
-                //     .background(colorScheme == .dark ? Color.mhaGray : Color.white)
-                //     .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                //     .cornerRadius(12)
-                //     .overlay(
-                //         RoundedRectangle(cornerRadius: 12)
-                //             .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
-                //     )
-                // //.frame(width: 250, height: 150, alignment:.center)
+                VStack {
+                    Text("Your Meals")
+                        .font(.title3)
+                        .padding(.top)
+                    
+                    // Calendar Week View
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 16) {
+                            ForEach(getCurrentWeek(), id: \.self) { date in
+                                VStack {
+                                    Text(date, formatter: DateFormatter.dayOfWeekFormatter)
+                                        .font(.subheadline)
+                                    Text(date, formatter: DateFormatter.dayFormatter)
+                                        .font(.title3)
+                                        .fontWeight(isToday(date) ? .bold : .regular)
+                                        .foregroundColor(isToday(date) ? .mhaGreen : .primary)
+                                }
+                                .padding()
+                                .background(isToday(date) ? Color.mhaPurple.opacity(0.2) : Color.clear)
+                                .cornerRadius(50)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .padding(.top)
+                }
                 
-                // Button("Add Meal") {
-                //     addMeal()
-                // }
-                // .padding()
-                // .frame(width: 120, height: 40)
-                // .background(Color.mhaGreen)
-                // .cornerRadius(50)
-                // .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-
-                //hopefully this adds it to the top right????
                 Spacer()
                 Button(action: {
                         withAnimation {
@@ -126,33 +131,6 @@ struct NutritionView: View {
                 .frame(width: 350)
                 .shadow(radius: 20)
                 .transition(.scale)
-            }
-
-            VStack {
-                Text("Your Meals")
-                    .font(.title3)
-                    .padding(.top)
-                
-                // Calendar Week View
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 16) {
-                        ForEach(getCurrentWeek(), id: \.self) { date in
-                            VStack {
-                                Text(date, formatter: DateFormatter.dayOfWeekFormatter)
-                                    .font(.subheadline)
-                                Text(date, formatter: DateFormatter.dayFormatter)
-                                    .font(.title3)
-                                    .fontWeight(isToday(date) ? .bold : .regular)
-                                    .foregroundColor(isToday(date) ? .mhaGreen : .primary)
-                            }
-                            .padding()
-                            .background(isToday(date) ? Color.mhaPurple.opacity(0.2) : Color.clear)
-                            .cornerRadius(50)
-                        }
-                    }
-                    .padding(.horizontal)
-                }
-                .padding(.top)
             }
                         
             List(meals, id: \.name) { meal in

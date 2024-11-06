@@ -64,7 +64,7 @@ struct NutritionView: View {
                 }) {
                     Image(systemName: "plus.circle")
                         .font(.title)
-                        .padding()
+                        .padding(12)
                 }
             }
             //TODO: fix the nutrition search thing

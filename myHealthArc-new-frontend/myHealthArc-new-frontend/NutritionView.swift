@@ -21,7 +21,7 @@ struct NutritionView: View {
     @State private var foodInfo: String = ""
     @State private var showFoodInfo: Bool = false
     @State private var totalNutrition: String = ""
-    
+    @State private var showPopup: Bool = false
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
@@ -45,28 +45,28 @@ struct NutritionView: View {
                 .frame(height:20)
             
             // Meal Input Section
-            HStack {
-                TextField("Enter meal (comma-separated)", text: $mealInput)
-                //.padding(.leading, 2)
-                    .padding(5)
-                    .background(colorScheme == .dark ? Color.mhaGray : Color.white)
-                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
-                    )
-                //.frame(width: 250, height: 150, alignment:.center)
+            // HStack {
+            //     TextField("Enter meal (comma-separated)", text: $mealInput)
+            //     //.padding(.leading, 2)
+            //         .padding(5)
+            //         .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+            //         .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+            //         .cornerRadius(12)
+            //         .overlay(
+            //             RoundedRectangle(cornerRadius: 12)
+            //                 .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+            //         )
+            //     //.frame(width: 250, height: 150, alignment:.center)
                 
-                Button("Add Meal") {
-                    addMeal()
-                }
-                .padding()
-                .frame(width: 120, height: 40)
-                .background(Color.mhaGreen)
-                .cornerRadius(50)
-                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-            }
+            //     Button("Add Meal") {
+            //         addMeal()
+            //     }
+            //     .padding()
+            //     .frame(width: 120, height: 40)
+            //     .background(Color.mhaGreen)
+            //     .cornerRadius(50)
+            //     .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+            // }
             //TODO: fix the nutrition search thing
             //TODO: figure out why spacing is so messed up
             Spacer()
@@ -128,7 +128,7 @@ struct NutritionView: View {
                 .shadow(radius: 20)
                 .transition(.scale)
             }
-            
+
             VStack {
                 Text("Your Meals")
                     .font(.title3)

@@ -123,42 +123,54 @@ struct NutritionController: RouteCollection {
 
     // Helper function to calculate nutrient/macro ranges
     private func calculateMacroRanges(from foods: [FoodDataResponse.FoodItem]) -> (Double, Double, Double, Double, Double, Double, Int, Int)? {
-        var proteinMinimum: Double = Double.greatestFiniteMagnitude
-        var proteinMaximum: Double = 0.0
-        var carbohydratesMinimum: Double = Double.greatestFiniteMagnitude
-        var carbohydratesMaximum: Double = 0.0
-        var fatsMinimum: Double = Double.greatestFiniteMagnitude
-        var fatsMaximum: Double = 0.0
-        var caloriesMinimum: Int = Int.max
-        var caloriesMaximum: Int = 0
+        var proteinValues = [Double]()
+        var carbohydrateValues = [Double]()
+        var fatValues = [Double]()
+        var calorieValues = [Int]()
 
         for foodItem in foods.prefix(15) {
             let (protein, carbs, fats, calories) = extractNutrientInfo(from: foodItem)
-
-            if protein > 0 {
-                proteinMinimum = min(proteinMinimum, protein)
-                proteinMaximum = max(proteinMaximum, protein)
-            }
-            if carbs > 0 {
-                carbohydratesMinimum = min(carbohydratesMinimum, carbs)
-                carbohydratesMaximum = max(carbohydratesMaximum, carbs)
-            }
-            if fats > 0 {
-                fatsMinimum = min(fatsMinimum, fats)
-                fatsMaximum = max(fatsMaximum, fats)
-            }
-            if calories > 0 {
-                caloriesMinimum = min(caloriesMinimum, calories)
-                caloriesMaximum = max(caloriesMaximum, calories)
-            }
+            if protein > 0 { proteinValues.append(protein) }
+            if carbs > 0 { carbohydrateValues.append(carbs) }
+            if fats > 0 { fatValues.append(fats) }
+            if calories > 0 { calorieValues.append(calories) }
         }
 
-        guard proteinMinimum != Double.greatestFiniteMagnitude,
-              carbohydratesMinimum != Double.greatestFiniteMagnitude,
-              fatsMinimum != Double.greatestFiniteMagnitude,
-              caloriesMinimum != Int.max else { return nil }
+        proteinValues = filterOutliers(values: proteinValues)
+        carbohydrateValues = filterOutliers(values: carbohydrateValues)
+        fatValues = filterOutliers(values: fatValues)
+        calorieValues = filterOutliers(values: calorieValues.map { Double($0) }).map { Int($0) }
+
+        guard !proteinValues.isEmpty,
+              !carbohydrateValues.isEmpty,
+              !fatValues.isEmpty,
+              !calorieValues.isEmpty else { return nil }
+
+        let proteinMinimum = proteinValues.min()!
+        let proteinMaximum = proteinValues.max()!
+        let carbohydratesMinimum = carbohydrateValues.min()!
+        let carbohydratesMaximum = carbohydrateValues.max()!
+        let fatsMinimum = fatValues.min()!
+        let fatsMaximum = fatValues.max()!
+        let caloriesMinimum = calorieValues.min()!
+        let caloriesMaximum = calorieValues.max()!
 
         return (proteinMinimum, proteinMaximum, carbohydratesMinimum, carbohydratesMaximum, fatsMinimum, fatsMaximum, caloriesMinimum, caloriesMaximum)
+    }
+
+    // Helper function to filter outliers using IQR method
+    private func filterOutliers(values: [Double]) -> [Double] {
+        guard values.count > 4 else { return values }
+
+        let sortedValues = values.sorted()
+        let q1 = sortedValues[sortedValues.count / 4]
+        let q3 = sortedValues[3 * sortedValues.count / 4]
+        let iqr = q3 - q1
+
+        let lowerBound = q1 - 1.5 * iqr
+        let upperBound = q3 + 1.5 * iqr
+
+        return sortedValues.filter { $0 >= lowerBound && $0 <= upperBound }
     }
 
     // Helper function to extract nutrient information from a food item

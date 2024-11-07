@@ -136,42 +136,58 @@ final class NutritionValidationTest: XCTestCase {
     }
 
     private func calculateMacroRanges(from foods: [FoodDataResponse.FoodItem]) -> (Double, Double, Double, Double, Double, Double, Int, Int)? {
-        var proteinMinimum: Double = Double.greatestFiniteMagnitude
-        var proteinMaximum: Double = 0.0
-        var carbohydratesMinimum: Double = Double.greatestFiniteMagnitude
-        var carbohydratesMaximum: Double = 0.0
-        var fatsMinimum: Double = Double.greatestFiniteMagnitude
-        var fatsMaximum: Double = 0.0
-        var caloriesMinimum: Int = Int.max
-        var caloriesMaximum: Int = 0
+        var proteinValues = [Double]()
+        var carbohydrateValues = [Double]()
+        var fatValues = [Double]()
+        var calorieValues = [Int]()
 
         for foodItem in foods.prefix(15) {
             let (protein, carbs, fats, calories) = extractNutrientInfo(from: foodItem)
-
-            if protein > 0 {
-                proteinMinimum = min(proteinMinimum, protein)
-                proteinMaximum = max(proteinMaximum, protein)
-            }
-            if carbs > 0 {
-                carbohydratesMinimum = min(carbohydratesMinimum, carbs)
-                carbohydratesMaximum = max(carbohydratesMaximum, carbs)
-            }
-            if fats > 0 {
-                fatsMinimum = min(fatsMinimum, fats)
-                fatsMaximum = max(fatsMaximum, fats)
-            }
-            if calories > 0 {
-                caloriesMinimum = min(caloriesMinimum, calories)
-                caloriesMaximum = max(caloriesMaximum, calories)
-            }
+            if protein > 0 { proteinValues.append(protein) }
+            if carbs > 0 { carbohydrateValues.append(carbs) }
+            if fats > 0 { fatValues.append(fats) }
+            if calories > 0 { calorieValues.append(calories) }
         }
+        
+        proteinValues = filterOutliers(values: proteinValues, nutrient: "protein")
+        carbohydrateValues = filterOutliers(values: carbohydrateValues, nutrient: "carbohydrates")
+        fatValues = filterOutliers(values: fatValues, nutrient: "fats")
+        calorieValues = filterOutliers(values: calorieValues.map { Double($0) }, nutrient: "calories").map { Int($0) }
 
-        guard proteinMinimum != Double.greatestFiniteMagnitude,
-              carbohydratesMinimum != Double.greatestFiniteMagnitude,
-              fatsMinimum != Double.greatestFiniteMagnitude,
-              caloriesMinimum != Int.max else { return nil }
+        guard !proteinValues.isEmpty,
+              !carbohydrateValues.isEmpty,
+              !fatValues.isEmpty,
+              !calorieValues.isEmpty else { return nil }
+
+        let proteinMinimum = proteinValues.min()!
+        let proteinMaximum = proteinValues.max()!
+        let carbohydratesMinimum = carbohydrateValues.min()!
+        let carbohydratesMaximum = carbohydrateValues.max()!
+        let fatsMinimum = fatValues.min()!
+        let fatsMaximum = fatValues.max()!
+        let caloriesMinimum = calorieValues.min()!
+        let caloriesMaximum = calorieValues.max()!
 
         return (proteinMinimum, proteinMaximum, carbohydratesMinimum, carbohydratesMaximum, fatsMinimum, fatsMaximum, caloriesMinimum, caloriesMaximum)
+    }
+
+    private func filterOutliers(values: [Double], nutrient: String) -> [Double] {
+        guard values.count > 4 else { return values }
+
+        let sortedValues = values.sorted()
+        let q1 = sortedValues[sortedValues.count / 4]
+        let q3 = sortedValues[3 * sortedValues.count / 4]
+        let iqr = q3 - q1
+
+        let lowerBound = q1 - 1.5 * iqr
+        let upperBound = q3 + 1.5 * iqr
+
+        let filteredValues = sortedValues.filter { $0 >= lowerBound && $0 <= upperBound }
+        let excludedValues = sortedValues.filter { $0 < lowerBound || $0 > upperBound }
+
+        print("Excluded \(nutrient) values: \(excludedValues)")
+
+        return filteredValues
     }
 
     private func extractNutrientInfo(from foodItem: FoodDataResponse.FoodItem) -> (Double, Double, Double, Int) {

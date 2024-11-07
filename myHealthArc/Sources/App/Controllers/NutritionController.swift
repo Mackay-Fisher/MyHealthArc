@@ -4,7 +4,15 @@ import Fluent
 struct NutritionController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let nutrition = routes.grouped("nutrition")
+        nutrition.post("create", use: self.createNutrition)
         nutrition.get("info", use: self.getNutritionInfo)
+    }
+
+    @Sendable
+    func createNutrition(req: Request) async throws -> HTTPStatus {
+        let nutrition = try req.content.decode(Nutrition.self)
+        try await nutrition.save(on: req.db)
+        return .created
     }
 
     @Sendable

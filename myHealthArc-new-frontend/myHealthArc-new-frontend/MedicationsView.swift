@@ -30,37 +30,20 @@ struct MedicationsView: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        VStack {
-            HStack{Image ("pills")
-                    .resizable()
-                    .scaledToFit()
-                    .padding(-2)
-                    .frame(width: 30)
-                Text("Medications")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding()
-            }
-            
-            Divider()
-                .overlay(
-                    (colorScheme == .dark ? Color.white : Color.gray)
-                )
-            Spacer()
-                .frame(height:20)
-            
+        ZStack {
             // Input for new medication
-            .sheet(isPresented: $showAddPopup) {
+            if showAddPopup {
                 VStack (spacing: 20) {
                     Text("Add Medications")
                         .font(.title3)
                         .fontWeight(.bold)
-                        .padding()
+                    
                     Divider()
                         .overlay(
                             (colorScheme == .dark ? Color.white : Color.gray)
                         )
                         .padding(.horizontal)
+                    
                     TextField("Enter medication name", text: $medicationInput)
                         .padding(10)
                         .frame(maxWidth: 300)
@@ -100,82 +83,105 @@ struct MedicationsView: View {
                 .background(
                     RoundedRectangle(cornerRadius: 20)
                         .fill(colorScheme == .dark ? Color.black : Color.white)
-                        .shadow(radius: 10)
+                        .shadow(color: colorScheme == .dark ? Color.white.opacity(0.5) : Color.black.opacity(0.5), radius: 10)
                 )
                 .padding(30)
+                .zIndex(1)   
             }
-            
-            HStack {
-                Text("Your Medications")
-                    .font(.title3)
-                    .padding()
-                Spacer()
-                Button(action: {
-                    showAddPopup = true
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 32))
-                        .foregroundColor(.purple)
+            VStack {
+                HStack{Image ("pills")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(-2)
+                        .frame(width: 30)
+                    Text("Medications")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .padding()
                 }
-            }
-            // List of added medications with checkboxes
-            List {
-                ForEach(addedMedications, id: \.self) { medication in
-                    HStack {
-                        // Checkbox for selecting medications
-                        Button(action: {
-                            toggleSelection(for: medication)
-                        }) {
-                            HStack {
-                                Image(systemName: selectedMedications.contains(medication) ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(selectedMedications.contains(medication) ? .mhaGreen : .gray)
-                                Text(medication)
-                                    .foregroundColor(.primary)
-                                Spacer()
-                                Button(action: {
-                                    if let index = addedMedications.firstIndex(of: medication) {
-                                        removeMedication(at: IndexSet([index]))
+                
+                Divider()
+                    .overlay(
+                        (colorScheme == .dark ? Color.white : Color.gray)
+                    )
+                Spacer()
+                    .frame(height:20)
+                
+                
+                
+                HStack {
+                    Text("Your Medications")
+                        .font(.title3)
+                        .padding()
+                    Spacer()
+                    Button(action: {
+                        showAddPopup = true
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 32))
+                            .foregroundColor(.purple)
+                    }
+                }
+                // List of added medications with checkboxes
+                List {
+                    ForEach(addedMedications, id: \.self) { medication in
+                        HStack {
+                            // Checkbox for selecting medications
+                            Button(action: {
+                                toggleSelection(for: medication)
+                            }) {
+                                HStack {
+                                    Image(systemName: selectedMedications.contains(medication) ? "checkmark.circle.fill" : "circle")
+                                        .foregroundColor(selectedMedications.contains(medication) ? .mhaGreen : .gray)
+                                    Text(medication)
+                                        .foregroundColor(.primary)
+                                    Spacer()
+                                    Button(action: {
+                                        if let index = addedMedications.firstIndex(of: medication) {
+                                            removeMedication(at: IndexSet([index]))
+                                        }
+                                    }) {
+                                        Image(systemName: "trash")
+                                            .foregroundColor(.red)
                                     }
-                                }) {
-                                    Image(systemName: "trash")
-                                        .foregroundColor(.red)
+                                    
                                 }
-                                
                             }
                         }
+                        
                     }
+                    .onDelete(perform: removeMedication)
+                }
+                .listStyle(PlainListStyle())
+
+                if showInteraction {
+
+                    Text("Interaction Results:")
+                        .font(.headline)
+                        .padding()
+                    Divider()
+                        .overlay(colorScheme == .dark ? Color.white : Color.black)
+                        .frame(width: 200)
+                    Text(interactionResults)
+                        .padding()
                     
                 }
-                .onDelete(perform: removeMedication)
-                }
-            .listStyle(PlainListStyle())
-
-            if showInteraction {
-
-                Text("Interaction Results:")
-                    .font(.headline)
-                    .padding()
-                Divider()
-                    .overlay(colorScheme == .dark ? Color.white : Color.black)
-                    .frame(width: 200)
-                Text(interactionResults)
-                    .padding()
                 
-            }
-            
-            // Check interactions button
-            Button("Check Interactions") {
-                checkInteractions()
+                // Check interactions button
+                Button("Check Interactions") {
+                    checkInteractions()
+                }
+                .padding()
+                .frame(width: 200)
+                .background(Color.mhaGreen)
+                .cornerRadius(50)
+                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+
             }
             .padding()
-            .frame(width: 200)
-            .background(Color.mhaGreen)
-            .cornerRadius(50)
-            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-
+            .background(colorScheme == .dark ? Color.black : Color.white)
+            .blur(radius: showAddPopup ? 10 : 0)
         }
-        .padding()
-        .background(colorScheme == .dark ? Color.black : Color.white)
     }
     private func addMedication() {
         guard !medicationInput.isEmpty else { return }

@@ -31,7 +31,7 @@ extension Color {
 
 @main
 struct myHealthArc_new_frontendApp: App {
-    @State private var isLoggedIn = false
+    @AppStorage("isLoggedIn") var isLoggedIn = false
     @State private var hasSignedUp = false
         
         var body: some Scene {

@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:MyHealthArc}/myHealthArc",
+            "name": "Debug App (myHealthArc)",
+            "program": "${workspaceFolder:MyHealthArc}/myHealthArc/.build/debug/App",
+            "preLaunchTask": "swift: Build Debug App (myHealthArc)"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:MyHealthArc}/myHealthArc",
+            "name": "Release App (myHealthArc)",
+            "program": "${workspaceFolder:MyHealthArc}/myHealthArc/.build/release/App",
+            "preLaunchTask": "swift: Build Release App (myHealthArc)"
+        }
+    ]
+}

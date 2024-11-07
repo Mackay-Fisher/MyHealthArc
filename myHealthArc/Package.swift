@@ -58,7 +58,8 @@ let package = Package(
             ],
             path: "Tests/NutritionTests",
             sources: [
-                "NutritionValidationTest.swift"
+                "NutritionValidationTest.swift",
+                "NutritionEntryTest.swift"
             ]
         )
     ]

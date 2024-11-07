@@ -123,6 +123,8 @@
 		8F161C2B2CC1B36200E726E7 /* myHealthArc-new-frontend */ = {
 			isa = PBXGroup;
 			children = (
+				5A0CF65A2CDC89B000874758 /* HealthKitViewModel.swift */,
+				5A0CF6542CDC7D4100874758 /* HealthKitManager.swift */,
 				5AD777E52CC330AF00DC2B8B /* myHealthArc-new-frontend.entitlements */,
 				8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */,
 				8F161C2E2CC1B36200E726E7 /* ContentView.swift */,
@@ -235,7 +237,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1520;
-				LastUpgradeCheck = 1520;
+				LastUpgradeCheck = 1610;
 				TargetAttributes = {
 					8F161C282CC1B36200E726E7 = {
 						CreatedOnToolsVersion = 15.2;
@@ -310,11 +312,13 @@
 				250FC2412CC208C80023AE43 /* TermsAndConditionsView.swift in Sources */,
 				250FC2372CC200D10023AE43 /* ServicesView.swift in Sources */,
 				250FC2332CC1F9CF0023AE43 /* LoginView.swift in Sources */,
+				5A0CF6552CDC7D4D00874758 /* HealthKitManager.swift in Sources */,
 				250FC23D2CC202D10023AE43 /* SignUpView.swift in Sources */,
 				250FC2392CC200DF0023AE43 /* SettingsView.swift in Sources */,
 				2555864A2CED326B00D1C638 /* GoalsView.swift in Sources */,
 				2528D6322CC9FB35000D5852 /* NutritionView.swift in Sources */,
 				8F161C2F2CC1B36200E726E7 /* ContentView.swift in Sources */,
+				5A0CF65B2CDC89BB00874758 /* HealthKitViewModel.swift in Sources */,
 				2562C0812CCA10CC009E4284 /* MedicationWidget.swift in Sources */,
 				8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */,
 			);
@@ -482,9 +486,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"myHealthArc-new-frontend/Preview Content\"";
-				DEVELOPMENT_TEAM = K3F2M3VV44;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "\"This app needs access to read your health data for personalized insights\"";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "\"This app needs access to update your health data for tracking purposes\"";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -515,9 +522,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"myHealthArc-new-frontend/Preview Content\"";
-				DEVELOPMENT_TEAM = K3F2M3VV44;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "\"This app needs access to read your health data for personalized insights\"";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "\"This app needs access to update your health data for tracking purposes\"";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -541,7 +551,6 @@
 		8F161C512CC1B36400E726E7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -561,7 +570,6 @@
 		8F161C522CC1B36400E726E7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -581,7 +589,6 @@
 		8F161C542CC1B36400E726E7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = K3F2M3VV44;
@@ -600,7 +607,6 @@
 		8F161C552CC1B36400E726E7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = K3F2M3VV44;

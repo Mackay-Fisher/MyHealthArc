@@ -2,12 +2,12 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var healthKitViewModel = HealthKitViewModel()
     @State private var showSettings: Bool = false // Toggle settings visibility
     @Environment(\.colorScheme) var colorScheme
     
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
-
     var body: some View {
         NavigationView {
             ZStack {
@@ -79,6 +79,9 @@ struct ContentView: View {
                             }
                         )
                 }
+            }
+            .onAppear {
+                healthKitViewModel.initializeHealthKit()
             }
         }
     }

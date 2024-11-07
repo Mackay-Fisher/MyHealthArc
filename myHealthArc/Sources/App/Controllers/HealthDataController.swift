@@ -66,21 +66,68 @@ struct HealthDataController: RouteCollection {
     
     @Sendable
     private func fetchStepCount() async throws -> HealthData {
-        // TODO: Implement the actual HealthKit query for step count
-        return HealthData(type: "steps", value: 0) // Placeholder return
+        let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
+        let startDate = Calendar.current.startOfDay(for: Date())
+        let endDate = Date()
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
+
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKStatisticsQuery(quantityType: stepType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                guard let sum = result?.sumQuantity() else {
+                    continuation.resume(returning: HealthData(type: "steps", value: 0))
+                    return
+                }
+                let steps = sum.doubleValue(for: HKUnit.count())
+                continuation.resume(returning: HealthData(type: "steps", value: steps))
+            }
+            healthStore.execute(query)
+        }
     }
     
     @Sendable
     private func fetchHeartRate() async throws -> HealthData {
-        // TODO: Implement the actual HealthKit query for heart rate
-        return HealthData(type: "heartRate", value: 0) // Placeholder return
+        let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
+        let startDate = Calendar.current.date(byAdding: .hour, value: -1, to: Date())!
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date(), options: .strictStartDate)
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(sampleType: heartRateType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)]) { _, samples, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                let heartRates = (samples as? [HKQuantitySample])?.map { $0.quantity.doubleValue(for: HKUnit(from: "count/min")) } ?? []
+                let averageHeartRate = heartRates.isEmpty ? 0 : heartRates.reduce(0, +) / Double(heartRates.count)
+                continuation.resume(returning: HealthData(type: "heartRate", value: averageHeartRate))
+            }
+            healthStore.execute(query)
+        }
     }
+
     
     @Sendable
     private func fetchWorkouts() async throws -> HealthData {
-        // TODO: Implement the actual HealthKit query for workouts
-        return HealthData(type: "workouts", value: 0) // Placeholder return
+        let workoutType = HKObjectType.workoutType()
+        let startDate = Calendar.current.startOfDay(for: Date())
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date(), options: .strictStartDate)
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(sampleType: workoutType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)]) { _, samples, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                let calories = (samples as? [HKWorkout])?.reduce(0) { $0 + ($1.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0) } ?? 0
+                continuation.resume(returning: HealthData(type: "workouts", value: calories))
+            }
+            healthStore.execute(query)
+        }
     }
+
 }
 
 #endif

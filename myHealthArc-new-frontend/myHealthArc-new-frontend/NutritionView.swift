@@ -21,7 +21,7 @@ struct NutritionView: View {
     @State private var foodInfo: String = ""
     @State private var showFoodInfo: Bool = false
     @State private var totalNutrition: String = ""
-    
+    @State private var showPopup: Bool = false
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
@@ -45,39 +45,79 @@ struct NutritionView: View {
                 .frame(height:20)
             
             // Meal Input Section
-            HStack {
-                TextField("Enter meal (comma-separated)", text: $mealInput)
-                //.padding(.leading, 2)
-                    .padding(5)
-                    .background(colorScheme == .dark ? Color.mhaGray : Color.white)
-                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
-                    )
-                //.frame(width: 250, height: 150, alignment:.center)
-                
-                Button("Add Meal") {
-                    addMeal()
+            ZStack(alignment: .topTrailing) {
+                HStack {
+                    Spacer()
+                    
+                    Text("Your Meals")
+                        .font(.title3)
+                        .padding(.top)
+                    
+                    Spacer()
                 }
-                .padding()
-                .frame(width: 120, height: 40)
-                .background(Color.mhaGreen)
-                .cornerRadius(50)
-                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                .padding(.horizontal)
+                
+                Button(action: {
+                    withAnimation {
+                        showPopup = true
+                    }
+                }) {
+                    Image(systemName: "plus.circle")
+                        .font(.title)
+                        .padding(12)
+                }
             }
+            .disabled(showPopup)
             //TODO: fix the nutrition search thing
             //TODO: figure out why spacing is so messed up
             Spacer()
                 .frame(height:20)
             
             
+            if showPopup {                
+                VStack(spacing: 20) {
+                    HStack {
+                        TextField("Enter meal (comma-separated)", text: $mealInput)
+                            .padding(5)
+                            .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                            )
+                        
+                        Button("Add Meal") {
+                            addMeal()
+                            withAnimation {
+                                showPopup = false
+                            }
+                        }
+                        .padding()
+                        .frame(width: 120, height: 40)
+                        .background(Color.green)
+                        .cornerRadius(20)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                    }
+
+                    Button(action: {
+                        withAnimation {
+                            showPopup = false
+                        }
+                    }) {
+                        Text("Cancel")
+                            .foregroundColor(.red)
+                    }
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(16)
+                .frame(width: 350)
+                .shadow(radius: 20)
+                .transition(.scale)
+            }
+
             VStack {
-                Text("Your Meals")
-                    .font(.title3)
-                    .padding(.top)
-                
                 // Calendar Week View
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {

@@ -63,7 +63,7 @@ struct MedicationsView: View {
                             .padding()
                             .background(Color.mhaPurple)
                             .cornerRadius(50)
-                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                            .foregroundColor(colorScheme == .dark ? Color.black : Color.white)
                             .font(.headline)
                     }
                     .frame(height: 45)

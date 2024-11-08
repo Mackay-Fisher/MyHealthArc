@@ -119,7 +119,7 @@ struct MedicationsView: View {
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .font(.system(size: 32))
-                            .foregroundColor(.purple)
+                            .foregroundColor(.mhaPurple)
                     }
                 }
                 // List of added medications with checkboxes

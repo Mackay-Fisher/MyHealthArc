@@ -31,15 +31,6 @@ extension Color {
     
 }
 
-struct User: Codable {
-    var id: UUID?
-    var fullName: String
-    var email: String
-    var passwordHash: String
-    var userHash: String
-}
-
-
 @main
 struct myHealthArc_new_frontendApp: App {
     @State private var isLoggedIn = false
@@ -86,11 +77,16 @@ struct myHealthArc_new_frontendApp: App {
     }
 
     private func fetchUserDetails(userHash: String) async throws -> User {
-        guard let user = try await User.query(on: req.db)
-            .filter(\.$userHash == userHash)
-            .first() else {
-            throw Abort(.notFound, reason: "User not found")
+        guard let url = URL(string: "http://localhost:8080/users/\(userHash)") else {
+            throw URLError(.badURL)
         }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        let user = try JSONDecoder().decode(User.self, from: data)
         return user
     }
 }

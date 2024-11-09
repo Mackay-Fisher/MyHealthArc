@@ -7,6 +7,7 @@
 
 import SwiftUI
 import LocalAuthentication
+import SwiftKeychainWrapper
 
 struct LoginDTO: Codable {
     var email: String
@@ -114,31 +115,53 @@ struct LoginView: View {
 
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
             context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Log in with FaceID") { success, authenticationError in
-                if success {
-                    DispatchQueue.main.async {
+                DispatchQueue.main.async {
+                    if success {
                         if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
                             Task {
                                 do {
                                     let user = try await fetchUserDetails(userHash: userHash)
                                     isLoggedIn = true
                                 } catch {
+                                    // Handle fetchUserDetails error
+                                    print("Failed to fetch user details: \(error.localizedDescription)")
+                                    isLoggedIn = false
                                 }
                             }
+                        } else {
+                            // Handle missing userHash
+                            print("No userHash found in Keychain")
+                            isLoggedIn = false
                         }
+                    } else {
+                        // Handle authentication error
+                        if let error = authenticationError {
+                            print("Authentication failed: \(error.localizedDescription)")
+                        }
+                        isLoggedIn = false
                     }
-                } else {
                 }
             }
         } else {
+            // Handle the case where biometrics are not available
+            if let error = error {
+                print("Biometrics not available: \(error.localizedDescription)")
+            }
+            isLoggedIn = false
         }
     }
 
     private func fetchUserDetails(userHash: String) async throws -> User {
-        guard let user = try await User.query(on: req.db)
-            .filter(\.$userHash == userHash)
-            .first() else {
-            throw Abort(.notFound, reason: "User not found")
+        guard let url = URL(string: "http://localhost:8080/users/\(userHash)") else {
+            throw URLError(.badURL)
         }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        let user = try JSONDecoder().decode(User.self, from: data)
         return user
     }
 }

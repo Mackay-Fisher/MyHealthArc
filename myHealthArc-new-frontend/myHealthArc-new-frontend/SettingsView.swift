@@ -158,19 +158,27 @@ struct SettingsView: View {
         var error: NSError?
 
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Enable FaceID for quick login") { success, authenticationError in
+        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Enable FaceID") { success, authenticationError in
+            DispatchQueue.main.async {
                 if success {
-                    if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
-                        KeychainWrapper.standard.set(true, forKey: "isFaceIDEnabled")
-                        KeychainWrapper.standard.set(userHash, forKey: "userHash")
-                    }
+                    print("FaceID authentication succeeded")
+                    isFaceIDEnabled = true
                 } else {
+                    // Handle authentication error
+                    if let error = authenticationError {
+                        print("Authentication failed: \(error.localizedDescription)")
+                    }
                     isFaceIDEnabled = false
                 }
             }
-        } else {
-            isFaceIDEnabled = false
         }
+    } else {
+        // Handle the case where biometrics are not available
+        if let error = error {
+            print("Biometrics not available: \(error.localizedDescription)")
+        }
+        isFaceIDEnabled = false
+    }
     }
 
     private func disableFaceID() {

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import LocalAuthentication
 
 struct LoginDTO: Codable {
     var email: String
@@ -71,6 +72,11 @@ struct LoginView: View {
                 .padding(.top)
                 .disabled(username.isEmpty || password.isEmpty)
             }
+            .onAppear {
+                if KeychainWrapper.standard.bool(forKey: "isFaceIDEnabled") == true {
+                    authenticateWithFaceID()
+                }
+            }
             
             /*.navigationDestination(isPresented: $isLoggedIn) {
                     View() // Destination view
@@ -91,6 +97,7 @@ struct LoginView: View {
                 if let user = try? JSONDecoder().decode(User.self, from: data) {
                     DispatchQueue.main.async {
                         isLoggedIn = true
+                        KeychainWrapper.standard.set(user.userHash, forKey: "userHash")
                     }
                 } else {
                     DispatchQueue.main.async {
@@ -99,6 +106,40 @@ struct LoginView: View {
                 }
             }
         }.resume()
+    }
+
+    private func authenticateWithFaceID() {
+        let context = LAContext()
+        var error: NSError?
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Log in with FaceID") { success, authenticationError in
+                if success {
+                    DispatchQueue.main.async {
+                        if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
+                            Task {
+                                do {
+                                    let user = try await fetchUserDetails(userHash: userHash)
+                                    isLoggedIn = true
+                                } catch {
+                                }
+                            }
+                        }
+                    }
+                } else {
+                }
+            }
+        } else {
+        }
+    }
+
+    private func fetchUserDetails(userHash: String) async throws -> User {
+        guard let user = try await User.query(on: req.db)
+            .filter(\.$userHash == userHash)
+            .first() else {
+            throw Abort(.notFound, reason: "User not found")
+        }
+        return user
     }
 }
 

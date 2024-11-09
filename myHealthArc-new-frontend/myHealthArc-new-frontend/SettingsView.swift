@@ -20,7 +20,7 @@ struct SettingsView: View {
     @State private var appleFitness: Bool = false
     @State private var prescription: Bool = false
     @State private var nutrition: Bool = false
-    
+    @State private var isFaceIDEnabled: Bool = false
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
 
@@ -115,7 +115,26 @@ struct SettingsView: View {
                 .cornerRadius(20)
                 
                 Spacer().frame(height: 20)
-                
+
+                Section {
+                    Toggle("Enable FaceID", isOn: $isFaceIDEnabled)
+                        .onChange(of: isFaceIDEnabled) { value in
+                            if value {
+                                enableFaceID()
+                            } else {
+                                disableFaceID()
+                            }
+                        }
+                        .font(.system(size: 18))
+                        .toggleStyle(.switch)
+                        .tint(Color.mhaGreen)
+                        .padding()
+                        .frame(width: 300)
+                }
+                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
+                .cornerRadius(20)
+
+                Spacer().frame(height: 20)
                 
                 Button("Logout") {
                     hasSignedUp = false
@@ -132,7 +151,30 @@ struct SettingsView: View {
         .background(colorScheme == .dark ? Color.black : Color.lightbackground)
     }
 
-    
+    private func enableFaceID() {
+        let context = LAContext()
+        var error: NSError?
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Enable FaceID for quick login") { success, authenticationError in
+                if success {
+                    if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
+                        KeychainWrapper.standard.set(true, forKey: "isFaceIDEnabled")
+                        KeychainWrapper.standard.set(userHash, forKey: "userHash")
+                    }
+                } else {
+                    isFaceIDEnabled = false
+                }
+            }
+        } else {
+            isFaceIDEnabled = false
+        }
+    }
+
+    private func disableFaceID() {
+        KeychainWrapper.standard.removeObject(forKey: "isFaceIDEnabled")
+        KeychainWrapper.standard.removeObject(forKey: "userHash")
+    }
 }
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {

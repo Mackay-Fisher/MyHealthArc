@@ -48,4 +48,38 @@ struct myHealthArc_new_frontendApp: App {
                 }
             }
         }
+
+        private func authenticateWithFaceID() {
+        let context = LAContext()
+        var error: NSError?
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Log in with FaceID") { success, authenticationError in
+                if success {
+                    DispatchQueue.main.async {
+                        if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
+                            Task {
+                                do {
+                                    let user = try await fetchUserDetails(userHash: userHash)
+                                    isLoggedIn = true
+                                } catch {
+                                }
+                            }
+                        }
+                    }
+                } else {
+                }
+            }
+        } else {
+        }
+    }
+
+    private func fetchUserDetails(userHash: String) async throws -> User {
+        guard let user = try await User.query(on: req.db)
+            .filter(\.$userHash == userHash)
+            .first() else {
+            throw Abort(.notFound, reason: "User not found")
+        }
+        return user
+    }
 }

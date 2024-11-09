@@ -18,17 +18,30 @@ struct NutritionWidgetView: View {
     var body: some View {
         NavigationLink(destination: NutritionView()) {
             VStack {
-                HStack{Image ("carrot")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 30)
+                HStack {
                     Spacer()
-                        .frame(width:15)
-                    Text("Nutrition Search")
-                        .font(.headline)
+                    HStack {
+                        Image("carrot")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(-1)
+                            .frame(width: 30)
+                        
+                        Spacer()
+                            .frame(width: 15)
+                        
+                        Text("Nutrition Search")
+                            .font(.headline)
+                            .padding(.top)
+                            .frame(alignment: .leading)
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
                         .padding(.top)
-                        .frame(alignment: .center)
-                }.frame(alignment: .center)
+                        .foregroundColor(colorScheme == .dark ? Color.lightbackground : Color.gray)
+                }
                 Divider()
 
                 // Food search input with system icon button

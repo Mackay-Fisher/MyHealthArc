@@ -84,7 +84,7 @@ struct ContentView: View {
     }
 }
 
-// Widget View for displaying health data
+// Widget View for displaying health data - can delete this function later
 struct WidgetView: View {
     var title: String
     var detail: String

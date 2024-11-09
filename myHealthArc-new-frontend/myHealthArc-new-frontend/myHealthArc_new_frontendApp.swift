@@ -6,6 +6,8 @@
 //
 //This file is just navigating between the initial files, so login, or the view where navigation options are present (tabs)
 import SwiftUI
+import LocalAuthentication
+import SwiftKeychainWrapper
 
 //NOTE: can just use this as is across all folders
 extension Color {
@@ -29,6 +31,15 @@ extension Color {
     
 }
 
+struct User: Codable {
+    var id: UUID?
+    var fullName: String
+    var email: String
+    var passwordHash: String
+    var userHash: String
+}
+
+
 @main
 struct myHealthArc_new_frontendApp: App {
     @State private var isLoggedIn = false
@@ -49,7 +60,7 @@ struct myHealthArc_new_frontendApp: App {
             }
         }
 
-        private func authenticateWithFaceID() {
+    private func authenticateWithFaceID() {
         let context = LAContext()
         var error: NSError?
 

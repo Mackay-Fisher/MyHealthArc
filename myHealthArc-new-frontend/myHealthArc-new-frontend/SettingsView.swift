@@ -14,6 +14,8 @@
 //
 //TODO: add logout method
 import SwiftUI
+import LocalAuthentication
+import SwiftKeychainWrapper
 
 struct SettingsView: View {
     @State private var appleHealth: Bool = false

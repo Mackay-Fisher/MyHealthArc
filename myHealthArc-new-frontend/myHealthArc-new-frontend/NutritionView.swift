@@ -304,6 +304,16 @@ struct NutritionView: View {
                             totalCalories += Int(nutrients["calories"] ?? 0)
                         }
 
+                        var proteinRange: Macro
+                        var carbsRange: Macro
+                        var fatsRange: Macro
+                        var caloriesRange: Macro
+
+                        proteinRange = Macro(name: "\(totalProtein)g", min: "\(totalProtein)g", max: "\(totalProtein)g", select: "\(totalProtein)g")
+                        carbsRange = Macro(name: "\(totalCarbs)g", min: "\(totalCarbs)g", max: "\(totalCarbs)g", select: "\(totalCarbs)g")
+                        fatsRange = Macro(name: "\(totalFats)g", min: "\(totalFats)g", max: "\(totalFats)g", select: "\(totalFats)g")
+                        caloriesRange = Macro(name: "\(totalCalories)", min: "\(totalCalories)", max: "\(totalCalories)", select: "\(totalCalories)")
+
                         // Format the total nutrient information
                         DispatchQueue.main.async {
                             totalNutrition = """
@@ -313,8 +323,10 @@ struct NutritionView: View {
                             Calories: \(totalCalories)
                             """
                             // Add the meal and its nutrition info to the list
-                            meals.append(Meal(name: mealName, totalNutrition: totalNutrition))
-                            showFoodInfo = true
+                            // meals.append(Meal(name: mealName, totalNutrition: totalNutrition))
+                            // showFoodInfo = true
+
+                            meals.append(Meal(name: mealName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange))
                         }
                     } else {
                         DispatchQueue.main.async {

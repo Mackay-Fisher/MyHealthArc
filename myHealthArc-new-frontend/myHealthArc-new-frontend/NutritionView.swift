@@ -11,7 +11,11 @@ import SwiftUI
 
 struct Meal {
     let name: String
-    let totalNutrition: String
+    //let totalNutrition: String
+    let totalProtein: Macro
+    let totalCarbs: Macro
+    let totalFats: Macro
+    let totalCalories: Macro
 }
 
 struct Macro{

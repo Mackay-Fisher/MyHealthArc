@@ -207,22 +207,22 @@ struct NutritionView: View {
                     }
 
                     HStack {
-                        Text(meal.totalFat.name)
+                        Text(meal.totalFats.name)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalFat.min)
+                        Text(meal.totalFats.min)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalFat.max)
+                        Text(meal.totalFats.max)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalFat.select)
+                        Text(meal.totalFats.select)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
@@ -380,8 +380,8 @@ struct NutritionView: View {
 
                         proteinRange = Macro(name: "Protein:", min: "min: \(totalProtein)g", max: "max: \(totalProtein)g", select: "\(totalProtein)g")
                         carbsRange = Macro(name: "Carbs:", min: "min: \(totalCarbs)g", max: "max: \(totalCarbs)g", select: "\(totalCarbs)g")
-                        fatsRange = Macro(name: "Fat", min: "min: \(totalFats)g", max: "max: \(totalFats)g", select: "\(totalFats)g")
-                        caloriesRange = Macro(name: "Calories", min: "min: \(totalCalories)", max: "max: \(totalCalories)", select: "\(totalCalories)")
+                        fatsRange = Macro(name: "Fat:", min: "min: \(totalFats)g", max: "max: \(totalFats)g", select: "\(totalFats)g")
+                        caloriesRange = Macro(name: "Calories:", min: "min: \(totalCalories)", max: "max: \(totalCalories)", select: "\(totalCalories)")
 
                         // Format the total nutrient information
                         DispatchQueue.main.async {

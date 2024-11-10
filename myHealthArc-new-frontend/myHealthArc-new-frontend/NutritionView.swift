@@ -378,10 +378,10 @@ struct NutritionView: View {
                         var fatsRange: Macro
                         var caloriesRange: Macro
 
-                        proteinRange = Macro(name: "\(totalProtein)g", min: "\(totalProtein)g", max: "\(totalProtein)g", select: "\(totalProtein)g")
-                        carbsRange = Macro(name: "\(totalCarbs)g", min: "\(totalCarbs)g", max: "\(totalCarbs)g", select: "\(totalCarbs)g")
-                        fatsRange = Macro(name: "\(totalFats)g", min: "\(totalFats)g", max: "\(totalFats)g", select: "\(totalFats)g")
-                        caloriesRange = Macro(name: "\(totalCalories)", min: "\(totalCalories)", max: "\(totalCalories)", select: "\(totalCalories)")
+                        proteinRange = Macro(name: "Protein:", min: "min: \(totalProtein)g", max: "max: \(totalProtein)g", select: "\(totalProtein)g")
+                        carbsRange = Macro(name: "Carbs:", min: "min: \(totalCarbs)g", max: "max: \(totalCarbs)g", select: "\(totalCarbs)g")
+                        fatsRange = Macro(name: "Fat", min: "min: \(totalFats)g", max: "max: \(totalFats)g", select: "\(totalFats)g")
+                        caloriesRange = Macro(name: "Calories", min: "min: \(totalCalories)", max: "max: \(totalCalories)", select: "\(totalCalories)")
 
                         // Format the total nutrient information
                         DispatchQueue.main.async {

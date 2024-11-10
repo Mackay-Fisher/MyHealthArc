@@ -284,11 +284,6 @@ struct NutritionView: View {
                                     .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
                             )
 
-                        Text("kcal")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-
                     }
                 }
             }
@@ -422,7 +417,7 @@ struct NutritionView: View {
                         proteinRange = Macro(name: "Protein:", min: "min: \(totalProtein)g", max: "max: \(totalProtein)g")
                         carbsRange = Macro(name: "Carbs:", min: "min: \(totalCarbs)g", max: "max: \(totalCarbs)g")
                         fatsRange = Macro(name: "Fat:", min: "min: \(totalFats)g", max: "max: \(totalFats)g")
-                        caloriesRange = Macro(name: "Calories:", min: "min: \(totalCalories)kcal", max: "max: \(totalCalories)kcal")
+                        caloriesRange = Macro(name: "Calories:", min: "min: \(totalCalories)", max: "max: \(totalCalories)")
 
                         // Format the total nutrient information
                         DispatchQueue.main.async {

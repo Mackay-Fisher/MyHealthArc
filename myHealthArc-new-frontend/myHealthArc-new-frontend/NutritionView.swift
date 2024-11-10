@@ -22,7 +22,6 @@ struct Macro{
     let name: String
     let min: String
     let max: String
-    let select: String
 }
 struct NutritionView: View {
     @State private var mealInput: String = ""
@@ -177,10 +176,6 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalProtein.select)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
                     }
 
 
@@ -200,10 +195,6 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalCarbs.select)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
                     }
 
                     HStack {
@@ -222,10 +213,6 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalFats.select)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
                     }
 
                     HStack {
@@ -244,10 +231,6 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalCalories.select)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
                     }
                 }
             }
@@ -378,10 +361,10 @@ struct NutritionView: View {
                         var fatsRange: Macro
                         var caloriesRange: Macro
 
-                        proteinRange = Macro(name: "Protein:", min: "min: \(totalProtein)g", max: "max: \(totalProtein)g", select: "\(totalProtein)g")
-                        carbsRange = Macro(name: "Carbs:", min: "min: \(totalCarbs)g", max: "max: \(totalCarbs)g", select: "\(totalCarbs)g")
-                        fatsRange = Macro(name: "Fat:", min: "min: \(totalFats)g", max: "max: \(totalFats)g", select: "\(totalFats)g")
-                        caloriesRange = Macro(name: "Calories:", min: "min: \(totalCalories)kcal", max: "max: \(totalCalories)kcal", select: "\(totalCalories)kcal")
+                        proteinRange = Macro(name: "Protein:", min: "min: \(totalProtein)g", max: "max: \(totalProtein)g")
+                        carbsRange = Macro(name: "Carbs:", min: "min: \(totalCarbs)g", max: "max: \(totalCarbs)g")
+                        fatsRange = Macro(name: "Fat:", min: "min: \(totalFats)g", max: "max: \(totalFats)g")
+                        caloriesRange = Macro(name: "Calories:", min: "min: \(totalCalories)kcal", max: "max: \(totalCalories)kcal")
 
                         // Format the total nutrient information
                         DispatchQueue.main.async {

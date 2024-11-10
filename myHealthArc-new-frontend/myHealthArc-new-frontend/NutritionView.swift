@@ -31,6 +31,10 @@ struct NutritionView: View {
     @State private var showFoodInfo: Bool = false
     @State private var totalNutrition: String = ""
     @State private var showPopup: Bool = false
+    @State private var selectProtein: String = ""
+    @State private var selectCarbs: String = ""
+    @State private var selectFats: String = ""
+    @State private var selectCalories: String = ""
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
@@ -176,6 +180,19 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
+                        TextField("Select", text: $selectProtein)
+                            .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                            )
+
+                        Text("g")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
                     }
 
 
@@ -191,6 +208,20 @@ struct NutritionView: View {
                             .padding(.bottom, 5)
 
                         Text(meal.totalCarbs.max)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        TextField("Select", text: $selectCarbs)
+                            .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                            )
+
+                        Text("g")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
@@ -213,6 +244,19 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
+                        TextField("Select", text: $selectFats)
+                            .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                            )
+
+                        Text("g")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
                     }
 
                     HStack {
@@ -227,6 +271,20 @@ struct NutritionView: View {
                             .padding(.bottom, 5)
 
                         Text(meal.totalCalories.max)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        TextField("Select", text: $selectCalories)
+                            .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                            )
+
+                        Text("kcal")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)

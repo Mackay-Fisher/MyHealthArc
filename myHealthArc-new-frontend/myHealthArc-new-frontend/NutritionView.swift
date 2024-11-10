@@ -381,7 +381,7 @@ struct NutritionView: View {
                         proteinRange = Macro(name: "Protein:", min: "min: \(totalProtein)g", max: "max: \(totalProtein)g", select: "\(totalProtein)g")
                         carbsRange = Macro(name: "Carbs:", min: "min: \(totalCarbs)g", max: "max: \(totalCarbs)g", select: "\(totalCarbs)g")
                         fatsRange = Macro(name: "Fat:", min: "min: \(totalFats)g", max: "max: \(totalFats)g", select: "\(totalFats)g")
-                        caloriesRange = Macro(name: "Calories:", min: "min: \(totalCalories)", max: "max: \(totalCalories)", select: "\(totalCalories)")
+                        caloriesRange = Macro(name: "Calories:", min: "min: \(totalCalories)kcal", max: "max: \(totalCalories)kcal", select: "\(totalCalories)kcal")
 
                         // Format the total nutrient information
                         DispatchQueue.main.async {

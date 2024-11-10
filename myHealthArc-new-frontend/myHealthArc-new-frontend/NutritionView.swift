@@ -161,25 +161,94 @@ struct NutritionView: View {
                     //     .foregroundColor(.secondary)
                     //     .padding(.bottom, 5)
 
-                    Text(meal.totalProtein)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.bottom, 5)
+                    HStack {
+                        Text(meal.totalProtein.name)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
 
-                    Text(meal.totalCarbs)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.bottom, 5)
+                        Text(meal.totalProtein.min)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
 
-                    Text(meal.totalFats)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.bottom, 5)
+                        Text(meal.totalProtein.max)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
 
-                    Text(meal.totalCalories)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.bottom, 5)
+                        Text(meal.totalProtein.select)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+                    }
+
+
+                    HStack {
+                        Text(meal.totalCarbs.name)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalCarbs.min)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalCarbs.max)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalCarbs.select)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+                    }
+
+                    HStack {
+                        Text(meal.totalFat.name)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalFat.min)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalFat.max)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalFat.select)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+                    }
+
+                    HStack {
+                        Text(meal.totalCalories.name)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalCalories.min)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalCalories.max)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalCalories.select)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+                    }
                 }
             }
             .listStyle(PlainListStyle())

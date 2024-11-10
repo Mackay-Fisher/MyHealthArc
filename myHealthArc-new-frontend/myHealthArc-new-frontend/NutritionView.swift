@@ -181,6 +181,7 @@ struct NutritionView: View {
                             .padding(.bottom, 5)
 
                         TextField("Select", text: $selectProtein)
+                            .font(.subheadline)
                             .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
                             .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                             .cornerRadius(12)
@@ -213,6 +214,7 @@ struct NutritionView: View {
                             .padding(.bottom, 5)
 
                         TextField("Select", text: $selectCarbs)
+                            .font(.subheadline)
                             .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
                             .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                             .cornerRadius(12)
@@ -245,6 +247,7 @@ struct NutritionView: View {
                             .padding(.bottom, 5)
 
                         TextField("Select", text: $selectFats)
+                            .font(.subheadline)
                             .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
                             .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                             .cornerRadius(12)
@@ -276,6 +279,7 @@ struct NutritionView: View {
                             .padding(.bottom, 5)
 
                         TextField("Select", text: $selectCalories)
+                            .font(.subheadline)
                             .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
                             .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                             .cornerRadius(12)

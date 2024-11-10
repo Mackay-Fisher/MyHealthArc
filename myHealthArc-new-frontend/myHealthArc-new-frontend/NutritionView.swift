@@ -14,6 +14,12 @@ struct Meal {
     let totalNutrition: String
 }
 
+struct Macro{
+    let name: String
+    let min: String
+    let max: String
+    let select: String
+}
 struct NutritionView: View {
     @State private var mealInput: String = ""
     @State private var meals: [Meal] = []

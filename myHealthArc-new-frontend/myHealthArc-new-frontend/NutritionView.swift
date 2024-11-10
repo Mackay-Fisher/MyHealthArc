@@ -156,7 +156,27 @@ struct NutritionView: View {
                         .font(.headline)
                         .padding(.bottom, 2)
                     
-                    Text(meal.totalNutrition)
+                    // Text(meal.totalNutrition)
+                    //     .font(.subheadline)
+                    //     .foregroundColor(.secondary)
+                    //     .padding(.bottom, 5)
+
+                    Text(meal.totalProtein)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 5)
+
+                    Text(meal.totalCarbs)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 5)
+
+                    Text(meal.totalFats)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 5)
+
+                    Text(meal.totalCalories)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .padding(.bottom, 5)

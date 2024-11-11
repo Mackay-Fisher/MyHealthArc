@@ -156,34 +156,41 @@ struct SettingsView: View {
     private func enableFaceID() {
         let context = LAContext()
         var error: NSError?
+        print("Attempting to enable FaceID")
 
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Enable FaceID") { success, authenticationError in
-            DispatchQueue.main.async {
-                if success {
-                    print("FaceID authentication succeeded")
-                    isFaceIDEnabled = true
-                } else {
-                    // Handle authentication error
-                    if let error = authenticationError {
-                        print("Authentication failed: \(error.localizedDescription)")
+            print("Biometrics are available")
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Enable FaceID") { success, authenticationError in
+                DispatchQueue.main.async {
+                    if success {
+                        isFaceIDEnabled = true
+                        print("FaceID enabled successfully")
+                        KeychainWrapper.standard.set(true, forKey: "isFaceIDEnabled")
+                        if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
+                            KeychainWrapper.standard.set(userHash, forKey: "userHash")
+                            print("KeychainWrapper: userHash saved")
+                        } else {
+                            print("KeychainWrapper: Failed to retrieve userHash")
+                        }
+                    } else {
+                        if let error = authenticationError {
+                            print("Authentication failed: \(error.localizedDescription)")
+                        }
+                        isFaceIDEnabled = false
                     }
-                    isFaceIDEnabled = false
                 }
             }
+        } else {
+            if let error = error {
+                print("Biometrics not available: \(error.localizedDescription)")
+            }
+            isFaceIDEnabled = false
         }
-    } else {
-        // Handle the case where biometrics are not available
-        if let error = error {
-            print("Biometrics not available: \(error.localizedDescription)")
-        }
-        isFaceIDEnabled = false
-    }
     }
 
     private func disableFaceID() {
         KeychainWrapper.standard.removeObject(forKey: "isFaceIDEnabled")
-        KeychainWrapper.standard.removeObject(forKey: "userHash")
+        isFaceIDEnabled = false
     }
 }
 struct SettingsView_Previews: PreviewProvider {

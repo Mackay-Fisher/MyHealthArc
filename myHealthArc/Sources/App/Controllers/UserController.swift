@@ -7,6 +7,7 @@ struct UserController: RouteCollection {
         let users = routes.grouped("users")
         users.post("signup", use: self.signup)
         users.post("login", use: self.login)
+        users.get(":userHash", use: self.getUserByHash)
     }
 
     @Sendable
@@ -42,6 +43,19 @@ struct UserController: RouteCollection {
         let isPasswordValid = try Bcrypt.verify(loginDTO.password, created: user.passwordHash)
         guard isPasswordValid else {
             throw Abort(.unauthorized, reason: "Invalid email or password")
+        }
+        return user
+    }
+
+    @Sendable
+    func getUserByHash(req: Request) async throws -> User {
+        guard let userHash = req.parameters.get("userHash") else {
+            throw Abort(.badRequest, reason: "Missing userHash parameter")
+        }
+        guard let user = try await User.query(on: req.db)
+            .filter(\.$userHash == userHash)
+            .first() else {
+            throw Abort(.notFound, reason: "User not found")
         }
         return user
     }

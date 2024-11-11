@@ -18,6 +18,7 @@ struct LoginView: View {
     @State private var username = ""
     @State private var password = ""
     @Binding var isLoggedIn: Bool
+    @State private var showFaceIDPrompt: Bool = false
     
     @Environment(\.colorScheme) var colorScheme
     
@@ -86,7 +87,7 @@ struct LoginView: View {
        //}
     }
 
-    func login() {
+    private func login() {
         var request = URLRequest(url: URL(string: "http://localhost:8080/users/login")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -109,6 +110,12 @@ struct LoginView: View {
         }.resume()
     }
 
+    private func checkFaceID() {
+        if KeychainWrapper.standard.bool(forKey: "isFaceIDEnabled") == true {
+            authenticateWithFaceID()
+        }
+    }
+
     private func authenticateWithFaceID() {
         let context = LAContext()
         var error: NSError?
@@ -122,19 +129,16 @@ struct LoginView: View {
                                 do {
                                     let user = try await fetchUserDetails(userHash: userHash)
                                     isLoggedIn = true
+                                    print("FaceID authentication successful")
                                 } catch {
-                                    // Handle fetchUserDetails error
                                     print("Failed to fetch user details: \(error.localizedDescription)")
                                     isLoggedIn = false
                                 }
                             }
                         } else {
-                            // Handle missing userHash
-                            print("No userHash found in Keychain")
-                            isLoggedIn = false
+                            print("KeychainWrapper: Failed to retrieve userHash")
                         }
                     } else {
-                        // Handle authentication error
                         if let error = authenticationError {
                             print("Authentication failed: \(error.localizedDescription)")
                         }
@@ -143,7 +147,6 @@ struct LoginView: View {
                 }
             }
         } else {
-            // Handle the case where biometrics are not available
             if let error = error {
                 print("Biometrics not available: \(error.localizedDescription)")
             }

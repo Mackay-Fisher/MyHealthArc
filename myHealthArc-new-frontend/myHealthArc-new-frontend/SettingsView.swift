@@ -22,7 +22,7 @@ struct SettingsView: View {
     @State private var appleFitness: Bool = false
     @State private var prescription: Bool = false
     @State private var nutrition: Bool = false
-    @State private var isFaceIDEnabled: Bool = false
+    @AppStorage("isFaceIDEnabled") private var isFaceIDEnabled: Bool = false
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
 

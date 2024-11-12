@@ -10,6 +10,9 @@ struct ServicesView: View {
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
     
+    @AppStorage("hasShownAlert") var hasShownAlert = false
+    @Binding var showAlert: Bool
+
     @State private var selectedServices: Set<String> = []
     @Environment(\.colorScheme) var colorScheme
     @State private var userName: String = "User Name" // Placeholder for user name
@@ -69,6 +72,20 @@ struct ServicesView: View {
                         .cornerRadius(25)
                 }
                 .padding(.bottom, 30)
+            }
+            .onAppear {
+                if !hasShownAlert {
+                    showAlert = true
+                    hasShownAlert = true
+                }
+            }
+            .alert("Do you want to enable face ID?", isPresented: $showAlert) {
+                Button("Yes", role: .destructive) {
+                    showAlert = false
+                }
+                Button("No", role: .cancel) {
+                    showAlert = false
+                }
             }
             .background(colorScheme == .dark ? Color.black : Color.white)
             .navigationBarHidden(true)

@@ -82,12 +82,13 @@ struct ServicesView: View {
                     hasShownAlert = true
                 }
             }
-            .alert("Do you want to enable face ID?", isPresented: $showAlert) {
+            .alert("Do you want to enable Face ID?", isPresented: $showAlert) {
                 Button("Yes") {
                     enableFaceID()
                     showAlert = false
                 }
                 Button("No", role: .cancel) {
+                    disableFaceID()
                     showAlert = false
                 }
             }

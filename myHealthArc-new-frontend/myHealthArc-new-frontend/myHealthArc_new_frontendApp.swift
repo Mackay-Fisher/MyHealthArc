@@ -6,6 +6,8 @@
 //
 //This file is just navigating between the initial files, so login, or the view where navigation options are present (tabs)
 import SwiftUI
+import LocalAuthentication
+import SwiftKeychainWrapper
 
 //NOTE: can just use this as is across all folders
 extension Color {
@@ -33,6 +35,7 @@ extension Color {
 struct myHealthArc_new_frontendApp: App {
     @State private var isLoggedIn = false
     @State private var hasSignedUp = false
+    @State private var showAlert = true
         
         var body: some Scene {
             WindowGroup {
@@ -40,7 +43,7 @@ struct myHealthArc_new_frontendApp: App {
                     Tabs(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
                 }
                 else if hasSignedUp {
-                    ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
+                    ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp, showAlert: $showAlert)
                 }
                 else {
                     //LoginView(isLoggedIn: $isLoggedIn)
@@ -48,4 +51,43 @@ struct myHealthArc_new_frontendApp: App {
                 }
             }
         }
+
+    private func authenticateWithFaceID() {
+        let context = LAContext()
+        var error: NSError?
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Log in with FaceID") { success, authenticationError in
+                if success {
+                    DispatchQueue.main.async {
+                        if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
+                            Task {
+                                do {
+                                    let user = try await fetchUserDetails(userHash: userHash)
+                                    isLoggedIn = true
+                                } catch {
+                                }
+                            }
+                        }
+                    }
+                } else {
+                }
+            }
+        } else {
+        }
+    }
+
+    private func fetchUserDetails(userHash: String) async throws -> User {
+        guard let url = URL(string: "http://localhost:8080/users/\(userHash)") else {
+            throw URLError(.badURL)
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        let user = try JSONDecoder().decode(User.self, from: data)
+        return user
+    }
 }

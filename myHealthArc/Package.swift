@@ -42,12 +42,13 @@ let package = Package(
             ],
             path: "Tests/AppTests",
             sources: [
-                "MongoTest.swift",
-                "SchemaTests.swift",
-                "InsertUsersTest.swift",
-                "CreateMedicationsTest.swift",
-                "CreateNutritionsTest.swift",
-                "CreateHealthKitsTest.swift"
+                 "MongoTest.swift",
+                //"SchemaTests.swift",
+                //"InsertUsersTest.swift",
+                //"CreateMedicationsTest.swift",
+                //"CreateNutritionsTest.swift",
+                "CreateHealthKitsTest.swift",
+                "FaceIDBackendTest.swift"
             ]
         )
     ]

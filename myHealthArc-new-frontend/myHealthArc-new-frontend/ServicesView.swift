@@ -156,6 +156,7 @@ struct ServicesView_Previews: PreviewProvider {
     static var previews: some View {
         @State var isLoggedIn: Bool = false
         @State var hasSignedUp: Bool = false
-        ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
+        @State var showAlert
+        ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp, showAlert: $showAlert)
     }
 }

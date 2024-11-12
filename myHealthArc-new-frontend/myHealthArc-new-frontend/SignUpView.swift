@@ -32,6 +32,7 @@ struct SignUpView: View {
     @State private var acceptedTerms: Bool = false
     @State private var ageVerified: Bool = false
     @State private var showDatePicker: Bool = false
+    @State private var showAlert: Bool = true
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
     
@@ -101,7 +102,7 @@ struct SignUpView: View {
                     }
                 }
                 if formIsValid {
-                        NavigationLink(destination: ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)) {
+                        NavigationLink(destination: ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp, showAlert: $showAlert)) {
                             Text("Sign Up")
                                 .frame(width: 200, height: 30)
                                 .foregroundColor(.white)

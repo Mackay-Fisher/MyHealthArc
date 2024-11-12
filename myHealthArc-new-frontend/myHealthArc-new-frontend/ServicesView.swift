@@ -5,11 +5,14 @@
 //  Created by Anjali Hole on 10/17/24.
 //
 import SwiftUI
+import LocalAuthentication
+import SwiftKeychainWrapper
 
 struct ServicesView: View {
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
     
+    @AppStorage("isFaceIDEnabled") private var isFaceIDEnabled: Bool = false
     @AppStorage("hasShownAlert") var hasShownAlert = false
     @Binding var showAlert: Bool
 
@@ -80,7 +83,8 @@ struct ServicesView: View {
                 }
             }
             .alert("Do you want to enable face ID?", isPresented: $showAlert) {
-                Button("Yes", role: .destructive) {
+                Button("Yes") {
+                    enableFaceID()
                     showAlert = false
                 }
                 Button("No", role: .cancel) {
@@ -105,6 +109,46 @@ struct ServicesView: View {
         } else {
             selectedServices.insert(service)
         }
+    }
+
+    private func enableFaceID() {
+        let context = LAContext()
+        var error: NSError?
+        print("Attempting to enable FaceID")
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            print("Biometrics are available")
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Enable FaceID") { success, authenticationError in
+                DispatchQueue.main.async {
+                    if success {
+                        isFaceIDEnabled = true
+                        print("FaceID enabled successfully")
+                        KeychainWrapper.standard.set(true, forKey: "isFaceIDEnabled")
+                        if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
+                            KeychainWrapper.standard.set(userHash, forKey: "userHash")
+                            print("KeychainWrapper: userHash saved")
+                        } else {
+                            print("KeychainWrapper: Failed to retrieve userHash")
+                        }
+                    } else {
+                        if let error = authenticationError {
+                            print("Authentication failed: \(error.localizedDescription)")
+                        }
+                        isFaceIDEnabled = false
+                    }
+                }
+            }
+        } else {
+            if let error = error {
+                print("Biometrics not available: \(error.localizedDescription)")
+            }
+            isFaceIDEnabled = false
+        }
+    }
+
+    private func disableFaceID() {
+        KeychainWrapper.standard.removeObject(forKey: "isFaceIDEnabled")
+        isFaceIDEnabled = false
     }
 }
 

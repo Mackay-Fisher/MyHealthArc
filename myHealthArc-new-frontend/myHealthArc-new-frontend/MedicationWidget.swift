@@ -19,17 +19,29 @@ struct MedicationWidget: View {
     var body: some View {
         NavigationLink(destination: MedicationsView()) {
             VStack {
-                HStack{Image ("pills")
-                        .resizable()
-                        .scaledToFit()
-                        .padding(-2)
-                        .frame(width: 30)
+                HStack {
                     Spacer()
-                        .frame(width:15)
-                    Text("Medication Comparison")
-                        .font(.headline)
+                    HStack {
+                        Image("pills")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(-1)
+                            .frame(width: 30)
+                        
+                        Spacer()
+                            .frame(width: 15)
+                        
+                        Text("Medication Comparison")
+                            .font(.headline)
+                            .padding(.top)
+                            .frame(alignment: .leading)
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
                         .padding(.top)
-                        .frame(alignment: .center)
+                        .foregroundColor(colorScheme == .dark ? Color.lightbackground : Color.gray)
                 }
                 
                 

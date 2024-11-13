@@ -11,9 +11,18 @@ import SwiftUI
 
 struct Meal {
     let name: String
-    let totalNutrition: String
+    //let totalNutrition: String
+    let totalProtein: Macro
+    let totalCarbs: Macro
+    let totalFats: Macro
+    let totalCalories: Macro
 }
 
+struct Macro{
+    let name: String
+    let min: String
+    let max: String
+}
 struct NutritionView: View {
     @State private var mealInput: String = ""
     @State private var meals: [Meal] = []
@@ -21,7 +30,7 @@ struct NutritionView: View {
     @State private var foodInfo: String = ""
     @State private var showFoodInfo: Bool = false
     @State private var totalNutrition: String = ""
-    
+    @State private var showPopup: Bool = false
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
@@ -45,47 +54,192 @@ struct NutritionView: View {
                 .frame(height:20)
             
             // Meal Input Section
-            HStack {
-                TextField("Enter meal (comma-separated)", text: $mealInput)
-                //.padding(.leading, 2)
-                    .padding(5)
-                    .background(colorScheme == .dark ? Color.mhaGray : Color.white)
-                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
-                    )
-                //.frame(width: 250, height: 150, alignment:.center)
-                
-                Button("Add Meal") {
-                    addMeal()
+            ZStack(alignment: .topTrailing) {
+                HStack {
+                    Spacer()
+                    
+                    Text("Your Meals")
+                        .font(.title3)
+                        .padding(.top)
+                    
+                    Spacer()
                 }
-                .padding()
-                .frame(width: 120, height: 40)
-                .background(Color.mhaGreen)
-                .cornerRadius(50)
-                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                .padding(.horizontal)
+                
+                Button(action: {
+                    withAnimation {
+                        showPopup = true
+                    }
+                }) {
+                    Image(systemName: "plus.circle")
+                        .font(.title)
+                        .padding(12)
+                }
             }
+            .disabled(showPopup)
+            //TODO: fix the nutrition search thing
             //TODO: figure out why spacing is so messed up
             Spacer()
                 .frame(height:20)
             
-            if !meals.isEmpty {
-                            Text("Your Meals")
-                                .font(.title3)
-                                .padding(.top)
+            
+            if showPopup {                
+                VStack(spacing: 20) {
+                    HStack {
+                        TextField("Enter meal (comma-separated)", text: $mealInput)
+                            .padding(5)
+                            .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                            )
+                        
+                        Button("Add Meal") {
+                            addMeal()
+                            withAnimation {
+                                showPopup = false
+                            }
                         }
+                        .padding()
+                        .frame(width: 120, height: 40)
+                        .background(Color.green)
+                        .cornerRadius(20)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                    }
+
+                    Button(action: {
+                        withAnimation {
+                            showPopup = false
+                        }
+                    }) {
+                        Text("Cancel")
+                            .foregroundColor(.red)
+                    }
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(16)
+                .frame(width: 350)
+                .shadow(radius: 20)
+                .transition(.scale)
+            }
+
+            VStack {
+                // Calendar Week View
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(getCurrentWeek(), id: \.self) { date in
+                            VStack {
+                                Text(date, formatter: DateFormatter.dayOfWeekFormatter)
+                                    .font(.subheadline)
+                                Text(date, formatter: DateFormatter.dayFormatter)
+                                    .font(.title3)
+                                    .fontWeight(isToday(date) ? .bold : .regular)
+                                    .foregroundColor(isToday(date) ? .mhaGreen : .primary)
+                            }
+                            .padding()
+                            .background(isToday(date) ? Color.mhaPurple.opacity(0.2) : Color.clear)
+                            .cornerRadius(50)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.top)
+            }
+                        
             List(meals, id: \.name) { meal in
                 VStack(alignment: .leading) {
-                    Text(meal.name)
-                        .font(.headline)
-                        .padding(.bottom, 2)
+                    HStack{
+                        Text(meal.name)
+                            .font(.headline)
+                            .padding(.bottom, 2)
+
+                            Spacer()
+
+                            Button("Edit", systemImage: "pencil") {
+                                // Edit meal
+                            }
+                    }
                     
-                    Text(meal.totalNutrition)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.bottom, 5)
+                    // Text(meal.totalNutrition)
+                    //     .font(.subheadline)
+                    //     .foregroundColor(.secondary)
+                    //     .padding(.bottom, 5)
+
+                    HStack {
+                        Text(meal.totalProtein.name)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalProtein.min)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalProtein.max)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                    }
+
+
+                    HStack {
+                        Text(meal.totalCarbs.name)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalCarbs.min)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalCarbs.max)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                    }
+
+                    HStack {
+                        Text(meal.totalFats.name)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalFats.min)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalFats.max)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                    }
+
+                    HStack {
+                        Text(meal.totalCalories.name)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalCalories.min)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                        Text(meal.totalCalories.max)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 5)
+
+                    }
                 }
             }
             .listStyle(PlainListStyle())
@@ -210,6 +364,16 @@ struct NutritionView: View {
                             totalCalories += Int(nutrients["calories"] ?? 0)
                         }
 
+                        var proteinRange: Macro
+                        var carbsRange: Macro
+                        var fatsRange: Macro
+                        var caloriesRange: Macro
+
+                        proteinRange = Macro(name: "Protein:", min: "min: \(totalProtein)g", max: "max: \(totalProtein)g")
+                        carbsRange = Macro(name: "Carbs:", min: "min: \(totalCarbs)g", max: "max: \(totalCarbs)g")
+                        fatsRange = Macro(name: "Fat:", min: "min: \(totalFats)g", max: "max: \(totalFats)g")
+                        caloriesRange = Macro(name: "Calories:", min: "min: \(totalCalories)", max: "max: \(totalCalories)")
+
                         // Format the total nutrient information
                         DispatchQueue.main.async {
                             totalNutrition = """
@@ -219,8 +383,10 @@ struct NutritionView: View {
                             Calories: \(totalCalories)
                             """
                             // Add the meal and its nutrition info to the list
-                            meals.append(Meal(name: mealName, totalNutrition: totalNutrition))
-                            showFoodInfo = true
+                            // meals.append(Meal(name: mealName, totalNutrition: totalNutrition))
+                            // showFoodInfo = true
+
+                            meals.append(Meal(name: mealName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange))
                         }
                     } else {
                         DispatchQueue.main.async {
@@ -319,6 +485,32 @@ struct NutritionView: View {
         foodInfo = ""
         showFoodInfo = false
     }
+    // Generate current week dates centered around today
+        private func getCurrentWeek() -> [Date] {
+            let calendar = Calendar.current
+            let today = Date()
+            let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
+            return (0..<7).map { calendar.date(byAdding: .day, value: $0, to: startOfWeek)! }
+        }
+        
+        // Check if the date is today
+        private func isToday(_ date: Date) -> Bool {
+            Calendar.current.isDateInToday(date)
+        }
+}
+// Date Formatters for day and day of week
+extension DateFormatter {
+    static let dayFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d"
+        return formatter
+    }()
+    
+    static let dayOfWeekFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE"
+        return formatter
+    }()
 }
 
 // Preview for SwiftUI Canvas
@@ -327,3 +519,4 @@ struct NutritionView_Previews: PreviewProvider {
         NutritionView()
     }
 }
+

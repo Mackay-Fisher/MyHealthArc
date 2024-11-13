@@ -25,107 +25,169 @@ struct MedicationsView: View {
     @State private var selectedMedications: Set<String> = [] // Track selected medications
     @State private var interactionResults: String = ""
     @State private var showInteraction: Bool = false
+    @State private var showAddPopup: Bool = false
     
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        VStack {
-            HStack{Image ("pills")
-                    .resizable()
-                    .scaledToFit()
-                    .padding(-2)
-                    .frame(width: 30)
-                Text("Medications")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding()
-            }
-            
-            Divider()
-                .overlay(
-                    (colorScheme == .dark ? Color.white : Color.gray)
-                )
-            Spacer()
-                .frame(height:20)
+        ZStack {
             // Input for new medication
-            HStack {
-                TextField("Enter medication name", text: $medicationInput)
-                    .padding(5)
-                    .background(colorScheme == .dark ? Color.mhaGray : Color.white)
-                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
-                    )
-                
-                Button("Add") {
-                    addMedication()
+            if showAddPopup {
+                VStack (spacing: 20) {
+                    Text("Add Medications")
+                        .font(.title3)
+                        .fontWeight(.bold)
+                    
+                    Divider()
+                        .overlay(
+                            (colorScheme == .dark ? Color.white : Color.gray)
+                        )
+                        .padding(.horizontal)
+                    
+                    TextField("Enter medication name", text: $medicationInput)
+                        .padding(10)
+                        .frame(maxWidth: 300)
+                        .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                        )
+                    
+                    Button(action: {
+                        addMedication()
+                    }) {
+                        Text("Add")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.mhaPurple)
+                            .cornerRadius(50)
+                            .foregroundColor(colorScheme == .dark ? Color.black : Color.white)
+                            .font(.headline)
+                    }
+                    .frame(height: 45)
+                    
+                    
+                    Button(action: {
+                        showAddPopup = false
+                    }) {
+                        Text("Cancel")
+                            .fontWeight(.bold)
+                            .foregroundColor(.red)
+                    }
+                    .padding(.bottom, 20)
                 }
                 .padding()
-                .frame(width: 80, height: 40)
-                .background(Color.mhaPurple)
-                .cornerRadius(50)
-                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                .frame(maxWidth: 400)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(colorScheme == .dark ? Color.black : Color.white)
+                        .shadow(color: colorScheme == .dark ? Color.white.opacity(0.5) : Color.black.opacity(0.5), radius: 10)
+                )
+                .padding(30)
+                .zIndex(1)   
             }
-            Text("Your Medications")
-                .font(.title3)
-                .padding()
-
-            // List of added medications with checkboxes
-            List {
-                ForEach(addedMedications, id: \.self) { medication in
-                    HStack {
-                        // Checkbox for selecting medications
-                        Button(action: {
-                            toggleSelection(for: medication)
-                        }) {
-                            HStack {
-                                Image(systemName: selectedMedications.contains(medication) ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(selectedMedications.contains(medication) ? .mhaGreen : .gray)
-                                Text(medication)
-                                    .foregroundColor(.primary)
-                                Spacer()
-                            }
-                        }
+            VStack {
+                HStack{Image ("pills")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(-2)
+                        .frame(width: 30)
+                    Text("Medications")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .padding()
+                }
+                
+                Divider()
+                    .overlay(
+                        (colorScheme == .dark ? Color.white : Color.gray)
+                    )
+                Spacer()
+                    .frame(height:20)
+                
+                
+                
+                HStack {
+                    Text("Your Medications")
+                        .font(.title3)
+                        .padding()
+                    Spacer()
+                    Button(action: {
+                        showAddPopup = true
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 32))
+                            .foregroundColor(.mhaPurple)
                     }
                 }
-                .onDelete(perform: removeMedication)
-            }
-            .listStyle(PlainListStyle())
+                // List of added medications with checkboxes
+                List {
+                    ForEach(addedMedications, id: \.self) { medication in
+                        HStack {
+                            // Checkbox for selecting medications
+                            Button(action: {
+                                toggleSelection(for: medication)
+                            }) {
+                                HStack {
+                                    Image(systemName: selectedMedications.contains(medication) ? "checkmark.circle.fill" : "circle")
+                                        .foregroundColor(selectedMedications.contains(medication) ? .mhaGreen : .gray)
+                                    Text(medication)
+                                        .foregroundColor(.primary)
+                                    Spacer()
+                                    Button(action: {
+                                        if let index = addedMedications.firstIndex(of: medication) {
+                                            removeMedication(at: IndexSet([index]))
+                                        }
+                                    }) {
+                                        Image(systemName: "trash")
+                                            .foregroundColor(.red)
+                                    }
+                                    
+                                }
+                            }
+                        }
+                        
+                    }
+                    .onDelete(perform: removeMedication)
+                }
+                .listStyle(PlainListStyle())
 
-            if showInteraction {
+                if showInteraction {
 
-                Text("Interaction Results:")
-                    .font(.headline)
-                    .padding()
-                Divider()
-                    .overlay(colorScheme == .dark ? Color.white : Color.black)
-                    .frame(width: 200)
-                Text(interactionResults)
-                    .padding()
+                    Text("Interaction Results:")
+                        .font(.headline)
+                        .padding()
+                    Divider()
+                        .overlay(colorScheme == .dark ? Color.white : Color.black)
+                        .frame(width: 200)
+                    Text(interactionResults)
+                        .padding()
+                    
+                }
                 
-            }
-            
-            // Check interactions button
-            Button("Check Interactions") {
-                checkInteractions()
+                // Check interactions button
+                Button("Check Interactions") {
+                    checkInteractions()
+                }
+                .padding()
+                .frame(width: 200)
+                .background(Color.mhaGreen)
+                .cornerRadius(50)
+                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+
             }
             .padding()
-            .frame(width: 200)
-            .background(Color.mhaGreen)
-            .cornerRadius(50)
-            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-
+            .background(colorScheme == .dark ? Color.black : Color.white)
+            .blur(radius: showAddPopup ? 10 : 0)
         }
-        .padding()
-        .background(colorScheme == .dark ? Color.black : Color.white)
     }
-
     private func addMedication() {
         guard !medicationInput.isEmpty else { return }
         addedMedications.append(medicationInput)
         medicationInput = ""
+        showAddPopup = false
     }
 
     private func removeMedication(at offsets: IndexSet) {

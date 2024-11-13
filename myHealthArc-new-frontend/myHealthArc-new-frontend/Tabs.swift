@@ -18,7 +18,19 @@ struct Tabs: View {
                     Image(systemName: "house")
                     Text("Home")
             }
-            MedicationsView()
+            SettingsView(isLoggedIn: $isLoggedIn,hasSignedUp: $hasSignedUp)
+                .tabItem {
+                    Image(systemName: "gear")
+                    Text("Settings")
+                }
+            //filler atm cuz 2 tabs looks dumb
+            EditProfilePage()
+                .tabItem {
+                    //TODO: figure out why this is filled in
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                    Text("Profile")
+            }
+            /*MedicationsView()
                 .tabItem {
                     Image(systemName: "pills")
                     Text("Medications")
@@ -27,7 +39,7 @@ struct Tabs: View {
                 .tabItem {
                     Image(systemName: "carrot")
                     Text("Nutrition")
-            }
+            }*/
             
             /*ServicesView(isLoggedIn: $isLoggedIn)
                 .tabItem {
@@ -35,11 +47,7 @@ struct Tabs: View {
                     Text("Services")
                 }
             */
-            SettingsView(isLoggedIn: $isLoggedIn,hasSignedUp: $hasSignedUp)
-                .tabItem {
-                    Image(systemName: "gear")
-                    Text("Settings")
-                }
+            
         }
     }
 }

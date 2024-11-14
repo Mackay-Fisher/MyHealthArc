@@ -171,7 +171,7 @@ struct NutritionView: View {
                                 showForm = true
                             }
                             .sheet(isPresented: $showForm) {
-                                EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories)
+                                EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories, proteinChanged: $proteinChanged, carbsChanged: $carbsChanged, fatsChanged: $fatsChanged, caloriesChanged: $caloriesChanged)
                             }
                     }
                     

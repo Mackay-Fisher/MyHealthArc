@@ -128,7 +128,8 @@ struct NutritionView: View {
                     }
                 }
                 .padding()
-                .background(Color.white)
+                .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
+                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 .cornerRadius(16)
                 .frame(width: 350)
                 .shadow(radius: 20)

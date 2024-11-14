@@ -2,7 +2,6 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var healthKitViewModel = HealthKitViewModel()
     @State private var showSettings: Bool = false // Toggle settings visibility
     @Environment(\.colorScheme) var colorScheme
     
@@ -79,9 +78,6 @@ struct ContentView: View {
                             }
                         )
                 }
-            }
-            .onAppear {
-                healthKitViewModel.initializeHealthKit()
             }
         }
     }

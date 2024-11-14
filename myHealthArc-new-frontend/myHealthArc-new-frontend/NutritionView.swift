@@ -353,10 +353,10 @@ struct NutritionView: View {
                         var fatsRange: Macro
                         var caloriesRange: Macro
 
-                        proteinRange = Macro(name: "Protein:", value: "/(totalProtein)g - /(totalProtein)g")
-                        carbsRange = Macro(name: "Carbs:", value: "/(totalCarbs)g - /(totalCarbs)g")
-                        fatsRange = Macro(name: "Fat:", value: "/(totalFats)g - /(totalFats)g")
-                        caloriesRange = Macro(name: "Calories:", value: "/(totalCalories)kcal - /(totalCalories)kcal")
+                        proteinRange = Macro(name: "Protein:", value: "\(totalProtein)g - \(totalProtein)g")
+                        carbsRange = Macro(name: "Carbs:", value: "\(totalCarbs)g - \(totalCarbs)g")
+                        fatsRange = Macro(name: "Fat:", value: "\(totalFats)g - \(totalFats)g")
+                        caloriesRange = Macro(name: "Calories:", value: "\(totalCalories)kcal - \(totalCalories)kcal")
 
                         // Format the total nutrient information
                         DispatchQueue.main.async {
@@ -506,10 +506,10 @@ struct EditMeal: View{
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
 
-    @State private var tempProtein: String = ""
-    @State private var tempCarbs: String = ""
-    @State private var tempFats: String = ""
-    @State private var tempCalories: String = ""
+    @State private var tempProtein: String 
+    @State private var tempCarbs: String 
+    @State private var tempFats: String 
+    @State private var tempCalories: String
 
     var body: some View{
         NavigationView{

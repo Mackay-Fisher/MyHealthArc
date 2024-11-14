@@ -537,10 +537,10 @@ struct EditMeal: View{
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
 
-    @State private var tempProtein: String 
-    @State private var tempCarbs: String 
-    @State private var tempFats: String 
-    @State private var tempCalories: String
+    @State private var tempProtein: String = ""
+    @State private var tempCarbs: String = ""
+    @State private var tempFats: String = ""
+    @State private var tempCalories: String = ""
 
     var body: some View{
         NavigationView{

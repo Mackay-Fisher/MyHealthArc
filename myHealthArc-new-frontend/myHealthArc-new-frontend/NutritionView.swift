@@ -20,8 +20,7 @@ struct Meal {
 
 struct Macro{
     let name: String
-    let min: String
-    let max: String
+    let value: String
 }
 struct NutritionView: View {
     @State private var mealInput: String = ""
@@ -174,16 +173,10 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalProtein.min)
+                        Text(meal.totalProtein.value)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
-
-                        Text(meal.totalProtein.max)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-
                     }
 
 
@@ -193,16 +186,10 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalCarbs.min)
+                        Text(meal.totalCarbs.value)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
-
-                        Text(meal.totalCarbs.max)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-
                     }
 
                     HStack {
@@ -211,16 +198,10 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalFats.min)
+                        Text(meal.totalFats.value)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
-
-                        Text(meal.totalFats.max)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-
                     }
 
                     HStack {
@@ -229,16 +210,10 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalCalories.min)
+                        Text(meal.totalCalories.value)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
-
-                        Text(meal.totalCalories.max)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-
                     }
                 }
             }
@@ -369,7 +344,7 @@ struct NutritionView: View {
                         var fatsRange: Macro
                         var caloriesRange: Macro
 
-                        proteinRange = Macro(name: "Protein:", min: "min: \(totalProtein)g", max: "max: \(totalProtein)g")
+                        proteinRange = Macro(name: "Protein:", value: "/(totalProtein)g - /(totalProtein)g")
                         carbsRange = Macro(name: "Carbs:", min: "min: \(totalCarbs)g", max: "max: \(totalCarbs)g")
                         fatsRange = Macro(name: "Fat:", min: "min: \(totalFats)g", max: "max: \(totalFats)g")
                         caloriesRange = Macro(name: "Calories:", min: "min: \(totalCalories)", max: "max: \(totalCalories)")

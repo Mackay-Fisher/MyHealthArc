@@ -30,7 +30,13 @@ struct NutritionView: View {
     @State private var showFoodInfo: Bool = false
     @State private var totalNutrition: String = ""
     @State private var showPopup: Bool = false
+    @State private var showForm: Bool = false
     @Environment(\.colorScheme) var colorScheme
+
+    @State private var editProtein: String = ""
+    @State private var editCarbs: String = ""
+    @State private var editFats: String = ""
+    @State private var editCalories: String = ""
 
     var body: some View {
         VStack {
@@ -82,7 +88,7 @@ struct NutritionView: View {
                 .frame(height:20)
             
             
-            if showPopup {                
+            if showPopup {              
                 VStack(spacing: 20) {
                     HStack {
                         TextField("Enter meal (comma-separated)", text: $mealInput)
@@ -158,7 +164,10 @@ struct NutritionView: View {
                             Spacer()
 
                             Button("Edit", systemImage: "pencil") {
-                                // Edit meal
+                                showForm = true
+                            }
+                            .sheet(isPresented: $showForm) {
+                                EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories)
                             }
                     }
                     
@@ -345,9 +354,9 @@ struct NutritionView: View {
                         var caloriesRange: Macro
 
                         proteinRange = Macro(name: "Protein:", value: "/(totalProtein)g - /(totalProtein)g")
-                        carbsRange = Macro(name: "Carbs:", min: "min: \(totalCarbs)g", max: "max: \(totalCarbs)g")
-                        fatsRange = Macro(name: "Fat:", min: "min: \(totalFats)g", max: "max: \(totalFats)g")
-                        caloriesRange = Macro(name: "Calories:", min: "min: \(totalCalories)", max: "max: \(totalCalories)")
+                        carbsRange = Macro(name: "Carbs:", value: "/(totalCarbs)g - /(totalCarbs)g")
+                        fatsRange = Macro(name: "Fat:", value: "/(totalFats)g - /(totalFats)g")
+                        caloriesRange = Macro(name: "Calories:", value: "/(totalCalories)kcal - /(totalCalories)kcal")
 
                         // Format the total nutrient information
                         DispatchQueue.main.async {
@@ -486,6 +495,67 @@ extension DateFormatter {
         formatter.dateFormat = "EEE"
         return formatter
     }()
+}
+
+struct EditMeal: View{
+    @Binding var protein: String = ""
+    @Binding var carbs: String = ""
+    @Binding var fats: String = ""
+    @Binding var calories: String = ""
+
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dismiss) var dismiss
+
+    @State private var tempProtein: String = ""
+    @State private var tempCarbs: String = ""
+    @State private var tempFats: String = ""
+    @State private var tempCalories: String = ""
+
+    var body: some View{
+        NavigationView{
+            Form{
+                Section(header: Text("Protein")){
+                    TextField("Protein", text: $tempProtein)
+                        .keyboardType(.decimalPad)
+                    TextField("Carbs", text: $tempCarbs)
+                        .keyboardType(.decimalPad)
+                    TextField("Fats", text: $tempFats)
+                        .keyboardType(.decimalPad)
+                    TextField("Calories", text: $tempCalories)
+                        .keyboardType(.decimalPad)
+                }
+
+                Section {
+                    Button("Save"){
+                        //Update only if there is a non-empty value
+                        if !tempProtein.isEmpty{
+                            protein = tempProtein
+                        }
+                        if !tempCarbs.isEmpty{
+                            carbs = tempCarbs
+                        }
+                        if !tempFats.isEmpty{
+                            fats = tempFats
+                        }
+                        if !tempCalories.isEmpty{
+                            calories = tempCalories
+                        }
+
+                        dismiss()
+                    }
+                    .foregroundColor(.blue)
+                }
+            }
+            .navigationTitle("Edit Meal")
+            .toolbar{
+                ToolbarItem(placement: .cancellationAction){
+                    Button("Cancel"){
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
 }
 
 // Preview for SwiftUI Canvas

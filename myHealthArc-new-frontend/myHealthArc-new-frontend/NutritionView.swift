@@ -50,6 +50,7 @@ struct NutritionView: View {
     @State private var showPopup: Bool = false
     @State private var showForm: Bool = false
     @Environment(\.colorScheme) var colorScheme
+    @State private var selectedDate: Date = Date() 
 
     @State private var editProtein: String = ""
     @State private var editCarbs: String = ""
@@ -170,6 +171,10 @@ struct NutritionView: View {
                             .padding()
                             .background(isToday(date) ? Color.mhaPurple.opacity(0.2) : Color.clear)
                             .cornerRadius(50)
+                            .onTapGesture {
+                                selectedDate = date 
+                                fetchMealsForDay(date: selectedDate)
+                            }
                         }
                     }
                     .padding(.horizontal)
@@ -306,6 +311,9 @@ struct NutritionView: View {
             Spacer()
         }
         .padding()
+        .onAppear {
+            fetchMealsForDay(date: selectedDate)
+        }
     }
     // Add Meal Functionality
     private func addMeal() {
@@ -401,6 +409,52 @@ struct NutritionView: View {
                     totalNutrition = "Decoding error: \(error.localizedDescription)"
                     showFoodInfo = true
                 }
+            }
+        }.resume()
+    }
+    
+    private func fetchMealsForDay(date: Date) {
+        let baseURL = "http://localhost:8080/nutrition/meals"
+        let dateString = ISO8601DateFormatter().string(from: date)
+
+        guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
+            print("Failed to retrieve userHash from Keychain")
+            return
+        }
+
+        guard let url = URL(string: "\(baseURL)?userHash=\(userHash)&date=\(dateString)") else {
+            print("Invalid URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching meals: \(error.localizedDescription)")
+                return
+            }
+
+            guard let data = data else {
+                print("No data received.")
+                return
+            }
+
+            do {
+                let meals = try JSONDecoder().decode([Nutrition].self, from: data)
+                DispatchQueue.main.async {
+                    self.meals = meals.map { meal in
+                        let proteinRange = Macro(name: "Protein:", value: "\(meal.proteinMinimum)g - \(meal.proteinMaximum)g")
+                        let carbsRange = Macro(name: "Carbs:", value: "\(meal.carbohydratesMinimum)g - \(meal.carbohydratesMaximum)g")
+                        let fatsRange = Macro(name: "Fats:", value: "\(meal.fatsMinimum)g - \(meal.fatsMaximum)g")
+                        let caloriesRange = Macro(name: "Calories:", value: "\(meal.caloriesMinimum)kcal - \(meal.caloriesMaximum)kcal")
+
+                        return Meal(name: meal.foodName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange)
+                    }
+                }
+            } catch {
+                print("Decoding error: \(error.localizedDescription)")
             }
         }.resume()
     }

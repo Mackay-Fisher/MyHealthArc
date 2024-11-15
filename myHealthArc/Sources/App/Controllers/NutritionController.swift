@@ -9,6 +9,7 @@ struct NutritionController: RouteCollection {
         nutrition.put(":nutritionID", use: self.updateNutrition)
         nutrition.delete(":nutritionID", use: self.deleteNutrition)
         nutrition.get("info", use: self.getNutritionInfo)
+        nutrition.get("meals", use: self.getMealsForDay)
     }
 
     @Sendable
@@ -122,6 +123,24 @@ struct NutritionController: RouteCollection {
         }
 
         return nutritionResults
+    }
+
+    @Sendable
+    func getMealsForDay(req: Request) async throws -> [Nutrition] {
+        guard let userHash = try? req.query.get(String.self, at: "userHash"),
+              let dateString = try? req.query.get(String.self, at: "date"),
+              let date = ISO8601DateFormatter().date(from: dateString) else {
+            throw Abort(.badRequest, reason: "Invalid or missing parameters.")
+        }
+
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        let endOfDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
+
+        return try await Nutrition.query(on: req.db)
+            .filter(\.$userHash == userHash)
+            .filter(\.$createdAt >= startOfDay)
+            .filter(\.$createdAt < endOfDay)
+            .all()
     }
 
     // Helper function to fetch nutrition for a food item from the API

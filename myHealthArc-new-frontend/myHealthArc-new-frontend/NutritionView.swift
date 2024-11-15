@@ -20,8 +20,7 @@ struct Meal {
 
 struct Macro{
     let name: String
-    let min: String
-    let max: String
+    let value: String
 }
 struct NutritionView: View {
     @State private var mealInput: String = ""
@@ -31,7 +30,17 @@ struct NutritionView: View {
     @State private var showFoodInfo: Bool = false
     @State private var totalNutrition: String = ""
     @State private var showPopup: Bool = false
+    @State private var showForm: Bool = false
     @Environment(\.colorScheme) var colorScheme
+
+    @State private var editProtein: String = ""
+    @State private var editCarbs: String = ""
+    @State private var editFats: String = ""
+    @State private var editCalories: String = ""
+    @State private var proteinChanged: Bool = false
+    @State private var carbsChanged: Bool = false
+    @State private var fatsChanged: Bool = false
+    @State private var caloriesChanged: Bool = false
 
     var body: some View {
         VStack {
@@ -83,7 +92,7 @@ struct NutritionView: View {
                 .frame(height:20)
             
             
-            if showPopup {                
+            if showPopup {              
                 VStack(spacing: 20) {
                     HStack {
                         TextField("Enter meal (comma-separated)", text: $mealInput)
@@ -119,7 +128,8 @@ struct NutritionView: View {
                     }
                 }
                 .padding()
-                .background(Color.white)
+                .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
+                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 .cornerRadius(16)
                 .frame(width: 350)
                 .shadow(radius: 20)
@@ -159,7 +169,10 @@ struct NutritionView: View {
                             Spacer()
 
                             Button("Edit", systemImage: "pencil") {
-                                // Edit meal
+                                showForm = true
+                            }
+                            .sheet(isPresented: $showForm) {
+                                EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories, proteinChanged: $proteinChanged, carbsChanged: $carbsChanged, fatsChanged: $fatsChanged, caloriesChanged: $caloriesChanged)
                             }
                     }
                     
@@ -174,16 +187,10 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalProtein.min)
+                        Text(meal.totalProtein.value)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
-
-                        Text(meal.totalProtein.max)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-
                     }
 
 
@@ -193,16 +200,10 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalCarbs.min)
+                        Text(meal.totalCarbs.value)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
-
-                        Text(meal.totalCarbs.max)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-
                     }
 
                     HStack {
@@ -211,16 +212,10 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalFats.min)
+                        Text(meal.totalFats.value)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
-
-                        Text(meal.totalFats.max)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-
                     }
 
                     HStack {
@@ -229,16 +224,10 @@ struct NutritionView: View {
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
 
-                        Text(meal.totalCalories.min)
+                        Text(meal.totalCalories.value)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
-
-                        Text(meal.totalCalories.max)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-
                     }
                 }
             }
@@ -369,10 +358,33 @@ struct NutritionView: View {
                         var fatsRange: Macro
                         var caloriesRange: Macro
 
-                        proteinRange = Macro(name: "Protein:", min: "min: \(totalProtein)g", max: "max: \(totalProtein)g")
-                        carbsRange = Macro(name: "Carbs:", min: "min: \(totalCarbs)g", max: "max: \(totalCarbs)g")
-                        fatsRange = Macro(name: "Fat:", min: "min: \(totalFats)g", max: "max: \(totalFats)g")
-                        caloriesRange = Macro(name: "Calories:", min: "min: \(totalCalories)", max: "max: \(totalCalories)")
+                        if proteinChanged{
+                            proteinRange = Macro(name: "Protein:", value: "\(String(describing: Double(editProtein)))g")
+                        }
+                        else{
+                            proteinRange = Macro(name: "Protein:", value: "\(totalProtein)g - \(totalProtein)g")
+                        }
+
+                        if carbsChanged{
+                            carbsRange = Macro(name: "Carbs:", value: "\(String(describing: Double(editCarbs)))g")
+                        }
+                        else{
+                            carbsRange = Macro(name: "Carbs:", value: "\(totalCarbs)g - \(totalCarbs)g")
+                        }
+
+                        if fatsChanged{
+                            fatsRange = Macro(name: "Fats:", value: "\(String(describing: Double(editFats)))g")
+                        }
+                        else{
+                            fatsRange = Macro(name: "Fats:", value: "\(totalFats)g - \(totalFats)g")
+                        }
+                        
+                        if caloriesChanged{
+                            caloriesRange = Macro(name: "Calories:", value: "\(String(describing: Double(editCalories)))kcal")
+                        }
+                        else{
+                            caloriesRange = Macro(name: "Calories:", value: "\(totalCalories)kcal - \(totalCalories)kcal")
+                        }
 
                         // Format the total nutrient information
                         DispatchQueue.main.async {
@@ -511,6 +523,75 @@ extension DateFormatter {
         formatter.dateFormat = "EEE"
         return formatter
     }()
+}
+
+struct EditMeal: View{
+    @Binding var protein: String 
+    @Binding var carbs: String
+    @Binding var fats: String 
+    @Binding var calories: String
+    @Binding var proteinChanged: Bool
+    @Binding var carbsChanged: Bool
+    @Binding var fatsChanged: Bool
+    @Binding var caloriesChanged: Bool
+
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dismiss) var dismiss
+
+    @State private var tempProtein: String = ""
+    @State private var tempCarbs: String = ""
+    @State private var tempFats: String = ""
+    @State private var tempCalories: String = ""
+
+    var body: some View{
+        NavigationView{
+            Form{
+                Section(header: Text("Edit Meal Nutrition")){
+                    TextField("Protein", text: $tempProtein)
+                        .keyboardType(.decimalPad)
+                    TextField("Carbs", text: $tempCarbs)
+                        .keyboardType(.decimalPad)
+                    TextField("Fats", text: $tempFats)
+                        .keyboardType(.decimalPad)
+                    TextField("Calories", text: $tempCalories)
+                        .keyboardType(.decimalPad)
+                }
+
+                Section {
+                    Button("Save"){
+                        //Update only if there is a non-empty value
+                        if !tempProtein.isEmpty{
+                            protein = tempProtein
+                            proteinChanged = true
+                        }
+                        if !tempCarbs.isEmpty{
+                            carbs = tempCarbs
+                            carbsChanged = true
+                        }
+                        if !tempFats.isEmpty{
+                            fats = tempFats
+                            fatsChanged = true
+                        }
+                        if !tempCalories.isEmpty{
+                            calories = tempCalories
+                            caloriesChanged = true
+                        }
+
+                        dismiss()
+                    }
+                    .foregroundColor(.blue)
+                }
+            }
+            .navigationTitle("Edit Meal")
+            .toolbar{
+                ToolbarItem(placement: .cancellationAction){
+                    Button("Cancel"){
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
 }
 
 // Preview for SwiftUI Canvas

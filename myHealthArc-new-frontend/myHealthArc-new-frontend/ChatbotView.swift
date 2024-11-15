@@ -10,7 +10,9 @@ import SwiftUI
 struct ChatbotView: View {
     @ObservedObject var viewModel: ChatbotViewModel
     @State private var userMessage = ""
-   
+    
+    @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         VStack {
             Button(action: {
@@ -25,7 +27,7 @@ struct ChatbotView: View {
                         .foregroundColor(.white)
                 }
                 .padding(10)
-                .background(Color.blue)
+                .background(Color.mhaPurple)
                 .cornerRadius(12)
                 .shadow(radius: 5)
                 .padding(.leading, 20)
@@ -35,8 +37,7 @@ struct ChatbotView: View {
             VStack {
                 MessagesListView(messages: viewModel.messages)
                 
-                var dietaryOptions = ["Vegetarian", "Vegan", "Gluten-Free"]
-                var selectedDietaryOption = ""
+                let dietaryOptions = ["Vegetarian", "Vegan", "Gluten-Free"]
                 HStack {
                     ForEach(dietaryOptions, id: \.self) { option in
                         Button(action: {
@@ -71,10 +72,14 @@ struct ChatbotView: View {
                     
                     Button(action: sendMessage) {
                         Text("Send")
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                     }
-                    .padding(.trailing)
+                    .padding(10)
+                    .background(Color.mhaPurple)
+                    .cornerRadius(12)
                 }
                 .padding(.bottom)
+                .padding(.trailing)
             }
         }
 
@@ -83,7 +88,7 @@ struct ChatbotView: View {
     func sendMessage() {
         guard !userMessage.isEmpty else { return }
         viewModel.sendUserMessage(userMessage)
-        userMessage = "" 
+        userMessage = ""
     }
 }
 
@@ -103,28 +108,28 @@ struct MessagesListView: View {
 
     struct MessageRow: View {
         var message: ChatMessage
-
+        @Environment(\.colorScheme) var colorScheme
         var body: some View {
             HStack {
                 if message.isUser {
                     Spacer()
                     Text(message.message)
                         .padding(12)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
+                        .background(Color.mhaPurple)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                         .cornerRadius(20)
                         .shadow(radius: 5)
                 } else {
                     Text(message.message)
                         .padding(12)
-                        .background(Color.gray.opacity(0.2))
-                        .foregroundColor(.black)
+                        .background(Color.mhaGreen.opacity(0.2))
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                         .cornerRadius(20)
                         .shadow(radius: 5)
                     Spacer()
                 }
             }
-            .padding(.horizontal, 10) 
+            .padding(.horizontal, 10)
         }
     }
 

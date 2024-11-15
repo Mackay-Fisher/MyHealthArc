@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SwiftUI
+import SwiftKeychainWrapper
 
 struct Meal {
     let name: String
@@ -33,10 +34,10 @@ struct Nutrition: Codable {
     let fatsMaximum: Double
     let caloriesMinimum: Int
     let caloriesMaximum: Int
-    let modifiedProtein: Bool
-    let modifiedCarbohydrates: Bool
-    let modifiedFats: Bool
-    let modifiedCalories: Bool
+    let modifiedProtein: Double?
+    let modifiedCarbohydrates: Double?
+    let modifiedFats: Double?
+    let modifiedCalories: Double?
 }
 
 struct NutritionView: View {
@@ -411,12 +412,17 @@ struct NutritionView: View {
             return
         }
 
+        guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
+            print("Failed to retrieve userHash from Keychain")
+            return
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let nutrition = Nutrition(
-            userHash: "userHash",
+            userHash: userHash,
             foodName: mealName,
             proteinMinimum: proteinMin,
             proteinMaximum: proteinMax,
@@ -426,10 +432,10 @@ struct NutritionView: View {
             fatsMaximum: fatsMax,
             caloriesMinimum: caloriesMin,
             caloriesMaximum: caloriesMax,
-            modifiedProtein: false,
-            modifiedCarbohydrates: false,
-            modifiedFats: false,
-            modifiedCalories: false
+            modifiedProtein: nil,
+            modifiedCarbohydrates: nil,
+            modifiedFats: nil,
+            modifiedCalories: nil
         )
 
         do {

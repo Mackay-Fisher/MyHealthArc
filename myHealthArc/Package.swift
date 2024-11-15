@@ -47,7 +47,8 @@ let package = Package(
                 //"InsertUsersTest.swift",
                 //"CreateMedicationsTest.swift",
                 //"CreateNutritionsTest.swift",
-                "CreateHealthKitsTest.swift"
+                "CreateHealthKitsTest.swift",
+                "FaceIDBackendTest.swift"
             ]
         ),
         .testTarget(

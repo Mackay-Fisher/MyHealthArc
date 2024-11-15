@@ -21,6 +21,24 @@ struct Macro{
     let name: String
     let value: String
 }
+
+struct Nutrition: Codable {
+    let userHash: String
+    let foodName: String
+    let proteinMinimum: Double
+    let proteinMaximum: Double
+    let carbohydratesMinimum: Double
+    let carbohydratesMaximum: Double
+    let fatsMinimum: Double
+    let fatsMaximum: Double
+    let caloriesMinimum: Int
+    let caloriesMaximum: Int
+    let modifiedProtein: Bool
+    let modifiedCarbohydrates: Bool
+    let modifiedFats: Bool
+    let modifiedCalories: Bool
+}
+
 struct NutritionView: View {
     @State private var mealInput: String = ""
     @State private var meals: [Meal] = []
@@ -290,16 +308,16 @@ struct NutritionView: View {
     }
     // Add Meal Functionality
     private func addMeal() {
-            guard !mealInput.isEmpty else { return }
+        guard !mealInput.isEmpty else { return }
 
-            // Split the meal input into individual food items
-            let foodItems = mealInput.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
-            let mealName = mealInput  // Keep the original meal input
-            mealInput = ""  // Clear the input
+        // Split the meal input into individual food items
+        let foodItems = mealInput.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+        let mealName = mealInput  // Keep the original meal input
+        mealInput = ""  // Clear the input
 
-            // Fetch nutrition info for the food items
-            fetchNutritionInfo(for: foodItems, mealName: mealName)
-        }
+        // Fetch nutrition info for the food items
+        fetchNutritionInfo(for: foodItems, mealName: mealName)
+    }
 
 
     // Fetch Nutrition Info for the Meal
@@ -368,6 +386,8 @@ struct NutritionView: View {
                         Calories: \(totalCaloriesMin)kcal - \(totalCaloriesMax)kcal
                         """
                         meals.append(Meal(name: mealName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange))
+
+                        createNutritionObject(mealName: mealName, proteinMin: totalProteinMin, proteinMax: totalProteinMax, carbsMin: totalCarbsMin, carbsMax: totalCarbsMax, fatsMin: totalFatsMin, fatsMax: totalFatsMax, caloriesMin: totalCaloriesMin, caloriesMax: totalCaloriesMax)
                     }
                 } else {
                     DispatchQueue.main.async {
@@ -382,6 +402,60 @@ struct NutritionView: View {
                 }
             }
         }.resume()
+    }
+
+    private func createNutritionObject(mealName: String, proteinMin: Double, proteinMax: Double, carbsMin: Double, carbsMax: Double, fatsMin: Double, fatsMax: Double, caloriesMin: Int, caloriesMax: Int) {
+        let baseURL = "http://localhost:8080/nutrition/create"
+        guard let url = URL(string: baseURL) else {
+            print("Invalid URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let nutrition = Nutrition(
+            userHash: "userHash",
+            foodName: mealName,
+            proteinMinimum: proteinMin,
+            proteinMaximum: proteinMax,
+            carbohydratesMinimum: carbsMin,
+            carbohydratesMaximum: carbsMax,
+            fatsMinimum: fatsMin,
+            fatsMaximum: fatsMax,
+            caloriesMinimum: caloriesMin,
+            caloriesMaximum: caloriesMax,
+            modifiedProtein: false,
+            modifiedCarbohydrates: false,
+            modifiedFats: false,
+            modifiedCalories: false
+        )
+
+        do {
+            let jsonData = try JSONEncoder().encode(nutrition)
+            request.httpBody = jsonData
+
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Error: \(error.localizedDescription)")
+                    return
+                }
+
+                guard let data = data else {
+                    print("No data received.")
+                    return
+                }
+
+                if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 201 {
+                    print("Nutrition object created successfully.")
+                } else {
+                    print("Failed to create nutrition object.")
+                }
+            }.resume()
+        } catch {
+            print("Encoding error: \(error.localizedDescription)")
+        }
     }
 
     private func fetchFoodInfo() {

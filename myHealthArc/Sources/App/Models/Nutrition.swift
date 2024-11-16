@@ -4,8 +4,8 @@ import Vapor
 final class Nutrition: Model, Content, @unchecked Sendable {
     static let schema = "nutrition"
     
-    @ID(key: .id)
-    var id: UUID?
+    @ID(custom: "id", generatedBy: .user)
+    var id: String?
     
     @Field(key: "userHash")
     var userHash: String
@@ -54,7 +54,7 @@ final class Nutrition: Model, Content, @unchecked Sendable {
     
     init() { }
     
-    init(id: UUID? = nil, userHash: String, foodName: String, proteinMinimum: Double, proteinMaximum: Double, carbohydratesMinimum: Double, carbohydratesMaximum: Double, fatsMinimum: Double, fatsMaximum: Double, caloriesMinimum: Int, caloriesMaximum: Int, modifiedProtein: Double? = nil, modifiedCarbohydrates: Double? = nil, modifiedFats: Double? = nil, modifiedCalories: Int? = nil) {
+    init(id: String? = nil, userHash: String, foodName: String, proteinMinimum: Double, proteinMaximum: Double, carbohydratesMinimum: Double, carbohydratesMaximum: Double, fatsMinimum: Double, fatsMaximum: Double, caloriesMinimum: Int, caloriesMaximum: Int, modifiedProtein: Double? = nil, modifiedCarbohydrates: Double? = nil, modifiedFats: Double? = nil, modifiedCalories: Int? = nil) {
         self.id = id
         self.userHash = userHash
         self.foodName = foodName

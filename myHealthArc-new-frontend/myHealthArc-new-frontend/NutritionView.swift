@@ -744,15 +744,19 @@ struct EditMeal: View {
 
         if proteinChanged {
             updatedFields["modifiedProtein"] = Double(protein) ?? 0.0
+            proteinChanged = false
         }
         if carbsChanged {
             updatedFields["modifiedCarbohydrates"] = Double(carbs) ?? 0.0
+            carbsChanged = false
         }
         if fatsChanged {
             updatedFields["modifiedFats"] = Double(fats) ?? 0.0
+            fatsChanged = false
         }
         if caloriesChanged {
             updatedFields["modifiedCalories"] = Int(calories) ?? 0
+            caloriesChanged = false
         }
 
         do {

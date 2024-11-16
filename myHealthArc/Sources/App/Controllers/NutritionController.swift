@@ -14,7 +14,8 @@ struct NutritionController: RouteCollection {
 
     @Sendable
     func createNutrition(req: Request) async throws -> HTTPStatus {
-        let nutrition = try req.content.decode(Nutrition.self)
+        var nutrition = try req.content.decode(Nutrition.self)
+        nutrition.id = generateRandomID()
         try await nutrition.save(on: req.db)
         return .created
     }
@@ -36,7 +37,7 @@ struct NutritionController: RouteCollection {
 
     @Sendable
     func updateNutrition(req: Request) async throws -> Nutrition {
-        let nutritionID = try req.parameters.require("nutritionID", as: UUID.self)
+        let nutritionID = try req.parameters.require("nutritionID", as: String.self)
         guard let existingNutrition = try await Nutrition.find(nutritionID, on: req.db) else {
             throw Abort(.notFound, reason: "Nutrition data not found for ID \(nutritionID)")
         }
@@ -276,5 +277,10 @@ struct NutritionController: RouteCollection {
         }
 
         return (protein, carbohydrates, fats, calories)
+    }
+
+    private func generateRandomID(length: Int = 16) -> String {
+        let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return String((0..<length).map { _ in characters.randomElement()! })
     }
 }

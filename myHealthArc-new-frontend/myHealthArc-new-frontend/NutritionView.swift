@@ -9,9 +9,12 @@
 import SwiftUI
 import SwiftUI
 import SwiftKeychainWrapper
+import Foundation
+
+var globalSelectedMealId: String?
 
 struct Meal {
-    let id: UUID
+    let id: String
     let name: String
     let totalProtein: Macro
     let totalCarbs: Macro
@@ -25,7 +28,7 @@ struct Macro{
 }
 
 struct Nutrition: Codable {
-    let id: UUID?
+    let id: String?
     let userHash: String
     let foodName: String
     let proteinMinimum: Double
@@ -53,7 +56,8 @@ struct NutritionView: View {
     @State private var showForm: Bool = false
     @Environment(\.colorScheme) var colorScheme
     @State private var selectedDate: Date = Date() 
-    @State private var MealId: UUID? = nil
+    @State private var mealId: String? = ""
+    @State private var selectedMeal: Meal = Meal(id: "", name: "", totalProtein: Macro(name: "", value: ""), totalCarbs: Macro(name: "", value: ""), totalFats: Macro(name: "", value: ""), totalCalories: Macro(name: "", value: ""))
 
     @State private var editProtein: String = ""
     @State private var editCarbs: String = ""
@@ -185,7 +189,7 @@ struct NutritionView: View {
                 .padding(.top)
             }
                         
-            List(meals, id: \.name) { meal in
+            List(meals, id: \.id) { meal in
                 VStack(alignment: .leading) {
                     HStack{
                         Text(meal.name)
@@ -194,14 +198,20 @@ struct NutritionView: View {
 
                             Spacer()
                             Button("Edit") {
+                                print("Edit button clicked for Meal ID: \(meal.id)")
+                                selectedMeal = meal
+                                mealId = meal.id
+                                globalSelectedMealId = mealId
                                 editProtein = meal.totalProtein.value
                                 editCarbs = meal.totalCarbs.value
                                 editFats = meal.totalFats.value
                                 editCalories = meal.totalCalories.value
-                                showForm = true
+                                DispatchQueue.main.async {
+                                    showForm = true
+                                }
                             }
                             .sheet(isPresented: $showForm) {
-                                EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories, proteinChanged: $proteinChanged, carbsChanged: $carbsChanged, fatsChanged: $fatsChanged, caloriesChanged: $caloriesChanged, mealName: meal.name, mealId: meal.id)
+                                EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories, proteinChanged: $proteinChanged, carbsChanged: $carbsChanged, fatsChanged: $fatsChanged, caloriesChanged: $caloriesChanged, mealName: selectedMeal.name, mealId: mealId ?? "")
                             }
                     }
                     
@@ -321,6 +331,12 @@ struct NutritionView: View {
             fetchMealsForDay(date: selectedDate)
         }
     }
+
+    func generateRandomID(length: Int = 16) -> String {
+        let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return String((0..<length).map { _ in characters.randomElement()! })
+    }
+
     // Add Meal Functionality
     private func addMeal() {
         guard !mealInput.isEmpty else { return }
@@ -400,7 +416,7 @@ struct NutritionView: View {
                         Fats: \(totalFatsMin)g - \(totalFatsMax)g, \
                         Calories: \(totalCaloriesMin)kcal - \(totalCaloriesMax)kcal
                         """
-                        meals.append(Meal(id: UUID(), name: mealName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange))
+                        meals.append(Meal(id: generateRandomID(), name: mealName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange))
 
                         createNutritionObject(mealName: mealName, proteinMin: totalProteinMin, proteinMax: totalProteinMax, carbsMin: totalCarbsMin, carbsMax: totalCarbsMax, fatsMin: totalFatsMin, fatsMax: totalFatsMax, caloriesMin: totalCaloriesMin, caloriesMax: totalCaloriesMax)
                     }
@@ -460,7 +476,7 @@ struct NutritionView: View {
                         let carbsRange = Macro(name: "Carbs:", value: meal.modifiedCarbohydrates >= 0 ? "\(meal.modifiedCarbohydrates)g" : "\(meal.carbohydratesMinimum)g - \(meal.carbohydratesMaximum)g")
                         let fatsRange = Macro(name: "Fats:", value: meal.modifiedFats >= 0 ? "\(meal.modifiedFats)g" : "\(meal.fatsMinimum)g - \(meal.fatsMaximum)g")
                         let caloriesRange = Macro(name: "Calories:", value: meal.modifiedCalories >= 0 ? "\(meal.modifiedCalories)kcal" : "\(meal.caloriesMinimum)kcal - \(meal.caloriesMaximum)kcal")
-
+                        print("Meal ID: \(meal.id!)")
                         return Meal(id: meal.id!, name: meal.foodName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange)
                     }
                 }
@@ -521,6 +537,11 @@ struct NutritionView: View {
 
                 if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 201 {
                     print("Nutrition object created successfully.")
+                    if let createdNutrition = try? JSONDecoder().decode(Nutrition.self, from: data) {
+                        DispatchQueue.main.async {
+                            self.mealId = createdNutrition.id
+                        }
+                    }
                 } else {
                     print("Failed to create nutrition object.")
                 }
@@ -632,7 +653,7 @@ struct EditMeal: View {
     @Binding var fatsChanged: Bool
     @Binding var caloriesChanged: Bool
     var mealName: String
-    var mealId: UUID
+    var mealId: String
 
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
@@ -690,13 +711,22 @@ struct EditMeal: View {
                     }
                 }
             }
+            .onAppear {
+                print("Entering Edit View with Meal ID: \(globalSelectedMealId)")
+            }
         }
     }
 
     private func updateNutritionInDatabase() {
-        print("\n\nNutrition item ID: \(mealId)")
+        print("Nutrition item ID: \(globalSelectedMealId)")
+
+        guard let globalSelectedMealId = globalSelectedMealId else {
+            print("Invalid meal ID")
+            return
+        }
+
         let baseURL = "http://localhost:8080/nutrition/update"
-        guard let url = URL(string: "\(baseURL)/\(mealId)") else {
+        guard let url = URL(string: "\(baseURL)/\(globalSelectedMealId)") else {
             print("Invalid URL")
             return
         }

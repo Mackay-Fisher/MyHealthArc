@@ -6,7 +6,7 @@ struct NutritionController: RouteCollection {
         let nutrition = routes.grouped("nutrition")
         nutrition.post("create", use: self.createNutrition)
         nutrition.get(":nutritionID", use: self.getNutrition)
-        nutrition.post("update", ":nutritionID", use: self.updateNutrition)
+        nutrition.patch("update", ":nutritionID", use: self.updateNutrition)
         nutrition.delete(":nutritionID", use: self.deleteNutrition)
         nutrition.get("info", use: self.getNutritionInfo)
         nutrition.get("meals", use: self.getMealsForDay)
@@ -27,24 +27,37 @@ struct NutritionController: RouteCollection {
         return nutrition
     }
 
+    struct UpdateNutritionData: Content {
+        var modifiedProtein: Double?
+        var modifiedCarbohydrates: Double?
+        var modifiedFats: Double?
+        var modifiedCalories: Int?
+    }
+
     @Sendable
     func updateNutrition(req: Request) async throws -> Nutrition {
-        let updatedNutrition = try req.content.decode(Nutrition.self)
-        guard let nutritionID = req.parameters.get("nutritionID"), let uuid = UUID(uuidString: nutritionID) else {
-            throw Abort(.badRequest, reason: "Invalid or missing nutrition ID.")
+        let nutritionID = try req.parameters.require("nutritionID", as: UUID.self)
+        guard let existingNutrition = try await Nutrition.find(nutritionID, on: req.db) else {
+            throw Abort(.notFound, reason: "Nutrition data not found for ID \(nutritionID)")
         }
 
-        guard let nutrition = try await Nutrition.find(uuid, on: req.db) else {
-            throw Abort(.notFound)
+        let updatedFields = try req.content.decode(UpdateNutritionData.self)
+
+        if let modifiedProtein = updatedFields.modifiedProtein {
+            existingNutrition.modifiedProtein = modifiedProtein
+        }
+        if let modifiedCarbohydrates = updatedFields.modifiedCarbohydrates {
+            existingNutrition.modifiedCarbohydrates = modifiedCarbohydrates
+        }
+        if let modifiedFats = updatedFields.modifiedFats {
+            existingNutrition.modifiedFats = modifiedFats
+        }
+        if let modifiedCalories = updatedFields.modifiedCalories {
+            existingNutrition.modifiedCalories = modifiedCalories
         }
 
-        nutrition.modifiedProtein = updatedNutrition.modifiedProtein
-        nutrition.modifiedCarbohydrates = updatedNutrition.modifiedCarbohydrates
-        nutrition.modifiedFats = updatedNutrition.modifiedFats
-        nutrition.modifiedCalories = updatedNutrition.modifiedCalories
-
-        try await nutrition.save(on: req.db)
-        return nutrition
+        try await existingNutrition.save(on: req.db)
+        return existingNutrition
     }
 
     @Sendable

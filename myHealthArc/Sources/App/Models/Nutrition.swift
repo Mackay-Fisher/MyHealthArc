@@ -37,16 +37,16 @@ final class Nutrition: Model, Content, @unchecked Sendable {
     @Field(key: "caloriesMaximum")
     var caloriesMaximum: Int
     
-    @OptionalField(key: "modifiedProtein")
+    @Field(key: "modifiedProtein")
     var modifiedProtein: Double?
     
-    @OptionalField(key: "modifiedCarbohydrates")
+    @Field(key: "modifiedCarbohydrates")
     var modifiedCarbohydrates: Double?
     
-    @OptionalField(key: "modifiedFats")
+    @Field(key: "modifiedFats")
     var modifiedFats: Double?
     
-    @OptionalField(key: "modifiedCalories")
+    @Field(key: "modifiedCalories")
     var modifiedCalories: Int?
     
     @Timestamp(key: "time", on: .create)

@@ -36,10 +36,10 @@ struct Nutrition: Codable {
     let fatsMaximum: Double
     let caloriesMinimum: Int
     let caloriesMaximum: Int
-    let modifiedProtein: Double?
-    let modifiedCarbohydrates: Double?
-    let modifiedFats: Double?
-    let modifiedCalories: Int?
+    let modifiedProtein: Double
+    let modifiedCarbohydrates: Double
+    let modifiedFats: Double
+    let modifiedCalories: Int
 }
 
 struct NutritionView: View {
@@ -53,6 +53,7 @@ struct NutritionView: View {
     @State private var showForm: Bool = false
     @Environment(\.colorScheme) var colorScheme
     @State private var selectedDate: Date = Date() 
+    @State private var MealId: UUID? = nil
 
     @State private var editProtein: String = ""
     @State private var editCarbs: String = ""
@@ -450,15 +451,15 @@ struct NutritionView: View {
                 let meals = try JSONDecoder().decode([Nutrition].self, from: data)
                 DispatchQueue.main.async {
                     self.meals = meals.map { meal in
-                        let proteinValue = meal.modifiedProtein ?? (meal.proteinMinimum + meal.proteinMaximum) / 2
-                        let carbsValue = meal.modifiedCarbohydrates ?? (meal.carbohydratesMinimum + meal.carbohydratesMaximum) / 2
-                        let fatsValue = meal.modifiedFats ?? (meal.fatsMinimum + meal.fatsMaximum) / 2
-                        let caloriesValue = meal.modifiedCalories ?? (meal.caloriesMinimum + meal.caloriesMaximum) / 2
+                        let proteinValue = meal.modifiedProtein >= 0 ? meal.modifiedProtein : (meal.proteinMinimum + meal.proteinMaximum) / 2
+                        let carbsValue = meal.modifiedCarbohydrates >= 0 ? meal.modifiedCarbohydrates : (meal.carbohydratesMinimum + meal.carbohydratesMaximum) / 2
+                        let fatsValue = meal.modifiedFats >= 0 ? meal.modifiedFats : (meal.fatsMinimum + meal.fatsMaximum) / 2
+                        let caloriesValue = meal.modifiedCalories >= 0 ? meal.modifiedCalories : (meal.caloriesMinimum + meal.caloriesMaximum) / 2
 
-                        let proteinRange = Macro(name: "Protein:", value: meal.modifiedProtein != nil ? "\(meal.modifiedProtein!)g" : "\(meal.proteinMinimum)g - \(meal.proteinMaximum)g")
-                        let carbsRange = Macro(name: "Carbs:", value: meal.modifiedCarbohydrates != nil ? "\(meal.modifiedCarbohydrates!)g" : "\(meal.carbohydratesMinimum)g - \(meal.carbohydratesMaximum)g")
-                        let fatsRange = Macro(name: "Fats:", value: meal.modifiedFats != nil ? "\(meal.modifiedFats!)g" : "\(meal.fatsMinimum)g - \(meal.fatsMaximum)g")
-                        let caloriesRange = Macro(name: "Calories:", value: meal.modifiedCalories != nil ? "\(meal.modifiedCalories!)kcal" : "\(meal.caloriesMinimum)kcal - \(meal.caloriesMaximum)kcal")
+                        let proteinRange = Macro(name: "Protein:", value: meal.modifiedProtein >= 0 ? "\(meal.modifiedProtein)g" : "\(meal.proteinMinimum)g - \(meal.proteinMaximum)g")
+                        let carbsRange = Macro(name: "Carbs:", value: meal.modifiedCarbohydrates >= 0 ? "\(meal.modifiedCarbohydrates)g" : "\(meal.carbohydratesMinimum)g - \(meal.carbohydratesMaximum)g")
+                        let fatsRange = Macro(name: "Fats:", value: meal.modifiedFats >= 0 ? "\(meal.modifiedFats)g" : "\(meal.fatsMinimum)g - \(meal.fatsMaximum)g")
+                        let caloriesRange = Macro(name: "Calories:", value: meal.modifiedCalories >= 0 ? "\(meal.modifiedCalories)kcal" : "\(meal.caloriesMinimum)kcal - \(meal.caloriesMaximum)kcal")
 
                         return Meal(id: meal.id!, name: meal.foodName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange)
                     }
@@ -497,10 +498,10 @@ struct NutritionView: View {
             fatsMaximum: fatsMax,
             caloriesMinimum: caloriesMin,
             caloriesMaximum: caloriesMax,
-            modifiedProtein: nil,
-            modifiedCarbohydrates: nil,
-            modifiedFats: nil,
-            modifiedCalories: nil
+            modifiedProtein: -1.0,
+            modifiedCarbohydrates: -1.0,
+            modifiedFats: -1.0,
+            modifiedCalories: -1
         )
 
         do {
@@ -705,37 +706,40 @@ struct EditMeal: View {
             return
         }
 
-        var modifiedAttributes: [String: Any] = [:]
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        var updatedFields: [String: Any] = ["userHash": userHash]
 
         if proteinChanged {
-            modifiedAttributes["modifiedProtein"] = Double(protein)
+            updatedFields["modifiedProtein"] = Double(protein) ?? 0.0
         }
         if carbsChanged {
-            modifiedAttributes["modifiedCarbohydrates"] = Double(carbs)
+            updatedFields["modifiedCarbohydrates"] = Double(carbs) ?? 0.0
         }
         if fatsChanged {
-            modifiedAttributes["modifiedFats"] = Double(fats)
-            modifiedAttributes["fatsMaximum"] = Double(fats) // Ensure fatsMaximum is included
+            updatedFields["modifiedFats"] = Double(fats) ?? 0.0
         }
         if caloriesChanged {
-            modifiedAttributes["modifiedCalories"] = Int(calories)
+            updatedFields["modifiedCalories"] = Int(calories) ?? 0
         }
 
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: modifiedAttributes, options: [])
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            let jsonData = try JSONSerialization.data(withJSONObject: updatedFields, options: [])
             request.httpBody = jsonData
+
             URLSession.shared.dataTask(with: request) { data, response, error in
                 if let error = error {
                     print("Error: \(error.localizedDescription)")
                     return
                 }
+
                 guard let data = data else {
                     print("No data received.")
                     return
                 }
+
                 if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
                     print("Nutrition object updated successfully.")
                 } else {

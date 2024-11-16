@@ -11,6 +11,7 @@ import SwiftUI
 import SwiftKeychainWrapper
 
 struct Meal {
+    let id: UUID
     let name: String
     let totalProtein: Macro
     let totalCarbs: Macro
@@ -24,6 +25,7 @@ struct Macro{
 }
 
 struct Nutrition: Codable {
+    let id: UUID?
     let userHash: String
     let foodName: String
     let proteinMinimum: Double
@@ -190,13 +192,16 @@ struct NutritionView: View {
                             .padding(.bottom, 2)
 
                             Spacer()
-                            /*
-                            Button("Edit", systemImage: "pencil") {
+                            Button("Edit") {
+                                editProtein = meal.totalProtein.value
+                                editCarbs = meal.totalCarbs.value
+                                editFats = meal.totalFats.value
+                                editCalories = meal.totalCalories.value
                                 showForm = true
                             }
                             .sheet(isPresented: $showForm) {
-                                EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories, proteinChanged: $proteinChanged, carbsChanged: $carbsChanged, fatsChanged: $fatsChanged, caloriesChanged: $caloriesChanged)
-                            }*/
+                                EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories, proteinChanged: $proteinChanged, carbsChanged: $carbsChanged, fatsChanged: $fatsChanged, caloriesChanged: $caloriesChanged, mealName: meal.name, mealId: meal.id)
+                            }
                     }
                     
                     // Text(meal.totalNutrition)
@@ -394,7 +399,7 @@ struct NutritionView: View {
                         Fats: \(totalFatsMin)g - \(totalFatsMax)g, \
                         Calories: \(totalCaloriesMin)kcal - \(totalCaloriesMax)kcal
                         """
-                        meals.append(Meal(name: mealName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange))
+                        meals.append(Meal(id: UUID(), name: mealName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange))
 
                         createNutritionObject(mealName: mealName, proteinMin: totalProteinMin, proteinMax: totalProteinMax, carbsMin: totalCarbsMin, carbsMax: totalCarbsMax, fatsMin: totalFatsMin, fatsMax: totalFatsMax, caloriesMin: totalCaloriesMin, caloriesMax: totalCaloriesMax)
                     }
@@ -455,7 +460,7 @@ struct NutritionView: View {
                         let fatsRange = Macro(name: "Fats:", value: meal.modifiedFats != nil ? "\(meal.modifiedFats!)g" : "\(meal.fatsMinimum)g - \(meal.fatsMaximum)g")
                         let caloriesRange = Macro(name: "Calories:", value: meal.modifiedCalories != nil ? "\(meal.modifiedCalories!)kcal" : "\(meal.caloriesMinimum)kcal - \(meal.caloriesMaximum)kcal")
 
-                        return Meal(name: meal.foodName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange)
+                        return Meal(id: meal.id!, name: meal.foodName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange)
                     }
                 }
             } catch {
@@ -481,6 +486,7 @@ struct NutritionView: View {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let nutrition = Nutrition(
+            id: nil, 
             userHash: userHash,
             foodName: mealName,
             proteinMinimum: proteinMin,
@@ -615,15 +621,17 @@ extension DateFormatter {
     }()
 }
 
-struct EditMeal: View{
-    @Binding var protein: String 
+struct EditMeal: View {
+    @Binding var protein: String
     @Binding var carbs: String
-    @Binding var fats: String 
+    @Binding var fats: String
     @Binding var calories: String
     @Binding var proteinChanged: Bool
     @Binding var carbsChanged: Bool
     @Binding var fatsChanged: Bool
     @Binding var caloriesChanged: Bool
+    var mealName: String
+    var mealId: UUID
 
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
@@ -633,10 +641,10 @@ struct EditMeal: View{
     @State private var tempFats: String = ""
     @State private var tempCalories: String = ""
 
-    var body: some View{
-        NavigationView{
-            Form{
-                Section(header: Text("Edit Meal Nutrition")){
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Edit Meal Nutrition")) {
                     TextField("Protein", text: $tempProtein)
                         .keyboardType(.decimalPad)
                     TextField("Carbs", text: $tempCarbs)
@@ -648,38 +656,94 @@ struct EditMeal: View{
                 }
 
                 Section {
-                    Button("Save"){
-                        //Update only if there is a non-empty value
-                        if !tempProtein.isEmpty{
+                    Button("Save") {
+                        // Update only if there is a non-empty value
+                        if !tempProtein.isEmpty {
                             protein = tempProtein
                             proteinChanged = true
                         }
-                        if !tempCarbs.isEmpty{
+                        if !tempCarbs.isEmpty {
                             carbs = tempCarbs
                             carbsChanged = true
                         }
-                        if !tempFats.isEmpty{
+                        if !tempFats.isEmpty {
                             fats = tempFats
                             fatsChanged = true
                         }
-                        if !tempCalories.isEmpty{
+                        if !tempCalories.isEmpty {
                             calories = tempCalories
                             caloriesChanged = true
                         }
 
+                        updateNutritionInDatabase()
                         dismiss()
                     }
                     .foregroundColor(.blue)
                 }
             }
             .navigationTitle("Edit Meal")
-            .toolbar{
-                ToolbarItem(placement: .cancellationAction){
-                    Button("Cancel"){
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
                         dismiss()
                     }
                 }
             }
+        }
+    }
+
+    private func updateNutritionInDatabase() {
+        print("\n\nNutrition item ID: \(mealId)")
+        let baseURL = "http://localhost:8080/nutrition/update"
+        guard let url = URL(string: "\(baseURL)/\(mealId)") else {
+            print("Invalid URL")
+            return
+        }
+
+        guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
+            print("Failed to retrieve userHash from Keychain")
+            return
+        }
+
+        var modifiedAttributes: [String: Any] = [:]
+
+        if proteinChanged {
+            modifiedAttributes["modifiedProtein"] = Double(protein)
+        }
+        if carbsChanged {
+            modifiedAttributes["modifiedCarbohydrates"] = Double(carbs)
+        }
+        if fatsChanged {
+            modifiedAttributes["modifiedFats"] = Double(fats)
+            modifiedAttributes["fatsMaximum"] = Double(fats) // Ensure fatsMaximum is included
+        }
+        if caloriesChanged {
+            modifiedAttributes["modifiedCalories"] = Int(calories)
+        }
+
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: modifiedAttributes, options: [])
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = jsonData
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Error: \(error.localizedDescription)")
+                    return
+                }
+                guard let data = data else {
+                    print("No data received.")
+                    return
+                }
+                if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                    print("Nutrition object updated successfully.")
+                } else {
+                    print("Failed to update nutrition object.")
+                }
+            }.resume()
+        } catch {
+            print("Encoding error: \(error.localizedDescription)")
         }
     }
 }

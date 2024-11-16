@@ -6,7 +6,7 @@ struct NutritionController: RouteCollection {
         let nutrition = routes.grouped("nutrition")
         nutrition.post("create", use: self.createNutrition)
         nutrition.get(":nutritionID", use: self.getNutrition)
-        nutrition.put(":nutritionID", use: self.updateNutrition)
+        nutrition.post("update", ":nutritionID", use: self.updateNutrition)
         nutrition.delete(":nutritionID", use: self.deleteNutrition)
         nutrition.get("info", use: self.getNutritionInfo)
         nutrition.get("meals", use: self.getMealsForDay)
@@ -30,20 +30,14 @@ struct NutritionController: RouteCollection {
     @Sendable
     func updateNutrition(req: Request) async throws -> Nutrition {
         let updatedNutrition = try req.content.decode(Nutrition.self)
-        guard let nutrition = try await Nutrition.find(req.parameters.get("nutritionID"), on: req.db) else {
+        guard let nutritionID = req.parameters.get("nutritionID"), let uuid = UUID(uuidString: nutritionID) else {
+            throw Abort(.badRequest, reason: "Invalid or missing nutrition ID.")
+        }
+
+        guard let nutrition = try await Nutrition.find(uuid, on: req.db) else {
             throw Abort(.notFound)
         }
 
-        nutrition.userHash = updatedNutrition.userHash
-        nutrition.foodName = updatedNutrition.foodName
-        nutrition.proteinMinimum = updatedNutrition.proteinMinimum
-        nutrition.proteinMaximum = updatedNutrition.proteinMaximum
-        nutrition.carbohydratesMinimum = updatedNutrition.carbohydratesMinimum
-        nutrition.carbohydratesMaximum = updatedNutrition.carbohydratesMaximum
-        nutrition.fatsMinimum = updatedNutrition.fatsMinimum
-        nutrition.fatsMaximum = updatedNutrition.fatsMaximum
-        nutrition.caloriesMinimum = updatedNutrition.caloriesMinimum
-        nutrition.caloriesMaximum = updatedNutrition.caloriesMaximum
         nutrition.modifiedProtein = updatedNutrition.modifiedProtein
         nutrition.modifiedCarbohydrates = updatedNutrition.modifiedCarbohydrates
         nutrition.modifiedFats = updatedNutrition.modifiedFats

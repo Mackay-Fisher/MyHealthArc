@@ -37,7 +37,7 @@ struct Nutrition: Codable {
     let modifiedProtein: Double?
     let modifiedCarbohydrates: Double?
     let modifiedFats: Double?
-    let modifiedCalories: Double?
+    let modifiedCalories: Int?
 }
 
 struct NutritionView: View {
@@ -445,10 +445,15 @@ struct NutritionView: View {
                 let meals = try JSONDecoder().decode([Nutrition].self, from: data)
                 DispatchQueue.main.async {
                     self.meals = meals.map { meal in
-                        let proteinRange = Macro(name: "Protein:", value: "\(meal.proteinMinimum)g - \(meal.proteinMaximum)g")
-                        let carbsRange = Macro(name: "Carbs:", value: "\(meal.carbohydratesMinimum)g - \(meal.carbohydratesMaximum)g")
-                        let fatsRange = Macro(name: "Fats:", value: "\(meal.fatsMinimum)g - \(meal.fatsMaximum)g")
-                        let caloriesRange = Macro(name: "Calories:", value: "\(meal.caloriesMinimum)kcal - \(meal.caloriesMaximum)kcal")
+                        let proteinValue = meal.modifiedProtein ?? (meal.proteinMinimum + meal.proteinMaximum) / 2
+                        let carbsValue = meal.modifiedCarbohydrates ?? (meal.carbohydratesMinimum + meal.carbohydratesMaximum) / 2
+                        let fatsValue = meal.modifiedFats ?? (meal.fatsMinimum + meal.fatsMaximum) / 2
+                        let caloriesValue = meal.modifiedCalories ?? (meal.caloriesMinimum + meal.caloriesMaximum) / 2
+
+                        let proteinRange = Macro(name: "Protein:", value: meal.modifiedProtein != nil ? "\(meal.modifiedProtein!)g" : "\(meal.proteinMinimum)g - \(meal.proteinMaximum)g")
+                        let carbsRange = Macro(name: "Carbs:", value: meal.modifiedCarbohydrates != nil ? "\(meal.modifiedCarbohydrates!)g" : "\(meal.carbohydratesMinimum)g - \(meal.carbohydratesMaximum)g")
+                        let fatsRange = Macro(name: "Fats:", value: meal.modifiedFats != nil ? "\(meal.modifiedFats!)g" : "\(meal.fatsMinimum)g - \(meal.fatsMaximum)g")
+                        let caloriesRange = Macro(name: "Calories:", value: meal.modifiedCalories != nil ? "\(meal.modifiedCalories!)kcal" : "\(meal.caloriesMinimum)kcal - \(meal.caloriesMaximum)kcal")
 
                         return Meal(name: meal.foodName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange)
                     }

@@ -4,7 +4,70 @@ import Fluent
 struct NutritionController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let nutrition = routes.grouped("nutrition")
+        nutrition.post("create", use: self.createNutrition)
+        nutrition.get(":nutritionID", use: self.getNutrition)
+        nutrition.patch("update", ":nutritionID", use: self.updateNutrition)
+        nutrition.delete(":nutritionID", use: self.deleteNutrition)
         nutrition.get("info", use: self.getNutritionInfo)
+        nutrition.get("meals", use: self.getMealsForDay)
+    }
+
+    @Sendable
+    func createNutrition(req: Request) async throws -> HTTPStatus {
+        var nutrition = try req.content.decode(Nutrition.self)
+        nutrition.id = generateRandomID()
+        try await nutrition.save(on: req.db)
+        return .created
+    }
+
+    @Sendable
+    func getNutrition(req: Request) async throws -> Nutrition {
+        guard let nutrition = try await Nutrition.find(req.parameters.get("nutritionID"), on: req.db) else {
+            throw Abort(.notFound)
+        }
+        return nutrition
+    }
+
+    struct UpdateNutritionData: Content {
+        var modifiedProtein: Double?
+        var modifiedCarbohydrates: Double?
+        var modifiedFats: Double?
+        var modifiedCalories: Int?
+    }
+
+    @Sendable
+    func updateNutrition(req: Request) async throws -> Nutrition {
+        let nutritionID = try req.parameters.require("nutritionID", as: String.self)
+        guard let existingNutrition = try await Nutrition.find(nutritionID, on: req.db) else {
+            throw Abort(.notFound, reason: "Nutrition data not found for ID \(nutritionID)")
+        }
+
+        let updatedFields = try req.content.decode(UpdateNutritionData.self)
+
+        if let modifiedProtein = updatedFields.modifiedProtein {
+            existingNutrition.modifiedProtein = modifiedProtein
+        }
+        if let modifiedCarbohydrates = updatedFields.modifiedCarbohydrates {
+            existingNutrition.modifiedCarbohydrates = modifiedCarbohydrates
+        }
+        if let modifiedFats = updatedFields.modifiedFats {
+            existingNutrition.modifiedFats = modifiedFats
+        }
+        if let modifiedCalories = updatedFields.modifiedCalories {
+            existingNutrition.modifiedCalories = modifiedCalories
+        }
+
+        try await existingNutrition.save(on: req.db)
+        return existingNutrition
+    }
+
+    @Sendable
+    func deleteNutrition(req: Request) async throws -> HTTPStatus {
+        guard let nutrition = try await Nutrition.find(req.parameters.get("nutritionID"), on: req.db) else {
+            throw Abort(.notFound)
+        }
+        try await nutrition.delete(on: req.db)
+        return .noContent
     }
 
     @Sendable
@@ -31,10 +94,14 @@ struct NutritionController: RouteCollection {
                 // If a match is found, add it to the results
                 let item = matchedItem.item
                 nutritionResults[item.foodItem] = [
-                    "protein": round(item.protein * 10) / 10,
-                    "carbohydrates": round(item.carbohydrates * 10) / 10,
-                    "fats": round(item.fats * 10) / 10,
-                    "calories": round(Double(item.calories) * 10) / 10
+                    "proteinMinimum": round(item.proteinMinimum * 10) / 10,
+                    "proteinMaximum": round(item.proteinMaximum * 10) / 10,
+                    "carbohydratesMinimum": round(item.carbohydratesMinimum * 10) / 10,
+                    "carbohydratesMaximum": round(item.carbohydratesMaximum * 10) / 10,
+                    "fatsMinimum": round(item.fatsMinimum * 10) / 10,
+                    "fatsMaximum": round(item.fatsMaximum * 10) / 10,
+                    "caloriesMinimum": round(Double(item.caloriesMinimum) * 10) / 10,
+                    "caloriesMaximum": round(Double(item.caloriesMaximum) * 10) / 10
                 ]
             } else {
                 // If no match is found, add to the list of missing items
@@ -66,6 +133,24 @@ struct NutritionController: RouteCollection {
         return nutritionResults
     }
 
+    @Sendable
+    func getMealsForDay(req: Request) async throws -> [Nutrition] {
+        guard let userHash = try? req.query.get(String.self, at: "userHash"),
+              let dateString = try? req.query.get(String.self, at: "date"),
+              let date = ISO8601DateFormatter().date(from: dateString) else {
+            throw Abort(.badRequest, reason: "Invalid or missing parameters.")
+        }
+
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        let endOfDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
+
+        return try await Nutrition.query(on: req.db)
+            .filter(\.$userHash == userHash)
+            .filter(\.$createdAt >= startOfDay)
+            .filter(\.$createdAt < endOfDay)
+            .all()
+    }
+
     // Helper function to fetch nutrition for a food item from the API
     private func fetchNutritionForFood(foodName: String, apiKey: String, req: Request) async -> (String, [String: Double]?) {
         let url = "https://api.nal.usda.gov/fdc/v1/foods/search?query=\(foodName)&pageSize=15&api_key=\(apiKey)"
@@ -79,31 +164,36 @@ struct NutritionController: RouteCollection {
 
             let foodDataResponse = try JSONDecoder().decode(FoodDataResponse.self, from: bodyData)
 
-            // Calculate average nutrient values from the first 15 food items
-            if let averagedNutrients = calculateAverageNutrients(from: foodDataResponse.foods) {
-                let (protein, carbohydrates, fats, calories) = averagedNutrients
+            // Calculate nutrient/macro values from the first 15 food items
+            if let macroRanges = calculateMacroRanges(from: foodDataResponse.foods) {
+                let (proteinMinimum, proteinMaximum, carbohydratesMinimum, carbohydratesMaximum, fatsMinimum, fatsMaximum, caloriesMinimum, caloriesMaximum) = macroRanges
 
                 // If valid nutrient data is found, save to the database and return rounded results
-                if protein > 0 || carbohydrates > 0 || fats > 0 || calories > 0 {
-                    let roundedNutrition = [
-                        "protein": round(protein * 10) / 10,
-                        "carbohydrates": round(carbohydrates * 10) / 10,
-                        "fats": round(fats * 10) / 10,
-                        "calories": round(Double(calories) * 10) / 10
-                    ]
+                let roundedNutrition = [
+                    "proteinMinimum": round(proteinMinimum * 10) / 10,
+                    "proteinMaximum": round(proteinMaximum * 10) / 10,
+                    "carbohydratesMinimum": round(carbohydratesMinimum * 10) / 10,
+                    "carbohydratesMaximum": round(carbohydratesMaximum * 10) / 10,
+                    "fatsMinimum": round(fatsMinimum * 10) / 10,
+                    "fatsMaximum": round(fatsMaximum * 10) / 10,
+                    "caloriesMinimum": round(Double(caloriesMinimum) * 10) / 10,
+                    "caloriesMaximum": round(Double(caloriesMaximum) * 10) / 10
+                ]
 
-                    // Save the new item to the database
-                    let newNutritionItem = NutritionItem(
-                        foodItem: foodName,
-                        protein: protein,
-                        carbohydrates: carbohydrates,
-                        fats: fats,
-                        calories: calories
-                    )
-                    try await newNutritionItem.save(on: req.db)
+                let newNutritionItem = NutritionItem(
+                    foodItem: foodName,
+                    proteinMinimum: proteinMinimum,
+                    proteinMaximum: proteinMaximum,
+                    carbohydratesMinimum: carbohydratesMinimum,
+                    carbohydratesMaximum: carbohydratesMaximum,
+                    fatsMinimum: fatsMinimum,
+                    fatsMaximum: fatsMaximum,
+                    caloriesMinimum: caloriesMinimum,
+                    caloriesMaximum: caloriesMaximum
+                )
+                try await newNutritionItem.save(on: req.db)
 
-                    return (foodName, roundedNutrition)
-                }
+                return (foodName, roundedNutrition)
             }
         } catch {
             return (foodName, nil)
@@ -112,36 +202,56 @@ struct NutritionController: RouteCollection {
         return (foodName, nil)
     }
 
-    // Helper function to calculate average nutrient values
-    private func calculateAverageNutrients(from foods: [FoodDataResponse.FoodItem]) -> (Double, Double, Double, Int)? {
-        var totalProtein: Double = 0.0
-        var totalCarbs: Double = 0.0
-        var totalFats: Double = 0.0
-        var totalCalories: Int = 0
-        var count = 0
+    // Helper function to calculate nutrient/macro ranges
+    private func calculateMacroRanges(from foods: [FoodDataResponse.FoodItem]) -> (Double, Double, Double, Double, Double, Double, Int, Int)? {
+        var proteinValues = [Double]()
+        var carbohydrateValues = [Double]()
+        var fatValues = [Double]()
+        var calorieValues = [Int]()
 
-        // Iterate over the first 15 food items
         for foodItem in foods.prefix(15) {
             let (protein, carbs, fats, calories) = extractNutrientInfo(from: foodItem)
-
-            // Add the nutrient values if they are valid
-            if protein > 0 || carbs > 0 || fats > 0 || calories > 0 {
-                totalProtein += protein
-                totalCarbs += carbs
-                totalFats += fats
-                totalCalories += calories
-                count += 1
-            }
+            if protein > 0 { proteinValues.append(protein) }
+            if carbs > 0 { carbohydrateValues.append(carbs) }
+            if fats > 0 { fatValues.append(fats) }
+            if calories > 0 { calorieValues.append(calories) }
         }
 
-        // Calculate averages
-        guard count > 0 else { return nil }
-        return (
-            totalProtein / Double(count),
-            totalCarbs / Double(count),
-            totalFats / Double(count),
-            totalCalories / count
-        )
+        proteinValues = filterOutliers(values: proteinValues)
+        carbohydrateValues = filterOutliers(values: carbohydrateValues)
+        fatValues = filterOutliers(values: fatValues)
+        calorieValues = filterOutliers(values: calorieValues.map { Double($0) }).map { Int($0) }
+
+        guard !proteinValues.isEmpty,
+              !carbohydrateValues.isEmpty,
+              !fatValues.isEmpty,
+              !calorieValues.isEmpty else { return nil }
+
+        let proteinMinimum = proteinValues.min()!
+        let proteinMaximum = proteinValues.max()!
+        let carbohydratesMinimum = carbohydrateValues.min()!
+        let carbohydratesMaximum = carbohydrateValues.max()!
+        let fatsMinimum = fatValues.min()!
+        let fatsMaximum = fatValues.max()!
+        let caloriesMinimum = calorieValues.min()!
+        let caloriesMaximum = calorieValues.max()!
+
+        return (proteinMinimum, proteinMaximum, carbohydratesMinimum, carbohydratesMaximum, fatsMinimum, fatsMaximum, caloriesMinimum, caloriesMaximum)
+    }
+
+    // Helper function to filter outliers using IQR method
+    private func filterOutliers(values: [Double]) -> [Double] {
+        guard values.count > 4 else { return values }
+
+        let sortedValues = values.sorted()
+        let q1 = sortedValues[sortedValues.count / 4]
+        let q3 = sortedValues[3 * sortedValues.count / 4]
+        let iqr = q3 - q1
+
+        let lowerBound = q1 - 1.5 * iqr
+        let upperBound = q3 + 1.5 * iqr
+
+        return sortedValues.filter { $0 >= lowerBound && $0 <= upperBound }
     }
 
     // Helper function to extract nutrient information from a food item
@@ -167,5 +277,10 @@ struct NutritionController: RouteCollection {
         }
 
         return (protein, carbohydrates, fats, calories)
+    }
+
+    private func generateRandomID(length: Int = 16) -> String {
+        let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return String((0..<length).map { _ in characters.randomElement()! })
     }
 }

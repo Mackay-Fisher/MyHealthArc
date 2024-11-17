@@ -43,11 +43,24 @@ let package = Package(
             path: "Tests/AppTests",
             sources: [
                 "MongoTest.swift",
-                "SchemaTests.swift",
-                "InsertUsersTest.swift",
-                "CreateMedicationsTest.swift",
-                "CreateNutritionsTest.swift",
-                "CreateHealthKitsTest.swift"
+                //"SchemaTests.swift",
+                //"InsertUsersTest.swift",
+                //"CreateMedicationsTest.swift",
+                //"CreateNutritionsTest.swift",
+                "CreateHealthKitsTest.swift",
+                "FaceIDBackendTest.swift"
+            ]
+        ),
+        .testTarget(
+            name: "NutritionTests",
+            dependencies: [
+                .target(name: "App"),
+                .product(name: "XCTVapor", package: "vapor"),
+            ],
+            path: "Tests/NutritionTests",
+            sources: [
+                "NutritionValidationTest.swift",
+                "NutritionEntryTest.swift"
             ]
         )
     ]

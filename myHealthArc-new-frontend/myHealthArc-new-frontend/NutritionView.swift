@@ -143,14 +143,14 @@ struct NutritionView: View {
                 .padding(.top)
             }
             
-            List(meals, id: \.id) { meal in
-                VStack(alignment: .leading) {
+                     List(meals, id: \.id) { meal in
+                VStack(alignment: .leading, spacing: 8) { // Removed any extra background
                     HStack {
                         Text(meal.name)
                             .font(.headline)
                             .padding(.bottom, 2)
                         Spacer()
-                        Button("Edit") {
+                        Button(action: {
                             print("Edit button clicked for Meal ID: \(meal.id)")
                             selectedMeal = meal
                             mealId = meal.id
@@ -162,15 +162,34 @@ struct NutritionView: View {
                             DispatchQueue.main.async {
                                 showForm = true
                             }
+                        }) {
+                            Image(systemName: "pencil")
+                                .foregroundColor(Color.mhaPurple) // Replace with your purple color definition
+                                .padding(6)
+                                .background(Circle().fill(Color.mhaPurple.opacity(0.2))) // Optional: Add a background circle for aesthetics
                         }
+                        .buttonStyle(PlainButtonStyle()) // Ensures the button doesn't get extra styling
                         .sheet(isPresented: $showForm) {
-                            EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories, proteinChanged: $proteinChanged, carbsChanged: $carbsChanged, fatsChanged: $fatsChanged, caloriesChanged: $caloriesChanged, mealName: selectedMeal.name, mealId: mealId ?? "")
-                            .presentationDetents([fraction(0.5)])
+                            EditMeal(
+                                protein: $editProtein,
+                                carbs: $editCarbs,
+                                fats: $editFats,
+                                calories: $editCalories,
+                                proteinChanged: $proteinChanged,
+                                carbsChanged: $carbsChanged,
+                                fatsChanged: $fatsChanged,
+                                caloriesChanged: $caloriesChanged,
+                                mealName: selectedMeal.name,
+                                mealId: mealId ?? ""
+                            )
+                            .presentationDetents([.fraction(0.55)])
                         }
                     }
-                    
+
                     HStack {
-                        VStack{
+                        Spacer()
+
+                        VStack {
                             Text(meal.totalProtein.name)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -181,7 +200,7 @@ struct NutritionView: View {
                                 .padding(.bottom, 5)
                         }
 
-                        VStack{
+                        VStack {
                             Text(meal.totalCarbs.name)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -192,7 +211,7 @@ struct NutritionView: View {
                                 .padding(.bottom, 5)
                         }
 
-                        VStack{
+                        VStack {
                             Text(meal.totalFats.name)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -203,7 +222,7 @@ struct NutritionView: View {
                                 .padding(.bottom, 5)
                         }
 
-                        VStack{
+                        VStack {
                             Text(meal.totalCalories.name)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -213,8 +232,12 @@ struct NutritionView: View {
                                 .foregroundColor(.secondary)
                                 .padding(.bottom, 5)
                         }
+
+                        Spacer()
                     }
                 }
+                .listRowBackground(Color.clear) // Ensure no background for each row
+                .padding(.vertical, 8) // Optional: Adjust padding for better spacing
             }
             .listStyle(PlainListStyle())
             .padding(.bottom)

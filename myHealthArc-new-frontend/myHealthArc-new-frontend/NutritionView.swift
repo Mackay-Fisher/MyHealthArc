@@ -111,12 +111,10 @@ struct NutritionView: View {
                     Image(systemName: "plus.circle")
                         .font(.title)
                         .padding(12)
+                        .foregroundColor(.mhaPurple)
                 }
             }
             .disabled(showPopup)
-            
-            Spacer()
-                .frame(height: 20)
             
             VStack {
                 // Calendar Week View

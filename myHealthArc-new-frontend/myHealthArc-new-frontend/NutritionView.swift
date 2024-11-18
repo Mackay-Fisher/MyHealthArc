@@ -171,47 +171,49 @@ struct NutritionView: View {
                     }
                     
                     HStack {
-                        Text(meal.totalProtein.name)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-                        Text(meal.totalProtein.value)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-                    }
-                    
-                    HStack {
-                        Text(meal.totalCarbs.name)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-                        Text(meal.totalCarbs.value)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-                    }
-                    
-                    HStack {
-                        Text(meal.totalFats.name)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-                        Text(meal.totalFats.value)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-                    }
-                    
-                    HStack {
-                        Text(meal.totalCalories.name)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
-                        Text(meal.totalCalories.value)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 5)
+                        VStack{
+                            Text(meal.totalProtein.name)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding(.bottom, 5)
+                            Text(meal.totalProtein.value)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding(.bottom, 5)
+                        }
+
+                        VStack{
+                            Text(meal.totalCarbs.name)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding(.bottom, 5)
+                            Text(meal.totalCarbs.value)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding(.bottom, 5)
+                        }
+
+                        VStack{
+                            Text(meal.totalFats.name)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding(.bottom, 5)
+                            Text(meal.totalFats.value)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding(.bottom, 5)
+                        }
+
+                        VStack{
+                            Text(meal.totalCalories.name)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding(.bottom, 5)
+                            Text(meal.totalCalories.value)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding(.bottom, 5)
+                        }
                     }
                 }
             }

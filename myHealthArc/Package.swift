@@ -21,8 +21,6 @@ let package = Package(
         .package(url: "https://github.com/swiftpackages/DotEnv.git", from: "3.0.0"),
         // Add this to your dependencies
         .package(url: "https://github.com/vapor/queues", from: "1.0.0"),
-
-        .package(url: "https://github.com/vapor/queues-scheduler.git", from: "1.0.0")
     ],
     targets: [
         .executableTarget(

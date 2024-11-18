@@ -8,66 +8,72 @@ import SwiftUI
 
 struct AppleHealthHomeView: View {
     @State private var selectedSection: HealthSection = .bmi // Default to BMI section
+    @State private var height: Double = 63
+    @State private var weight: Double = 115
+    @State private var age: Int = 22
 
     var body: some View {
-        VStack(spacing: 20) {
-            // Header
-            Text("❤️ Apple Health Data")
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
+        GeometryReader { geometry in
+            VStack(spacing: 20) {
+                // Header
+                Text("❤️ Apple Health Data")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
 
-            // Highlighted Line with Indicator
-            
-            // Horizontal Selector
-            HStack(spacing: 30) {
-                SectionButton(section: .bmi, isSelected: selectedSection == .bmi) {
-                    selectedSection = .bmi
+                // Horizontal Selector
+                HStack(spacing: 30) {
+                    SectionButton(section: .bmi, isSelected: selectedSection == .bmi) {
+                        selectedSection = .bmi
+                    }
+
+                    SectionButton(section: .sleep, isSelected: selectedSection == .sleep) {
+                        selectedSection = .sleep
+                    }
+
+                    SectionButton(section: .vitals, isSelected: selectedSection == .vitals) {
+                        selectedSection = .vitals
+                    }
                 }
 
-                SectionButton(section: .sleep, isSelected: selectedSection == .sleep) {
-                    selectedSection = .sleep
-                }
+                // Highlighted Line with Indicator
+                ZStack {
+                    Triangle()
+                        .fill(Color.pink)
+                        .frame(width: 20, height: 10)
+                        .offset(x: indicatorPosition(for: selectedSection), y: -5)
 
-                SectionButton(section: .vitals, isSelected: selectedSection == .vitals) {
-                    selectedSection = .vitals
+                    Rectangle()
+                        .fill(Color.pink.opacity(0.8))
+                        .frame(height: 2)
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, -10)
+
+                // Dynamic Content View
+                ZStack {
+                    if selectedSection == .bmi {
+                        BodyInfoView(
+                            containerHeight: geometry.size.height - geometry.safeAreaInsets.top - 150,
+                            height: $height,
+                            weight: $weight,
+                            age: $age
+                        )
+                    } else if selectedSection == .sleep {
+                        SleepDataView()
+                    } else if selectedSection == .vitals {
+                        VitalInfoView()
+                    }
+                }
+                .frame(height: geometry.size.height - geometry.safeAreaInsets.top - 100) // Adjust height dynamically
+                .cornerRadius(20)
+
+
+                Spacer()
             }
-            ZStack {
-                
-                Triangle()
-                    .fill(Color.pink)
-                    .frame(width: 20, height: 10)
-                    .offset(x: indicatorPosition(for: selectedSection), y: -5)
-                // Line
-                Rectangle()
-                    .fill(Color.pink.opacity(0.8))
-                    .frame(height: 2)
-
-                // Triangle Indicator
-                
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, -8)
-
-
-            // Dynamic Content View
-            ZStack {
-                if selectedSection == .bmi {
-                    BodyInfoView()
-                } else if selectedSection == .sleep {
-                    SleepDataView()
-                } else if selectedSection == .vitals {
-                    VitalInfoView()
-                }
-            }
-            .background(Color(.secondarySystemBackground).edgesIgnoringSafeArea(.bottom))
-            .cornerRadius(20)
-
-            Spacer()
+            .padding()
+            .background(Color.black.edgesIgnoringSafeArea(.all))
         }
-        .padding()
-        .background(Color.black.edgesIgnoringSafeArea(.all))
     }
 
     // Calculate the position of the triangle indicator

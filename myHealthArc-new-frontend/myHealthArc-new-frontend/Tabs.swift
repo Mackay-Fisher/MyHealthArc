@@ -30,6 +30,12 @@ struct Tabs: View {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
                     Text("Profile")
             }
+            // Temporary Placement
+            MacrosTrackingView()
+                .tabItem {
+                    Image(systemName: "chart.pie")
+                    Text("Macros")
+                }
             /*MedicationsView()
                 .tabItem {
                     Image(systemName: "pills")

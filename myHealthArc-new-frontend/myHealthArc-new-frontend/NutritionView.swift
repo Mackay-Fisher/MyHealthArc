@@ -76,7 +76,7 @@ struct NutritionView: View {
                     .scaledToFit()
                     .padding(-2)
                     .frame(width: 30)
-                Text("Nutrition Tracker")
+                Text("Nutrition Tracking")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding()
@@ -165,6 +165,7 @@ struct NutritionView: View {
                         }
                         .sheet(isPresented: $showForm) {
                             EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories, proteinChanged: $proteinChanged, carbsChanged: $carbsChanged, fatsChanged: $fatsChanged, caloriesChanged: $caloriesChanged, mealName: selectedMeal.name, mealId: mealId ?? "")
+                            .presentationDetents([fraction(0.5)])
                         }
                     }
                     

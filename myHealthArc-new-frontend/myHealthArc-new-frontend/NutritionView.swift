@@ -57,7 +57,7 @@ struct NutritionView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var selectedDate: Date = Date() 
     @State private var mealId: String? = ""
-    @State private var selectedMeal: Meal = Meal(id: "", name: "", totalProtein: Macro(name: "", value: ""), totalCarbs: Macro(name: "", value: ""), totalFats: Macro(name: "", value: ""), totalCalories: Macro(name: "", value: ""))
+    @State private var selectedMeal: Meal = Meal(id: "", name: "", totalProtein:\ Macro(name: "", value: ""), totalCarbs: Macro(name: "", value: ""), totalFats: Macro(name: "", value: ""), totalCalories: Macro(name: "", value: ""))
 
     @State private var editProtein: String = ""
     @State private var editCarbs: String = ""
@@ -405,17 +405,17 @@ struct NutritionView: View {
                         totalCaloriesMax += Int(nutrients["caloriesMaximum"] ?? 0)
                     }
 
-                    let proteinRange = Macro(name: "Protein:", value: "\(totalProteinMin)g - \(totalProteinMax)g")
-                    let carbsRange = Macro(name: "Carbs:", value: "\(totalCarbsMin)g - \(totalCarbsMax)g")
-                    let fatsRange = Macro(name: "Fats:", value: "\(totalFatsMin)g - \(totalFatsMax)g")
-                    let caloriesRange = Macro(name: "Calories:", value: "\(totalCaloriesMin)kcal - \(totalCaloriesMax)kcal")
+                    let proteinRange = Macro(name: "Protein", value: "\(totalProteinMin)g - \(totalProteinMax)g")
+                    let carbsRange = Macro(name: "Carbs", value: "\(totalCarbsMin)g - \(totalCarbsMax)g")
+                    let fatsRange = Macro(name: "Fats", value: "\(totalFatsMin)g - \(totalFatsMax)g")
+                    let caloriesRange = Macro(name: "Calories", value: "\(totalCaloriesMin)kcal - \(totalCaloriesMax)kcal")
 
                     DispatchQueue.main.async {
                         totalNutrition = """
-                        Protein: \(totalProteinMin)g - \(totalProteinMax)g, \
-                        Carbs: \(totalCarbsMin)g - \(totalCarbsMax)g, \
-                        Fats: \(totalFatsMin)g - \(totalFatsMax)g, \
-                        Calories: \(totalCaloriesMin)kcal - \(totalCaloriesMax)kcal
+                        Protein \(totalProteinMin)g - \(totalProteinMax)g, \
+                        Carbs \(totalCarbsMin)g - \(totalCarbsMax)g, \
+                        Fats \(totalFatsMin)g - \(totalFatsMax)g, \
+                        Calories \(totalCaloriesMin)kcal - \(totalCaloriesMax)kcal
                         """
                         meals.append(Meal(id: generateRandomID(), name: mealName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange))
 
@@ -473,10 +473,10 @@ struct NutritionView: View {
                         let fatsValue = meal.modifiedFats >= 0 ? meal.modifiedFats : (meal.fatsMinimum + meal.fatsMaximum) / 2
                         let caloriesValue = meal.modifiedCalories >= 0 ? meal.modifiedCalories : (meal.caloriesMinimum + meal.caloriesMaximum) / 2
 
-                        let proteinRange = Macro(name: "Protein:", value: meal.modifiedProtein >= 0 ? "\(meal.modifiedProtein)g" : "\(meal.proteinMinimum)g - \(meal.proteinMaximum)g")
-                        let carbsRange = Macro(name: "Carbs:", value: meal.modifiedCarbohydrates >= 0 ? "\(meal.modifiedCarbohydrates)g" : "\(meal.carbohydratesMinimum)g - \(meal.carbohydratesMaximum)g")
-                        let fatsRange = Macro(name: "Fats:", value: meal.modifiedFats >= 0 ? "\(meal.modifiedFats)g" : "\(meal.fatsMinimum)g - \(meal.fatsMaximum)g")
-                        let caloriesRange = Macro(name: "Calories:", value: meal.modifiedCalories >= 0 ? "\(meal.modifiedCalories)kcal" : "\(meal.caloriesMinimum)kcal - \(meal.caloriesMaximum)kcal")
+                        let proteinRange = Macro(name: "Protein", value: meal.modifiedProtein >= 0 ? "\(meal.modifiedProtein)g" : "\(meal.proteinMinimum)g - \(meal.proteinMaximum)g")
+                        let carbsRange = Macro(name: "Carbs", value: meal.modifiedCarbohydrates >= 0 ? "\(meal.modifiedCarbohydrates)g" : "\(meal.carbohydratesMinimum)g - \(meal.carbohydratesMaximum)g")
+                        let fatsRange = Macro(name: "Fats", value: meal.modifiedFats >= 0 ? "\(meal.modifiedFats)g" : "\(meal.fatsMinimum)g - \(meal.fatsMaximum)g")
+                        let caloriesRange = Macro(name: "Calories", value: meal.modifiedCalories >= 0 ? "\(meal.modifiedCalories)kcal" : "\(meal.caloriesMinimum)kcal - \(meal.caloriesMaximum)kcal")
                         print("Meal ID: \(meal.id!)")
                         return Meal(id: meal.id!, name: meal.foodName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange)
                     }
@@ -588,10 +588,10 @@ struct NutritionView: View {
                         let foodItem = firstFoodItem.key
                         let nutrients = firstFoodItem.value
                         foodInfo = """
-                        \(foodItem.capitalized) - Protein: \(nutrients["proteinMinimum"] ?? 0)g - \(nutrients["proteinMaximum"] ?? 0)g, \
-                        Carbs: \(nutrients["carbohydratesMinimum"] ?? 0)g - \(nutrients["carbohydratesMaximum"] ?? 0)g, \
-                        Fats: \(nutrients["fatsMinimum"] ?? 0)g - \(nutrients["fatsMaximum"] ?? 0)g, \
-                        Calories: \(nutrients["caloriesMinimum"] ?? 0)kcal - \(nutrients["caloriesMaximum"] ?? 0)kcal
+                        \(foodItem.capitalized) - Protein \(nutrients["proteinMinimum"] ?? 0)g - \(nutrients["proteinMaximum"] ?? 0)g, \
+                        Carbs \(nutrients["carbohydratesMinimum"] ?? 0)g - \(nutrients["carbohydratesMaximum"] ?? 0)g, \
+                        Fats \(nutrients["fatsMinimum"] ?? 0)g - \(nutrients["fatsMaximum"] ?? 0)g, \
+                        Calories \(nutrients["caloriesMinimum"] ?? 0)kcal - \(nutrients["caloriesMaximum"] ?? 0)kcal
                         """
                     } else {
                         foodInfo = "No information found."

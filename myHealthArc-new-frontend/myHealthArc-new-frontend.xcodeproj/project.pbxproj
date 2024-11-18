@@ -64,7 +64,6 @@
 		5AAA9B472CEDB6030051134F /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		5AD777E52CC330AF00DC2B8B /* myHealthArc-new-frontend.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "myHealthArc-new-frontend.entitlements"; sourceTree = "<group>"; };
 		8F161C292CC1B36200E726E7 /* myHealthArc-new-frontend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "myHealthArc-new-frontend.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myHealthArc_new_frontendApp.swift; sourceTree = "<group>"; };
 		8F161C2E2CC1B36200E726E7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8F161C302CC1B36400E726E7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8F161C332CC1B36400E726E7 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -124,11 +123,13 @@
 			isa = PBXGroup;
 			children = (
 				5AD777E52CC330AF00DC2B8B /* myHealthArc-new-frontend.entitlements */,
-				8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */,
 				8F161C2E2CC1B36200E726E7 /* ContentView.swift */,
 				250FC2322CC1F9CF0023AE43 /* LoginView.swift */,
 				5AAA9B472CEDB6030051134F /* APIClient.swift */,
 				250FC23A2CC201430023AE43 /* Tabs.swift */,
+				5AB0CE292CEB0F9E003FC857 /* AppleHealthManager.swift */,
+				5AB0CE2B2CEB0FBA003FC857 /* ActivityManager.swift */,
+				5AB0CE252CEB0E43003FC857 /* myHealthArc_new_frontendApp.swift */,
 				8F161C302CC1B36400E726E7 /* Assets.xcassets */,
 				250FC23C2CC202C90023AE43 /* SignUpView.swift */,
 				250FC2382CC200DF0023AE43 /* SettingsView.swift */,
@@ -308,7 +309,9 @@
 				250FC23F2CC205900023AE43 /* AppOpenScreen.swift in Sources */,
 				2528D6282CC9DA8E000D5852 /* MedicationsView.swift in Sources */,
 				250FC2412CC208C80023AE43 /* TermsAndConditionsView.swift in Sources */,
+				5AB0CE2A2CEB0F9E003FC857 /* AppleHealthManager.swift in Sources */,
 				250FC2372CC200D10023AE43 /* ServicesView.swift in Sources */,
+				5AB0CE2C2CEB0FBA003FC857 /* ActivityManager.swift in Sources */,
 				250FC2332CC1F9CF0023AE43 /* LoginView.swift in Sources */,
 				250FC23D2CC202D10023AE43 /* SignUpView.swift in Sources */,
 				250FC2392CC200DF0023AE43 /* SettingsView.swift in Sources */,
@@ -316,7 +319,6 @@
 				2528D6322CC9FB35000D5852 /* NutritionView.swift in Sources */,
 				8F161C2F2CC1B36200E726E7 /* ContentView.swift in Sources */,
 				2562C0812CCA10CC009E4284 /* MedicationWidget.swift in Sources */,
-				8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

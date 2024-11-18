@@ -283,79 +283,89 @@ struct NutritionView: View {
         }()
         
     private func fetchMealsForDay(date: Date) {
-        let baseURL = "http://localhost:8080/nutrition/meals"
-        
-        // Format the date properly for the API
-        let startOfDay = Calendar.current.startOfDay(for: date)
-        let dateString = NutritionView.apiDateFormatter.string(from: startOfDay)
-        
-        guard let userHash = KeychainWrapper.standard.string(forKey: "userHash"),
-              let encodedDate = dateString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: "\(baseURL)?userHash=\(userHash)&date=\(encodedDate)") else {
-            print("Failed to create URL with date: \(date)")
-            return
-        }
-        
-        print("Fetching meals for date: \(dateString)")  // Debug print
-        print("Using URL: \(url.absoluteString)")  // Debug print
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Error fetching meals: \(error.localizedDescription)")
+            let baseURL = "http://localhost:8080/nutrition/meals"
+            let dateString = ISO8601DateFormatter().string(from: date)
+            
+            guard let userHash = KeychainWrapper.standard.string(forKey: "userHash"),
+                  let url = URL(string: "\(baseURL)?userHash=\(userHash)&date=\(dateString)") else {
+                print("DEBUG - Failed to create URL with userHash or date")
                 return
             }
             
-            if let httpResponse = response as? HTTPURLResponse {
-                print("Response status code: \(httpResponse.statusCode)")
-            }
+            print("DEBUG - Fetching meals for date: \(dateString)")
+            print("DEBUG - Using URL: \(url.absoluteString)")
             
-            guard let data = data else {
-                print("No data received")
-                return
-            }
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
             
-            do {
-                let nutritions = try JSONDecoder().decode([Nutrition].self, from: data)
-                print("Received \(nutritions.count) meals from server")  // Debug print
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("DEBUG - Error fetching meals: \(error.localizedDescription)")
+                    return
+                }
                 
-                DispatchQueue.main.async {
-                    self.meals = nutritions.map { nutrition in
-                        let proteinValue = nutrition.modifiedProtein >= 0 ?
-                        "\(nutrition.modifiedProtein)g" :
-                        "\(nutrition.proteinMinimum)g - \(nutrition.proteinMaximum)g"
-                        let carbsValue = nutrition.modifiedCarbohydrates >= 0 ?
-                        "\(nutrition.modifiedCarbohydrates)g" :
-                        "\(nutrition.carbohydratesMinimum)g - \(nutrition.carbohydratesMaximum)g"
-                        let fatsValue = nutrition.modifiedFats >= 0 ?
-                        "\(nutrition.modifiedFats)g" :
-                        "\(nutrition.fatsMinimum)g - \(nutrition.fatsMaximum)g"
-                        let caloriesValue = nutrition.modifiedCalories >= 0 ?
-                        "\(nutrition.modifiedCalories)kcal" :
-                        "\(nutrition.caloriesMinimum)kcal - \(nutrition.caloriesMaximum)kcal"
-                        
-                        return Meal(
-                            id: nutrition.id ?? generateRandomID(),
-                            name: nutrition.foodName,
-                            totalProtein: Macro(name: "Protein:", value: proteinValue),
-                            totalCarbs: Macro(name: "Carbs:", value: carbsValue),
-                            totalFats: Macro(name: "Fats:", value: fatsValue),
-                            totalCalories: Macro(name: "Calories:", value: caloriesValue)
-                        )
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("DEBUG - Response status code: \(httpResponse.statusCode)")
+                }
+                
+                guard let data = data else {
+                    print("DEBUG - No data received")
+                    return
+                }
+                
+                do {
+                    let nutritions = try JSONDecoder().decode([Nutrition].self, from: data)
+                    print("DEBUG - Received \(nutritions.count) meals from server")
+                    
+                    DispatchQueue.main.async {
+                        self.meals = nutritions.map { nutrition in
+                            print("DEBUG - Processing meal: \(nutrition.foodName)")
+                            
+                            // Format protein values
+                            let proteinValue = nutrition.modifiedProtein >= 0 ?
+                                String(format: "%.1f", nutrition.modifiedProtein) :
+                                String(format: "%.1f-%.1f", nutrition.proteinMinimum, nutrition.proteinMaximum)
+                            
+                            // Format carbs values
+                            let carbsValue = nutrition.modifiedCarbohydrates >= 0 ?
+                                String(format: "%.1f", nutrition.modifiedCarbohydrates) :
+                                String(format: "%.1f-%.1f", nutrition.carbohydratesMinimum, nutrition.carbohydratesMaximum)
+                            
+                            // Format fats values
+                            let fatsValue = nutrition.modifiedFats >= 0 ?
+                                String(format: "%.1f", nutrition.modifiedFats) :
+                                String(format: "%.1f-%.1f", nutrition.fatsMinimum, nutrition.fatsMaximum)
+                            
+                            // Format calories values
+                            let caloriesValue = nutrition.modifiedCalories >= 0 ?
+                                String(nutrition.modifiedCalories) :
+                                "\(nutrition.caloriesMinimum)-\(nutrition.caloriesMaximum)"
+                            
+                            print("DEBUG - Formatted values:")
+                            print("Protein: \(proteinValue)")
+                            print("Carbs: \(carbsValue)")
+                            print("Fats: \(fatsValue)")
+                            print("Calories: \(caloriesValue)")
+                            
+                            return Meal(
+                                id: nutrition.id ?? generateRandomID(),
+                                name: nutrition.foodName,
+                                totalProtein: Macro(name: "Protein:", value: "\(proteinValue)g"),
+                                totalCarbs: Macro(name: "Carbs:", value: "\(carbsValue)g"),
+                                totalFats: Macro(name: "Fats:", value: "\(fatsValue)g"),
+                                totalCalories: Macro(name: "Calories:", value: "\(caloriesValue)kcal")
+                            )
+                        }
+                        print("DEBUG - Updated meals array with \(self.meals.count) items")
                     }
-                    print("Updated meals array with \(self.meals.count) items for date \(dateString)")
+                } catch {
+                    print("DEBUG - Decoding error: \(error)")
+                    if let responseString = String(data: data, encoding: .utf8) {
+                        print("DEBUG - Raw response: \(responseString)")
+                    }
                 }
-            } catch {
-                print("Decoding error: \(error)")
-                if let responseString = String(data: data, encoding: .utf8) {
-                    print("Raw response: \(responseString)")
-                }
-            }
-        }.resume()
-    }
-
+            }.resume()
+        }
     
     // Fetch Nutrition Info for the Meal
         private func fetchNutritionInfo(for foodItems: [String], mealName: String) {
@@ -577,22 +587,100 @@ struct EditMeal: View {
     @State private var fats: String = ""
     @State private var calories: String = ""
     
+    init(meal: Meal, onSave: @escaping () -> Void) {
+        print("DEBUG - Raw Meal Values:")
+        print("Protein: \(meal.totalProtein.value)")
+        print("Carbs: \(meal.totalCarbs.value)")
+        print("Fats: \(meal.totalFats.value)")
+        print("Calories: \(meal.totalCalories.value)")
+        
+        self.meal = meal
+        self.onSave = onSave
+        
+        // Extract the first number from each value string
+        let proteinValue = EditMeal.extractFirstNumber(from: meal.totalProtein.value)
+        let carbsValue = EditMeal.extractFirstNumber(from: meal.totalCarbs.value)
+        let fatsValue = EditMeal.extractFirstNumber(from: meal.totalFats.value)
+        let caloriesValue = EditMeal.extractFirstNumber(from: meal.totalCalories.value)
+        
+        print("DEBUG - Extracted Values:")
+        print("Protein: \(proteinValue)")
+        print("Carbs: \(carbsValue)")
+        print("Fats: \(fatsValue)")
+        print("Calories: \(caloriesValue)")
+        
+        // Initialize State properties
+        _protein = State(initialValue: proteinValue)
+        _carbs = State(initialValue: carbsValue)
+        _fats = State(initialValue: fatsValue)
+        _calories = State(initialValue: caloriesValue)
+    }
+    
+    // Helper function to extract the first number from a string
+    private static func extractFirstNumber(from string: String) -> String {
+        if let firstNumber = string.split(whereSeparator: { !$0.isNumber && $0 != "." })
+            .first(where: { Double($0) != nil }) {
+            return String(firstNumber)
+        }
+        return ""
+    }
+    
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Edit Meal Nutrition")) {
-                    TextField("Protein (g)", text: $protein)
-                        .keyboardType(.decimalPad)
-                    TextField("Carbs (g)", text: $carbs)
-                        .keyboardType(.decimalPad)
-                    TextField("Fats (g)", text: $fats)
-                        .keyboardType(.decimalPad)
-                    TextField("Calories", text: $calories)
-                        .keyboardType(.decimalPad)
+                Section(header: Text("Current Values")) {
+                    Text("Original Protein: \(meal.totalProtein.value)")
+                    Text("Original Carbs: \(meal.totalCarbs.value)")
+                    Text("Original Fats: \(meal.totalFats.value)")
+                    Text("Original Calories: \(meal.totalCalories.value)")
                 }
                 
-                Button("Save Changes") {
-                    updateNutrition()
+                Section(header: Text("Edit Meal Nutrition")) {
+                    HStack {
+                        Text("Protein:")
+                        TextField("Enter protein (g)", text: $protein)
+                            .keyboardType(.decimalPad)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    HStack {
+                        Text("Carbs:")
+                        TextField("Enter carbs (g)", text: $carbs)
+                            .keyboardType(.decimalPad)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    HStack {
+                        Text("Fats:")
+                        TextField("Enter fats (g)", text: $fats)
+                            .keyboardType(.decimalPad)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    HStack {
+                        Text("Calories:")
+                        TextField("Enter calories", text: $calories)
+                            .keyboardType(.decimalPad)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                }
+                
+                Section {
+                    Button(action: {
+                        print("DEBUG - Saving values:")
+                        print("Protein: \(protein)")
+                        print("Carbs: \(carbs)")
+                        print("Fats: \(fats)")
+                        print("Calories: \(calories)")
+                        updateNutrition()
+                    }) {
+                        Text("Save Changes")
+                            .frame(maxWidth: .infinity)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                    }
                 }
             }
             .navigationTitle("Edit \(meal.name)")
@@ -605,11 +693,15 @@ struct EditMeal: View {
     private func updateNutrition() {
         guard let mealId = globalSelectedMealId,
               let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
+            print("DEBUG - Missing mealId or userHash")
             return
         }
         
+        print("DEBUG - Updating meal with ID: \(mealId)")
+        
         let baseURL = "http://localhost:8080/nutrition/update"
         guard let url = URL(string: "\(baseURL)/\(mealId)") else {
+            print("DEBUG - Invalid URL")
             return
         }
         
@@ -628,6 +720,8 @@ struct EditMeal: View {
             updatedFields["modifiedCalories"] = Int(calories) ?? 0
         }
         
+        print("DEBUG - Sending update with fields: \(updatedFields)")
+        
         var request = URLRequest(url: url)
         request.httpMethod = "PATCH"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -638,24 +732,25 @@ struct EditMeal: View {
             
             URLSession.shared.dataTask(with: request) { data, response, error in
                 if let error = error {
-                    print("Error: \(error.localizedDescription)")
+                    print("DEBUG - Error: \(error.localizedDescription)")
                     return
                 }
                 
-                if let httpResponse = response as? HTTPURLResponse,
-                   httpResponse.statusCode == 200 {
-                    DispatchQueue.main.async {
-                        onSave()
-                        dismiss()
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("DEBUG - Response status: \(httpResponse.statusCode)")
+                    if httpResponse.statusCode == 200 {
+                        DispatchQueue.main.async {
+                            onSave()
+                            dismiss()
+                        }
                     }
                 }
             }.resume()
         } catch {
-            print("Encoding error: \(error)")
+            print("DEBUG - Encoding error: \(error)")
         }
     }
 }
-
 // MARK: - Date Formatter Extensions
 extension DateFormatter {
     static let dayFormatter: DateFormatter = {

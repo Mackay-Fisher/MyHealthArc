@@ -3,9 +3,7 @@ import Fluent
 import FluentMongoDriver
 import Leaf
 import Vapor
-import Jobs
 
-// configures your application
 public func configure(_ app: Application) async throws {
     // Serve files from /Public folder
     app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
@@ -26,18 +24,6 @@ public func configure(_ app: Application) async throws {
 
     // Use Leaf for rendering
     app.views.use(.leaf)
-
-    // Register scheduled jobs
-    app.jobs.add(MyScheduledJob(), on: "weeklyJobQueue")
-
-    // Schedule job to run every Monday at midnight
-    app.jobs.schedule(MyScheduledJob())
-        .weekly()
-        .at(.monday, .midnight)
-
-    // Start the Jobs server
-    app.jobs.start()
-
     // Register routes
     try routes(app)
 }

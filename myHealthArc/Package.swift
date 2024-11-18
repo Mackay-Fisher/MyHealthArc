@@ -19,7 +19,10 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.65.0"),
         // 🌍 DotEnv for environment variable management.
         .package(url: "https://github.com/swiftpackages/DotEnv.git", from: "3.0.0"),
-        .package(url: "https://github.com/vapor/jobs.git", from: "1.0.0"),
+        // Add this to your dependencies
+        .package(url: "https://github.com/vapor/queues", from: "1.0.0"),
+
+        .package(url: "https://github.com/vapor/queues-scheduler.git", from: "1.0.0")
     ],
     targets: [
         .executableTarget(
@@ -33,7 +36,7 @@ let package = Package(
                 .product(name: "NIOPosix", package: "swift-nio"),
                 .product(name: "DotEnv", package: "DotEnv"),
             ],
-            swiftSettings: swiftSettings
+            swiftSettings: swiftSettings // Removed the trailing comma here
         ),
         .testTarget(
             name: "AppTests",
@@ -43,7 +46,7 @@ let package = Package(
             ],
             path: "Tests/AppTests",
             sources: [
-                 "MongoTest.swift",
+                "MongoTest.swift",
                 //"SchemaTests.swift",
                 //"InsertUsersTest.swift",
                 //"CreateMedicationsTest.swift",

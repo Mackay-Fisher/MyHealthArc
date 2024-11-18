@@ -327,89 +327,89 @@ struct NutritionView: View {
         }()
         
     private func fetchMealsForDay(date: Date) {
-            let baseURL = "http://localhost:8080/nutrition/meals"
-            let dateString = ISO8601DateFormatter().string(from: date)
-            
-            guard let userHash = KeychainWrapper.standard.string(forKey: "userHash"),
-                  let url = URL(string: "\(baseURL)?userHash=\(userHash)&date=\(dateString)") else {
-                print("DEBUG - Failed to create URL with userHash or date")
+        let baseURL = "http://localhost:8080/nutrition/meals"
+        let dateString = ISO8601DateFormatter().string(from: date)
+        
+        guard let userHash = KeychainWrapper.standard.string(forKey: "userHash"),
+            let url = URL(string: "\(baseURL)?userHash=\(userHash)&date=\(dateString)") else {
+            print("DEBUG - Failed to create URL with userHash or date")
+            return
+        }
+        
+        print("DEBUG - Fetching meals for date: \(dateString)")
+        print("DEBUG - Using URL: \(url.absoluteString)")
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("DEBUG - Error fetching meals: \(error.localizedDescription)")
                 return
             }
             
-            print("DEBUG - Fetching meals for date: \(dateString)")
-            print("DEBUG - Using URL: \(url.absoluteString)")
+            if let httpResponse = response as? HTTPURLResponse {
+                print("DEBUG - Response status code: \(httpResponse.statusCode)")
+            }
             
-            var request = URLRequest(url: url)
-            request.httpMethod = "GET"
+            guard let data = data else {
+                print("DEBUG - No data received")
+                return
+            }
             
-            URLSession.shared.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    print("DEBUG - Error fetching meals: \(error.localizedDescription)")
-                    return
-                }
+            do {
+                let nutritions = try JSONDecoder().decode([Nutrition].self, from: data)
+                print("DEBUG - Received \(nutritions.count) meals from server")
                 
-                if let httpResponse = response as? HTTPURLResponse {
-                    print("DEBUG - Response status code: \(httpResponse.statusCode)")
-                }
-                
-                guard let data = data else {
-                    print("DEBUG - No data received")
-                    return
-                }
-                
-                do {
-                    let nutritions = try JSONDecoder().decode([Nutrition].self, from: data)
-                    print("DEBUG - Received \(nutritions.count) meals from server")
-                    
-                    DispatchQueue.main.async {
-                        self.meals = nutritions.map { nutrition in
-                            print("DEBUG - Processing meal: \(nutrition.foodName)")
-                            
-                            // Format protein values
-                            let proteinValue = nutrition.modifiedProtein >= 0 ?
-                                String(format: "%.1f", nutrition.modifiedProtein) :
-                                String(format: "%.1f-%.1f", nutrition.proteinMinimum, nutrition.proteinMaximum)
-                            
-                            // Format carbs values
-                            let carbsValue = nutrition.modifiedCarbohydrates >= 0 ?
-                                String(format: "%.1f", nutrition.modifiedCarbohydrates) :
-                                String(format: "%.1f-%.1f", nutrition.carbohydratesMinimum, nutrition.carbohydratesMaximum)
-                            
-                            // Format fats values
-                            let fatsValue = nutrition.modifiedFats >= 0 ?
-                                String(format: "%.1f", nutrition.modifiedFats) :
-                                String(format: "%.1f-%.1f", nutrition.fatsMinimum, nutrition.fatsMaximum)
-                            
-                            // Format calories values
-                            let caloriesValue = nutrition.modifiedCalories >= 0 ?
-                                String(nutrition.modifiedCalories) :
-                                "\(nutrition.caloriesMinimum)-\(nutrition.caloriesMaximum)"
-                            
-                            print("DEBUG - Formatted values:")
-                            print("Protein: \(proteinValue)")
-                            print("Carbs: \(carbsValue)")
-                            print("Fats: \(fatsValue)")
-                            print("Calories: \(caloriesValue)")
-                            
-                            return Meal(
-                                id: nutrition.id ?? generateRandomID(),
-                                name: nutrition.foodName,
-                                totalProtein: Macro(name: "Protein:", value: "\(proteinValue)"),
-                                totalCarbs: Macro(name: "Carbs:", value: "\(carbsValue)"),
-                                totalFats: Macro(name: "Fats:", value: "\(fatsValue)"),
-                                totalCalories: Macro(name: "Calories:", value: "\(caloriesValue)")
-                            )
-                        }
-                        print("DEBUG - Updated meals array with \(self.meals.count) items")
+                DispatchQueue.main.async {
+                    self.meals = nutritions.map { nutrition in
+                        print("DEBUG - Processing meal: \(nutrition.foodName)")
+                        
+                        // Format protein values
+                        let proteinValue = nutrition.modifiedProtein != nutrition.proteinMinimum ?
+                            String(format: "%.1f", nutrition.modifiedProtein) :
+                            String(format: "%.1f-%.1f", nutrition.proteinMinimum, nutrition.proteinMaximum)
+                        
+                        // Format carbs values
+                        let carbsValue = nutrition.modifiedCarbohydrates != nutrition.carbohydratesMinimum ?
+                            String(format: "%.1f", nutrition.modifiedCarbohydrates) :
+                            String(format: "%.1f-%.1f", nutrition.carbohydratesMinimum, nutrition.carbohydratesMaximum)
+                        
+                        // Format fats values
+                        let fatsValue = nutrition.modifiedFats != nutrition.fatsMinimum ?
+                            String(format: "%.1f", nutrition.modifiedFats) :
+                            String(format: "%.1f-%.1f", nutrition.fatsMinimum, nutrition.fatsMaximum)
+                        
+                        // Format calories values
+                        let caloriesValue = nutrition.modifiedCalories != nutrition.caloriesMinimum ?
+                            String(nutrition.modifiedCalories) :
+                            "\(nutrition.caloriesMinimum)-\(nutrition.caloriesMaximum)"
+                        
+                        print("DEBUG - Formatted values:")
+                        print("Protein: \(proteinValue)")
+                        print("Carbs: \(carbsValue)")
+                        print("Fats: \(fatsValue)")
+                        print("Calories: \(caloriesValue)")
+                        
+                        return Meal(
+                            id: nutrition.id ?? generateRandomID(),
+                            name: nutrition.foodName,
+                            totalProtein: Macro(name: "Protein:", value: "\(proteinValue)"),
+                            totalCarbs: Macro(name: "Carbs:", value: "\(carbsValue)"),
+                            totalFats: Macro(name: "Fats:", value: "\(fatsValue)"),
+                            totalCalories: Macro(name: "Calories:", value: "\(caloriesValue)")
+                        )
                     }
-                } catch {
-                    print("DEBUG - Decoding error: \(error)")
-                    if let responseString = String(data: data, encoding: .utf8) {
-                        print("DEBUG - Raw response: \(responseString)")
-                    }
+                    print("DEBUG - Updated meals array with \(self.meals.count) items")
                 }
-            }.resume()
-        }
+            } catch {
+                print("DEBUG - Decoding error: \(error)")
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("DEBUG - Raw response: \(responseString)")
+                }
+            }
+        }.resume()
+    }
     
     // Fetch Nutrition Info for the Meal
         private func fetchNutritionInfo(for foodItems: [String], mealName: String) {
@@ -524,10 +524,10 @@ struct NutritionView: View {
                 fatsMaximum: fatsMax,
                 caloriesMinimum: caloriesMin,
                 caloriesMaximum: caloriesMax,
-                modifiedProtein: -1.0,
-                modifiedCarbohydrates: -1.0,
-                modifiedFats: -1.0,
-                modifiedCalories: -1
+                modifiedProtein: proteinMin,
+                modifiedCarbohydrates: carbsMin,
+                modifiedFats: fatsMin,
+                modifiedCalories: caloriesMin
             )
             
             var request = URLRequest(url: url)

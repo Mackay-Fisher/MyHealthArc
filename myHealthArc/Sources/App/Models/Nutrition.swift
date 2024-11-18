@@ -54,7 +54,7 @@ final class Nutrition: Model, Content, @unchecked Sendable {
     
     init() { }
     
-    init(id: String? = nil, userHash: String, foodName: String, proteinMinimum: Double, proteinMaximum: Double, carbohydratesMinimum: Double, carbohydratesMaximum: Double, fatsMinimum: Double, fatsMaximum: Double, caloriesMinimum: Int, caloriesMaximum: Int, modifiedProtein: Double? = nil, modifiedCarbohydrates: Double? = nil, modifiedFats: Double? = nil, modifiedCalories: Int? = nil) {
+    init(id: String? = nil, userHash: String, foodName: String, proteinMinimum: Double, proteinMaximum: Double, carbohydratesMinimum: Double, carbohydratesMaximum: Double, fatsMinimum: Double, fatsMaximum: Double, caloriesMinimum: Int, caloriesMaximum: Int) {
         self.id = id
         self.userHash = userHash
         self.foodName = foodName
@@ -66,9 +66,9 @@ final class Nutrition: Model, Content, @unchecked Sendable {
         self.fatsMaximum = fatsMaximum
         self.caloriesMinimum = caloriesMinimum
         self.caloriesMaximum = caloriesMaximum
-        self.modifiedProtein = modifiedProtein
-        self.modifiedCarbohydrates = modifiedCarbohydrates
-        self.modifiedFats = modifiedFats
-        self.modifiedCalories = modifiedCalories
+        self.modifiedProtein = proteinMinimum
+        self.modifiedCarbohydrates = carbohydratesMinimum
+        self.modifiedFats = fatsMinimum
+        self.modifiedCalories = caloriesMinimum
     }
 }

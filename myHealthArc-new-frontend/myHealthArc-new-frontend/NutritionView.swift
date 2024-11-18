@@ -57,8 +57,8 @@ struct NutritionView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var selectedDate: Date = Date() 
     @State private var mealId: String? = ""
-    @State private var selectedMeal: Meal = Meal(id: "", name: "", totalProtein:\ Macro(name: "", value: ""), totalCarbs: Macro(name: "", value: ""), totalFats: Macro(name: "", value: ""), totalCalories: Macro(name: "", value: ""))
-
+    @State private var selectedMeal: Meal = Meal(id: "", name: "", totalProtein: Macro(name: "", value: ""), totalCarbs: Macro(name: "", value: ""), totalFats: Macro(name: "", value: ""), totalCalories: Macro(name: "", value: ""))
+   
     @State private var editProtein: String = ""
     @State private var editCarbs: String = ""
     @State private var editFats: String = ""
@@ -81,28 +81,28 @@ struct NutritionView: View {
                     .fontWeight(.bold)
                     .padding()
             }
-            
+
             Divider()
                 .overlay(
                     (colorScheme == .dark ? Color.white : Color.gray)
                 )
-            
+
             Spacer()
                 .frame(height: 20)
-            
+
             // Meal Input Section
             ZStack(alignment: .topTrailing) {
                 HStack {
                     Spacer()
-                    
+
                     Text("Your Meals")
                         .font(.title3)
                         .padding(.top)
-                    
+
                     Spacer()
                 }
                 .padding(.horizontal)
-                
+
                 Button(action: {
                     withAnimation {
                         showPopup = true
@@ -111,11 +111,11 @@ struct NutritionView: View {
                     Image(systemName: "plus.circle")
                         .font(.title)
                         .padding(12)
-                        .foregroundColor(.mhaPurple)
+                        .foregroundColor(Color.mhaPurple)
                 }
             }
             .disabled(showPopup)
-            
+
             VStack {
                 // Calendar Week View
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -142,15 +142,15 @@ struct NutritionView: View {
                 }
                 .padding(.top)
             }
-            
-                     List(meals, id: \.id) { meal in
-                VStack(alignment: .leading, spacing: 8) { // Removed any extra background
+
+            List(meals, id: \.id) { meal in
+                VStack(alignment: .leading) {
                     HStack {
                         Text(meal.name)
                             .font(.headline)
                             .padding(.bottom, 2)
                         Spacer()
-                        Button(action: {
+                        Button("Edit") {
                             print("Edit button clicked for Meal ID: \(meal.id)")
                             selectedMeal = meal
                             mealId = meal.id
@@ -162,34 +162,15 @@ struct NutritionView: View {
                             DispatchQueue.main.async {
                                 showForm = true
                             }
-                        }) {
-                            Image(systemName: "pencil")
-                                .foregroundColor(Color.mhaPurple) // Replace with your purple color definition
-                                .padding(6)
-                                .background(Circle().fill(Color.mhaPurple.opacity(0.2))) // Optional: Add a background circle for aesthetics
                         }
-                        .buttonStyle(PlainButtonStyle()) // Ensures the button doesn't get extra styling
                         .sheet(isPresented: $showForm) {
-                            EditMeal(
-                                protein: $editProtein,
-                                carbs: $editCarbs,
-                                fats: $editFats,
-                                calories: $editCalories,
-                                proteinChanged: $proteinChanged,
-                                carbsChanged: $carbsChanged,
-                                fatsChanged: $fatsChanged,
-                                caloriesChanged: $caloriesChanged,
-                                mealName: selectedMeal.name,
-                                mealId: mealId ?? ""
-                            )
-                            .presentationDetents([.fraction(0.55)])
+                            EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories, proteinChanged: $proteinChanged, carbsChanged: $carbsChanged, fatsChanged: $fatsChanged, caloriesChanged: $caloriesChanged, mealName: selectedMeal.name, mealId: mealId ?? "")
+                            .presentationDetents([fraction(0.5)])
                         }
                     }
 
                     HStack {
-                        Spacer()
-
-                        VStack {
+                        VStack{
                             Text(meal.totalProtein.name)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -200,7 +181,7 @@ struct NutritionView: View {
                                 .padding(.bottom, 5)
                         }
 
-                        VStack {
+                        VStack{
                             Text(meal.totalCarbs.name)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -211,7 +192,7 @@ struct NutritionView: View {
                                 .padding(.bottom, 5)
                         }
 
-                        VStack {
+                        VStack{
                             Text(meal.totalFats.name)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -222,7 +203,7 @@ struct NutritionView: View {
                                 .padding(.bottom, 5)
                         }
 
-                        VStack {
+                        VStack{
                             Text(meal.totalCalories.name)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -232,19 +213,15 @@ struct NutritionView: View {
                                 .foregroundColor(.secondary)
                                 .padding(.bottom, 5)
                         }
-
-                        Spacer()
                     }
                 }
-                .listRowBackground(Color.clear) // Ensure no background for each row
-                .padding(.vertical, 8) // Optional: Adjust padding for better spacing
             }
             .listStyle(PlainListStyle())
             .padding(.bottom)
             .padding(.leading, -15)
-            
+
             Spacer()
-            
+
             HStack {
                 TextField("Search for food", text: $foodSearch, onCommit: {
                     fetchFoodInfo()
@@ -257,7 +234,7 @@ struct NutritionView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
                 )
-                
+
                 Button(action: fetchFoodInfo) {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.white)
@@ -267,13 +244,13 @@ struct NutritionView: View {
                 }
             }
             .padding()
-            
+
             if showFoodInfo {
                 VStack(alignment: .leading) {
                     Text(foodInfo)
                         .font(.headline)
                         .padding(.bottom, 2)
-                    
+
                     Button(action: clearSearch) {
                         Text("Clear")
                             .padding()
@@ -286,7 +263,7 @@ struct NutritionView: View {
                 }
                 .padding()
             }
-            
+
             Spacer()
         }
         .padding()
@@ -302,7 +279,7 @@ struct NutritionView: View {
                                     showPopup = false
                                 }
                             }
-                        
+
                         VStack(spacing: 20) {
                             TextField("Enter meal (comma-separated)", text: $mealInput)
                                 .padding(10)
@@ -313,7 +290,7 @@ struct NutritionView: View {
                                     RoundedRectangle(cornerRadius: 12)
                                         .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
                                 )
-                            
+
                             HStack(spacing: 10) {
                                 Button("Add Meal") {
                                     addMeal()
@@ -326,7 +303,7 @@ struct NutritionView: View {
                                 .background(Color.mHaGreen)
                                 .cornerRadius(20)
                                 .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                                
+
                                 Button("Cancel") {
                                     withAnimation {
                                         showPopup = false
@@ -437,7 +414,7 @@ struct NutritionView: View {
                         Protein \(totalProteinMin)g - \(totalProteinMax)g, \
                         Carbs \(totalCarbsMin)g - \(totalCarbsMax)g, \
                         Fats \(totalFatsMin)g - \(totalFatsMax)g, \
-                        Calories \(totalCaloriesMin)kcal - \(totalCaloriesMax)kcal
+                        Calories \(totalCaloriesMin)kcal - \(totalCaloriesMax)kca
                         """
                         meals.append(Meal(id: generateRandomID(), name: mealName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange))
 
@@ -457,7 +434,7 @@ struct NutritionView: View {
             }
         }.resume()
     }
-    
+
     private func fetchMealsForDay(date: Date) {
         let baseURL = "http://localhost:8080/nutrition/meals"
         let dateString = ISO8601DateFormatter().string(from: date)
@@ -613,7 +590,7 @@ struct NutritionView: View {
                         \(foodItem.capitalized) - Protein \(nutrients["proteinMinimum"] ?? 0)g - \(nutrients["proteinMaximum"] ?? 0)g, \
                         Carbs \(nutrients["carbohydratesMinimum"] ?? 0)g - \(nutrients["carbohydratesMaximum"] ?? 0)g, \
                         Fats \(nutrients["fatsMinimum"] ?? 0)g - \(nutrients["fatsMaximum"] ?? 0)g, \
-                        Calories \(nutrients["caloriesMinimum"] ?? 0)kcal - \(nutrients["caloriesMaximum"] ?? 0)kcal
+                        Calories \(nutrients["caloriesMinimum"] ?? 0)kcal - \(nutrients["caloriesMaximum"] ?? 0)kcal?? 0)kcal
                         """
                     } else {
                         foodInfo = "No information found."
@@ -630,7 +607,7 @@ struct NutritionView: View {
             }
         }.resume()
     }
-    
+
 
     // Clear Search Functionality
     private func clearSearch() {
@@ -645,7 +622,7 @@ struct NutritionView: View {
             let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
             return (0..<7).map { calendar.date(byAdding: .day, value: $0, to: startOfWeek)! }
         }
-        
+
         // Check if the date is today
         private func isToday(_ date: Date) -> Bool {
             Calendar.current.isDateInToday(date)
@@ -658,7 +635,7 @@ extension DateFormatter {
         formatter.dateFormat = "d"
         return formatter
     }()
-    
+
     static let dayOfWeekFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEE"
@@ -815,4 +792,3 @@ struct NutritionView_Previews: PreviewProvider {
         NutritionView()
     }
 }
-

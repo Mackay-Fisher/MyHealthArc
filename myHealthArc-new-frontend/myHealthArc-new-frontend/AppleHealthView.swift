@@ -62,7 +62,7 @@ struct AppleHealthHomeView: View {
                     } else if selectedSection == .sleep {
                         SleepDataView()
                     } else if selectedSection == .vitals {
-                        VitalInfoView()
+                        VitalInfoView( containerHeight: geometry.size.height - geometry.safeAreaInsets.top - 150)
                     }
                 }
                 .frame(height: geometry.size.height - geometry.safeAreaInsets.top - 100) // Adjust height dynamically

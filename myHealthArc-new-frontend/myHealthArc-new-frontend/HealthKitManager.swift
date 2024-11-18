@@ -9,7 +9,8 @@ import BackgroundTasks
 
 class HealthKitBackgroundManager {
     private let healthStore = HKHealthStore()
-    private var anchor: HKQueryAnchor? // Store the anchor for incremental updates
+    private var healthAnchor: HKQueryAnchor? // Anchor for health data updates
+    private var fitnessAnchor: HKQueryAnchor? // Anchor for fitness data updates
 
     static let shared = HealthKitBackgroundManager() // Singleton instance
 
@@ -18,116 +19,171 @@ class HealthKitBackgroundManager {
     // MARK: - Background Task Registration
     func registerBackgroundTasks() {
         BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.myapp.healthSync", using: nil) { task in
-            self.handleBackgroundHealthSync(task: task as! BGAppRefreshTask)
+            self.handleMasterUpdate(task: task as! BGAppRefreshTask)
         }
     }
 
-    // MARK: - Schedule Background Health Sync
-    func scheduleBackgroundHealthSync() {
+    // MARK: - Schedule Background Master Sync
+    func scheduleBackgroundMasterSync() {
         let request = BGAppRefreshTaskRequest(identifier: "com.myapp.healthSync")
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60) // Schedule every 15 minutes
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60) // Every 15 minutes
 
         do {
             try BGTaskScheduler.shared.submit(request)
-            print("Background sync scheduled.")
+            print("Background master sync scheduled.")
         } catch {
-            print("Failed to schedule background sync: \(error.localizedDescription)")
+            print("Failed to schedule background master sync: \(error.localizedDescription)")
         }
     }
 
-    // MARK: - Handle Background Task
-    func handleBackgroundHealthSync(task: BGAppRefreshTask) {
+    // MARK: - Handle Master Update Task
+    func handleMasterUpdate(task: BGAppRefreshTask) {
         task.expirationHandler = {
             print("Background task expired before completion.")
         }
 
-        // Perform sync
         Task {
-            self.syncHealthData { success in
+            print("Starting periodic background sync...")
+            guard await self.requestHealthKitAuthorization() else {
+                print("HealthKit authorization not granted.")
+                task.setTaskCompleted(success: false)
+                return
+            }
+
+            self.syncMasterData { success in
+                print("Periodic background sync completed: \(success ? "Success" : "Failure")")
                 task.setTaskCompleted(success: success)
+
+                // Schedule the next background sync
+                self.scheduleBackgroundMasterSync()
             }
         }
     }
 
-    // MARK: - Start Observing HealthKit Changes
-    func startObservingHealthData() {
-        observeHealthKitChanges(for: .stepCount)
-        observeHealthKitChanges(for: .activeEnergyBurned)
-        observeHealthKitChanges(for: .distanceWalkingRunning)
-        observeHealthKitChanges(for: .heartRate)
-    }
 
-    private func observeHealthKitChanges(for quantityType: HKQuantityTypeIdentifier) {
-        guard let sampleType = HKSampleType.quantityType(forIdentifier: quantityType) else { return }
+    // MARK: - Perform Master Sync
+    func syncMasterData(completion: @escaping (Bool) -> Void) {
+        print("Starting master sync...")
+        let group = DispatchGroup()
+        var success = true
 
-        let query = HKObserverQuery(sampleType: sampleType, predicate: nil) { [weak self] _, completionHandler, error in
-            if let error = error {
-                print("Observer error: \(error.localizedDescription)")
-                return
-            }
-
-            // Fetch new data and sync it to the database
-            self?.startAnchoredQuery(for: quantityType) { samples in
-                self?.syncSamplesToDatabase(samples: samples)
-            }
-
-            // Notify HealthKit that you're done processing the update
-            completionHandler()
+        group.enter()
+        syncHealthData { result in
+            print("Health data sync completed: \(result ? "Success" : "Failure")")
+            success = success && result
+            group.leave()
         }
 
-        healthStore.execute(query)
-        healthStore.enableBackgroundDelivery(for: sampleType, frequency: .immediate) { success, error in
-            if let error = error {
-                print("Error enabling background delivery: \(error.localizedDescription)")
-            } else {
-                print("Background delivery enabled for \(quantityType.rawValue).")
-            }
+        group.enter()
+        syncFitnessData { result in
+            print("Fitness data sync completed: \(result ? "Success" : "Failure")")
+            success = success && result
+            group.leave()
+        }
+
+        group.notify(queue: .main) {
+            print("Master sync completed: \(success ? "Success" : "Failure")")
+            completion(success)
         }
     }
 
-    // MARK: - Start Anchored Query
-    private func startAnchoredQuery(for quantityType: HKQuantityTypeIdentifier, completion: @escaping ([HKQuantitySample]) -> Void) {
-        guard let sampleType = HKSampleType.quantityType(forIdentifier: quantityType) else { return }
+}
 
-        let query = HKAnchoredObjectQuery(
-            type: sampleType,
-            predicate: nil,
-            anchor: anchor,
-            limit: HKObjectQueryNoLimit
-        ) { query, samplesOrNil, deletedObjectsOrNil, newAnchor, error in
-            guard let samples = samplesOrNil as? [HKQuantitySample] else {
-                print("Error fetching HealthKit data: \(error?.localizedDescription ?? "Unknown error")")
-                return
-            }
+extension HealthKitBackgroundManager {
+    // MARK: - Request HealthKit Authorization
+    func requestHealthKitAuthorization() async -> Bool {
+        let healthTypesToRead: Set<HKObjectType> = [
+            HKObjectType.quantityType(forIdentifier: .heartRate)!,
+            HKObjectType.quantityType(forIdentifier: .stepCount)!,
+            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
+            HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!
+        ]
 
-            // Save the new anchor for future incremental updates
-            self.anchor = newAnchor
-
-            // Return the fetched samples
-            completion(samples)
+        do {
+            try await healthStore.requestAuthorization(toShare: [], read: healthTypesToRead)
+            return true
+        } catch {
+            print("HealthKit authorization failed: \(error.localizedDescription)")
+            return false
         }
-
-        query.updateHandler = { query, samplesOrNil, deletedObjectsOrNil, newAnchor, error in
-            guard let samples = samplesOrNil as? [HKQuantitySample] else { return }
-            self.anchor = newAnchor
-            completion(samples)
-        }
-
-        healthStore.execute(query)
     }
 
-    // MARK: - Sync HealthKit Data to Database
-    private func syncSamplesToDatabase(samples: [HKQuantitySample]) {
+    // MARK: - Health Data Sync
+    func syncHealthData(completion: @escaping (Bool) -> Void) {
+        let healthTypes: [HKQuantityTypeIdentifier] = [.heartRate]
+
+        performAnchoredQuery(for: healthTypes, anchor: healthAnchor) { samples, newAnchor in
+            self.healthAnchor = newAnchor // Update the stored anchor for health data
+            self.syncSamplesToDatabase(samples: samples, category: "health")
+            completion(true)
+        }
+    }
+
+    // MARK: - Fitness Data Sync
+    func syncFitnessData(completion: @escaping (Bool) -> Void) {
+        let fitnessTypes: [HKQuantityTypeIdentifier] = [.stepCount, .activeEnergyBurned, .distanceWalkingRunning]
+
+        performAnchoredQuery(for: fitnessTypes, anchor: fitnessAnchor) { samples, newAnchor in
+            self.fitnessAnchor = newAnchor // Update the stored anchor for fitness data
+            self.syncSamplesToDatabase(samples: samples, category: "fitness")
+            completion(true)
+        }
+    }
+
+    // MARK: - Perform Anchored Query
+    private func performAnchoredQuery(for types: [HKQuantityTypeIdentifier], anchor: HKQueryAnchor?, completion: @escaping ([HKQuantitySample], HKQueryAnchor?) -> Void) {
+        let group = DispatchGroup()
+        var allSamples: [HKQuantitySample] = []
+        var latestAnchor: HKQueryAnchor? = anchor // Create a local copy of the anchor
+
+        for type in types {
+            guard let sampleType = HKSampleType.quantityType(forIdentifier: type) else { continue }
+            group.enter()
+
+            let query = HKAnchoredObjectQuery(
+                type: sampleType,
+                predicate: nil,
+                anchor: latestAnchor,
+                limit: HKObjectQueryNoLimit
+            ) { query, samplesOrNil, _, newAnchor, error in
+                defer { group.leave() } // Ensure `group.leave()` is always called
+                guard let samples = samplesOrNil as? [HKQuantitySample] else {
+                    print("Error fetching HealthKit data: \(error?.localizedDescription ?? "Unknown error")")
+                    return
+                }
+
+                allSamples.append(contentsOf: samples)
+                latestAnchor = newAnchor // Update the latest anchor
+            }
+
+            healthStore.execute(query)
+        }
+
+        group.notify(queue: .main) {
+            completion(allSamples, latestAnchor) // Return both samples and the updated anchor
+        }
+    }
+
+    // MARK: - Sync Samples to Database
+    private func syncSamplesToDatabase(samples: [HKQuantitySample], category: String) {
         let dataToSync = samples.map { sample -> [String: Any] in
             return [
                 "startDate": sample.startDate,
                 "endDate": sample.endDate,
                 "value": sample.quantity.doubleValue(for: HKUnit.count()), // Adjust the unit as needed
-                "type": sample.quantityType.identifier
+                "type": sample.quantityType.identifier,
+                "category": category
             ]
         }
 
-        // Send data to your backend database
+        // Log data for validation
+        print("Synced \(category.capitalized) Data:")
+        for data in dataToSync {
+            print(data)
+        }
+
+        // Commented out the backend sync as it's not implemented yet
+        /*
         guard let url = URL(string: "https://your-backend.com/health-data") else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -141,31 +197,12 @@ class HealthKitBackgroundManager {
                 if let error = error {
                     print("Error syncing data to database: \(error.localizedDescription)")
                 } else {
-                    print("HealthKit data successfully synced to database.")
+                    print("\(category.capitalized) data successfully synced to database.")
                 }
             }.resume()
         } catch {
             print("Error serializing data: \(error.localizedDescription)")
         }
-    }
-
-    // MARK: - Perform Full Sync
-    func syncHealthData(completion: @escaping (Bool) -> Void) {
-        let types: [HKQuantityTypeIdentifier] = [.stepCount, .activeEnergyBurned, .distanceWalkingRunning, .heartRate]
-
-        let group = DispatchGroup()
-        var success = true
-
-        for type in types {
-            group.enter()
-            startAnchoredQuery(for: type) { samples in
-                self.syncSamplesToDatabase(samples: samples)
-                group.leave()
-            }
-        }
-
-        group.notify(queue: .main) {
-            completion(success)
-        }
+        */
     }
 }

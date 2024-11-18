@@ -299,7 +299,7 @@ struct NutritionView: View {
                                 }
                                 .padding()
                                 .frame(width: 120, height: 40)
-                                .background(Color.green)
+                                .background(Color.mHaGreen)
                                 .cornerRadius(20)
                                 .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                                 
@@ -310,9 +310,9 @@ struct NutritionView: View {
                                 }
                                 .padding()
                                 .frame(width: 120, height: 40)
-                                .background(Color.red.opacity(0.2))
+                                .background(Color.red.opacity(0.4))
                                 .cornerRadius(20)
-                                .foregroundColor(.red)
+                                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                             }
                         }
                         .padding()

@@ -61,10 +61,8 @@ struct AppleHealthHomeView: View {
                     VitalInfoView()
                 }
             }
-            .padding()
             .background(Color(.secondarySystemBackground).edgesIgnoringSafeArea(.bottom))
             .cornerRadius(20)
-            .padding()
 
             Spacer()
         }
@@ -137,37 +135,6 @@ struct SectionButton: View {
                 .foregroundColor(.white)
         }
         .onTapGesture(perform: action)
-    }
-}
-
-// Subsections
-struct BodyInfoView: View {
-    var body: some View {
-        VStack {
-            Text("BMI Information")
-                .font(.headline)
-                .foregroundColor(.white)
-        }
-    }
-}
-
-struct SleepDataView: View {
-    var body: some View {
-        VStack {
-            Text("Sleep Data")
-                .font(.headline)
-                .foregroundColor(.white)
-        }
-    }
-}
-
-struct VitalInfoView: View {
-    var body: some View {
-        VStack {
-            Text("Vital Information")
-                .font(.headline)
-                .foregroundColor(.white)
-        }
     }
 }
 

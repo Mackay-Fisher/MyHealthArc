@@ -70,7 +70,8 @@ struct NutritionView: View {
 
     var body: some View {
         VStack {
-            HStack{Image ("carrot")
+            HStack {
+                Image("carrot")
                     .resizable()
                     .scaledToFit()
                     .padding(-2)
@@ -85,8 +86,9 @@ struct NutritionView: View {
                 .overlay(
                     (colorScheme == .dark ? Color.white : Color.gray)
                 )
+            
             Spacer()
-                .frame(height:20)
+                .frame(height: 20)
             
             // Meal Input Section
             ZStack(alignment: .topTrailing) {
@@ -112,56 +114,10 @@ struct NutritionView: View {
                 }
             }
             .disabled(showPopup)
-            //TODO: fix the nutrition search thing
-            //TODO: figure out why spacing is so messed up
+            
             Spacer()
-                .frame(height:20)
+                .frame(height: 20)
             
-            
-            if showPopup {              
-                VStack(spacing: 20) {
-                    HStack {
-                        TextField("Enter meal (comma-separated)", text: $mealInput)
-                            .padding(5)
-                            .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
-                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                            .cornerRadius(12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
-                            )
-                        
-                        Button("Add Meal") {
-                            addMeal()
-                            withAnimation {
-                                showPopup = false
-                            }
-                        }
-                        .padding()
-                        .frame(width: 120, height: 40)
-                        .background(Color.green)
-                        .cornerRadius(20)
-                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                    }
-
-                    Button(action: {
-                        withAnimation {
-                            showPopup = false
-                        }
-                    }) {
-                        Text("Cancel")
-                            .foregroundColor(.red)
-                    }
-                }
-                .padding()
-                .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
-                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                .cornerRadius(16)
-                .frame(width: 350)
-                .shadow(radius: 20)
-                .transition(.scale)
-            }
-
             VStack {
                 // Calendar Week View
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -179,7 +135,7 @@ struct NutritionView: View {
                             .background(isToday(date) ? Color.mhaPurple.opacity(0.2) : Color.clear)
                             .cornerRadius(50)
                             .onTapGesture {
-                                selectedDate = date 
+                                selectedDate = date
                                 fetchMealsForDay(date: selectedDate)
                             }
                         }
@@ -188,81 +144,70 @@ struct NutritionView: View {
                 }
                 .padding(.top)
             }
-                        
+            
             List(meals, id: \.id) { meal in
                 VStack(alignment: .leading) {
-                    HStack{
+                    HStack {
                         Text(meal.name)
                             .font(.headline)
                             .padding(.bottom, 2)
-
-                            Spacer()
-                            Button("Edit") {
-                                print("Edit button clicked for Meal ID: \(meal.id)")
-                                selectedMeal = meal
-                                mealId = meal.id
-                                globalSelectedMealId = mealId
-                                editProtein = meal.totalProtein.value
-                                editCarbs = meal.totalCarbs.value
-                                editFats = meal.totalFats.value
-                                editCalories = meal.totalCalories.value
-                                DispatchQueue.main.async {
-                                    showForm = true
-                                }
+                        Spacer()
+                        Button("Edit") {
+                            print("Edit button clicked for Meal ID: \(meal.id)")
+                            selectedMeal = meal
+                            mealId = meal.id
+                            globalSelectedMealId = mealId
+                            editProtein = meal.totalProtein.value
+                            editCarbs = meal.totalCarbs.value
+                            editFats = meal.totalFats.value
+                            editCalories = meal.totalCalories.value
+                            DispatchQueue.main.async {
+                                showForm = true
                             }
-                            .sheet(isPresented: $showForm) {
-                                EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories, proteinChanged: $proteinChanged, carbsChanged: $carbsChanged, fatsChanged: $fatsChanged, caloriesChanged: $caloriesChanged, mealName: selectedMeal.name, mealId: mealId ?? "")
-                            }
+                        }
+                        .sheet(isPresented: $showForm) {
+                            EditMeal(protein: $editProtein, carbs: $editCarbs, fats: $editFats, calories: $editCalories, proteinChanged: $proteinChanged, carbsChanged: $carbsChanged, fatsChanged: $fatsChanged, caloriesChanged: $caloriesChanged, mealName: selectedMeal.name, mealId: mealId ?? "")
+                        }
                     }
                     
-                    // Text(meal.totalNutrition)
-                    //     .font(.subheadline)
-                    //     .foregroundColor(.secondary)
-                    //     .padding(.bottom, 5)
-
                     HStack {
                         Text(meal.totalProtein.name)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
-
                         Text(meal.totalProtein.value)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
                     }
-
-
+                    
                     HStack {
                         Text(meal.totalCarbs.name)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
-
                         Text(meal.totalCarbs.value)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
                     }
-
+                    
                     HStack {
                         Text(meal.totalFats.name)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
-
                         Text(meal.totalFats.value)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
                     }
-
+                    
                     HStack {
                         Text(meal.totalCalories.name)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 5)
-
                         Text(meal.totalCalories.value)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
@@ -275,11 +220,8 @@ struct NutritionView: View {
             .padding(.leading, -15)
             
             Spacer()
-        
-
-            // Food Search Section
+            
             HStack {
-                
                 TextField("Search for food", text: $foodSearch, onCommit: {
                     fetchFoodInfo()
                 })
@@ -291,9 +233,7 @@ struct NutritionView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
                 )
-                //.frame(width: 250, height: 150, alignment:.center)
-
-
+                
                 Button(action: fetchFoodInfo) {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.white)
@@ -303,14 +243,13 @@ struct NutritionView: View {
                 }
             }
             .padding()
-
-            // Display Food Info
+            
             if showFoodInfo {
                 VStack(alignment: .leading) {
                     Text(foodInfo)
                         .font(.headline)
                         .padding(.bottom, 2)
-
+                    
                     Button(action: clearSearch) {
                         Text("Clear")
                             .padding()
@@ -323,10 +262,70 @@ struct NutritionView: View {
                 }
                 .padding()
             }
-
+            
             Spacer()
         }
         .padding()
+        .overlay(
+            // Floating popup
+            Group {
+                if showPopup {
+                    ZStack {
+                        Color.black.opacity(0.4)
+                            .edgesIgnoringSafeArea(.all)
+                            .onTapGesture {
+                                withAnimation {
+                                    showPopup = false
+                                }
+                            }
+                        
+                        VStack(spacing: 20) {
+                            TextField("Enter meal (comma-separated)", text: $mealInput)
+                                .padding(10)
+                                .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
+                                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                                .cornerRadius(12)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
+                                )
+                            
+                            HStack(spacing: 10) {
+                                Button("Add Meal") {
+                                    addMeal()
+                                    withAnimation {
+                                        showPopup = false
+                                    }
+                                }
+                                .padding()
+                                .frame(width: 120, height: 40)
+                                .background(Color.green)
+                                .cornerRadius(20)
+                                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                                
+                                Button("Cancel") {
+                                    withAnimation {
+                                        showPopup = false
+                                    }
+                                }
+                                .padding()
+                                .frame(width: 120, height: 40)
+                                .background(Color.red.opacity(0.2))
+                                .cornerRadius(20)
+                                .foregroundColor(.red)
+                            }
+                        }
+                        .padding()
+                        .background(colorScheme == .dark ? Color.gray.opacity(0.9) : Color.white)
+                        .cornerRadius(16)
+                        .frame(width: 350)
+                        .shadow(radius: 20)
+                    }
+                    .transition(.scale)
+                    .zIndex(1) // Ensure popup is above other elements
+                }
+            }
+        )
         .onAppear {
             fetchMealsForDay(date: selectedDate)
         }

@@ -165,3 +165,4 @@ final class HealthKitData: Model, Content {
         self.workoutCaloriesBurned = workoutCaloriesBurned
         self.workoutDistance = workoutDistance
     }
+}

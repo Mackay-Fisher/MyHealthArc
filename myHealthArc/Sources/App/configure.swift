@@ -17,7 +17,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateUser())
     app.migrations.add(CreateMedication())
     app.migrations.add(CreateNutrition())
-    app.migrations.add(CreateHealthKit())
+    app.migrations.add(CreateHealthKitData())
     app.migrations.add(CreateMedicationInteractions())
     app.migrations.add(CreateNutritionItem())
     app.migrations.add(CreateUserGoals())  // Add fitness goals migration

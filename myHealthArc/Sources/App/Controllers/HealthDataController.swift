@@ -16,7 +16,7 @@ struct HealthKitDataController: RouteCollection {
         let healthDataArray = try req.content.decode([HealthKitData].self)
         
         // Save each HealthKitData entry to the database
-        try await healthDataArray.forEach { data in
+        for data in healthDataArray {
             try await data.save(on: req.db)
         }
         
@@ -29,10 +29,10 @@ struct HealthKitDataController: RouteCollection {
         guard let userHash = req.parameters.get("userHash") else {
             throw Abort(.badRequest, reason: "Missing userHash parameter")
         }
-        
+
         // Query health data for the specified user
         return try await HealthKitData.query(on: req.db)
-            .filter(\.$userHash == userHash)
+            .filter(\HealthKitData.$userHash == userHash) // Explicitly specify the type
             .all()
     }
     
@@ -52,10 +52,35 @@ struct HealthKitDataController: RouteCollection {
         let updatedData = try req.content.decode(HealthKitData.self)
         
         // Update the fields
-        existingData.steps = updatedData.steps
-        existingData.heartRate = updatedData.heartRate
-        existingData.hoursSleep = updatedData.hoursSleep
+        existingData.userHash = updatedData.userHash
         existingData.date = updatedData.date
+        existingData.height = updatedData.height
+        existingData.bodyMass = updatedData.bodyMass
+        existingData.bodyMassIndex = updatedData.bodyMassIndex
+        existingData.heartRate = updatedData.heartRate
+        existingData.bloodPressureSystolic = updatedData.bloodPressureSystolic
+        existingData.bloodPressureDiastolic = updatedData.bloodPressureDiastolic
+        existingData.respiratoryRate = updatedData.respiratoryRate
+        existingData.bodyTemperature = updatedData.bodyTemperature
+        existingData.stepCount = updatedData.stepCount
+        existingData.distanceWalkingRunning = updatedData.distanceWalkingRunning
+        existingData.flightsClimbed = updatedData.flightsClimbed
+        existingData.activeEnergyBurned = updatedData.activeEnergyBurned
+        existingData.exerciseTime = updatedData.exerciseTime
+        existingData.dietaryEnergy = updatedData.dietaryEnergy
+        existingData.protein = updatedData.protein
+        existingData.carbohydrates = updatedData.carbohydrates
+        existingData.fat = updatedData.fat
+        existingData.calcium = updatedData.calcium
+        existingData.iron = updatedData.iron
+        existingData.potassium = updatedData.potassium
+        existingData.sodium = updatedData.sodium
+        existingData.sleepAnalysis = updatedData.sleepAnalysis
+        existingData.timeAsleep = updatedData.timeAsleep
+        existingData.workoutType = updatedData.workoutType
+        existingData.workoutDuration = updatedData.workoutDuration
+        existingData.workoutCaloriesBurned = updatedData.workoutCaloriesBurned
+        existingData.workoutDistance = updatedData.workoutDistance
         
         // Save the updated entry
         try await existingData.save(on: req.db)

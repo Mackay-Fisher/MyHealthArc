@@ -275,56 +275,86 @@ struct NutritionView: View {
             fetchNutritionInfo(for: foodItems, mealName: mealName)
         }
     
+    private static let apiDateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+            formatter.timeZone = TimeZone(abbreviation: "UTC")
+            return formatter
+        }()
+        
     private func fetchMealsForDay(date: Date) {
-            let baseURL = "http://localhost:8080/nutrition/meals"
-            let dateString = ISO8601DateFormatter().string(from: date)
-
-            guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
-                print("Failed to retrieve userHash from Keychain")
-                return
-            }
-
-            guard let url = URL(string: "\(baseURL)?userHash=\(userHash)&date=\(dateString)") else {
-                print("Invalid URL")
-                return
-            }
-
-            var request = URLRequest(url: url)
-            request.httpMethod = "GET"
-
-            URLSession.shared.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    print("Error fetching meals: \(error.localizedDescription)")
-                    return
-                }
-
-                guard let data = data else {
-                    print("No data received.")
-                    return
-                }
-
-                do {
-                    let meals = try JSONDecoder().decode([Nutrition].self, from: data)
-                    DispatchQueue.main.async {
-                        self.meals = meals.map { meal in
-                            let proteinValue = meal.modifiedProtein >= 0 ? meal.modifiedProtein : (meal.proteinMinimum + meal.proteinMaximum) / 2
-                            let carbsValue = meal.modifiedCarbohydrates >= 0 ? meal.modifiedCarbohydrates : (meal.carbohydratesMinimum + meal.carbohydratesMaximum) / 2
-                            let fatsValue = meal.modifiedFats >= 0 ? meal.modifiedFats : (meal.fatsMinimum + meal.fatsMaximum) / 2
-                            let caloriesValue = meal.modifiedCalories >= 0 ? meal.modifiedCalories : (meal.caloriesMinimum + meal.caloriesMaximum) / 2
-
-                            let proteinRange = Macro(name: "Protein:", value: meal.modifiedProtein >= 0 ? "\(meal.modifiedProtein)g" : "\(meal.proteinMinimum)g - \(meal.proteinMaximum)g")
-                            let carbsRange = Macro(name: "Carbs:", value: meal.modifiedCarbohydrates >= 0 ? "\(meal.modifiedCarbohydrates)g" : "\(meal.carbohydratesMinimum)g - \(meal.carbohydratesMaximum)g")
-                            let fatsRange = Macro(name: "Fats:", value: meal.modifiedFats >= 0 ? "\(meal.modifiedFats)g" : "\(meal.fatsMinimum)g - \(meal.fatsMaximum)g")
-                            let caloriesRange = Macro(name: "Calories:", value: meal.modifiedCalories >= 0 ? "\(meal.modifiedCalories)kcal" : "\(meal.caloriesMinimum)kcal - \(meal.caloriesMaximum)kcal")
-                            print("Meal ID: \(meal.id!)")
-                            return Meal(id: meal.id!, name: meal.foodName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange)
-                        }
-                    }
-                } catch {
-                    print("Decoding error: \(error.localizedDescription)")
-                }
-            }.resume()
+        let baseURL = "http://localhost:8080/nutrition/meals"
+        
+        // Format the date properly for the API
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        let dateString = NutritionView.apiDateFormatter.string(from: startOfDay)
+        
+        guard let userHash = KeychainWrapper.standard.string(forKey: "userHash"),
+              let encodedDate = dateString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "\(baseURL)?userHash=\(userHash)&date=\(encodedDate)") else {
+            print("Failed to create URL with date: \(date)")
+            return
         }
+        
+        print("Fetching meals for date: \(dateString)")  // Debug print
+        print("Using URL: \(url.absoluteString)")  // Debug print
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching meals: \(error.localizedDescription)")
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("Response status code: \(httpResponse.statusCode)")
+            }
+            
+            guard let data = data else {
+                print("No data received")
+                return
+            }
+            
+            do {
+                let nutritions = try JSONDecoder().decode([Nutrition].self, from: data)
+                print("Received \(nutritions.count) meals from server")  // Debug print
+                
+                DispatchQueue.main.async {
+                    self.meals = nutritions.map { nutrition in
+                        let proteinValue = nutrition.modifiedProtein >= 0 ?
+                        "\(nutrition.modifiedProtein)g" :
+                        "\(nutrition.proteinMinimum)g - \(nutrition.proteinMaximum)g"
+                        let carbsValue = nutrition.modifiedCarbohydrates >= 0 ?
+                        "\(nutrition.modifiedCarbohydrates)g" :
+                        "\(nutrition.carbohydratesMinimum)g - \(nutrition.carbohydratesMaximum)g"
+                        let fatsValue = nutrition.modifiedFats >= 0 ?
+                        "\(nutrition.modifiedFats)g" :
+                        "\(nutrition.fatsMinimum)g - \(nutrition.fatsMaximum)g"
+                        let caloriesValue = nutrition.modifiedCalories >= 0 ?
+                        "\(nutrition.modifiedCalories)kcal" :
+                        "\(nutrition.caloriesMinimum)kcal - \(nutrition.caloriesMaximum)kcal"
+                        
+                        return Meal(
+                            id: nutrition.id ?? generateRandomID(),
+                            name: nutrition.foodName,
+                            totalProtein: Macro(name: "Protein:", value: proteinValue),
+                            totalCarbs: Macro(name: "Carbs:", value: carbsValue),
+                            totalFats: Macro(name: "Fats:", value: fatsValue),
+                            totalCalories: Macro(name: "Calories:", value: caloriesValue)
+                        )
+                    }
+                    print("Updated meals array with \(self.meals.count) items for date \(dateString)")
+                }
+            } catch {
+                print("Decoding error: \(error)")
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("Raw response: \(responseString)")
+                }
+            }
+        }.resume()
+    }
 
     
     // Fetch Nutrition Info for the Meal
@@ -411,22 +441,23 @@ struct NutritionView: View {
             }.resume()
         }
     
-    private func createNutritionObject(mealName: String, proteinMin: Double, proteinMax: Double, carbsMin: Double, carbsMax: Double, fatsMin: Double, fatsMax: Double, caloriesMin: Int, caloriesMax: Int) {
+    private func createNutritionObject(mealName: String, proteinMin: Double, proteinMax: Double,
+                                         carbsMin: Double, carbsMax: Double, fatsMin: Double, fatsMax: Double,
+                                         caloriesMin: Int, caloriesMax: Int) {
             let baseURL = "http://localhost:8080/nutrition/create"
             guard let url = URL(string: baseURL) else {
                 print("Invalid URL")
                 return
             }
-
+            
             guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
                 print("Failed to retrieve userHash from Keychain")
                 return
             }
-
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+            
+            // Format the date for the create request
+            let dateString = NutritionView.apiDateFormatter.string(from: selectedDate)
+            
             let nutrition = Nutrition(
                 id: nil,
                 userHash: userHash,
@@ -444,31 +475,32 @@ struct NutritionView: View {
                 modifiedFats: -1.0,
                 modifiedCalories: -1
             )
-
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            
             do {
                 let jsonData = try JSONEncoder().encode(nutrition)
                 request.httpBody = jsonData
-
+                print("Creating nutrition object for date: \(dateString)")  // Debug print
+                
                 URLSession.shared.dataTask(with: request) { data, response, error in
                     if let error = error {
                         print("Error: \(error.localizedDescription)")
                         return
                     }
-
-                    guard let data = data else {
-                        print("No data received.")
-                        return
-                    }
-
-                    if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 201 {
-                        print("Nutrition object created successfully.")
-                        if let createdNutrition = try? JSONDecoder().decode(Nutrition.self, from: data) {
+                    
+                    if let httpResponse = response as? HTTPURLResponse {
+                        print("Create response status: \(httpResponse.statusCode)")
+                        if httpResponse.statusCode == 201 {
                             DispatchQueue.main.async {
-                                self.mealId = createdNutrition.id
+                                fetchMealsForDay(date: selectedDate)
                             }
+                            print("Nutrition object created successfully")
+                        } else {
+                            print("Failed to create nutrition object")
                         }
-                    } else {
-                        print("Failed to create nutrition object.")
                     }
                 }.resume()
             } catch {

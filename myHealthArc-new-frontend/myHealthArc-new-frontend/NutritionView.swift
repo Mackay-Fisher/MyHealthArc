@@ -37,6 +37,18 @@ struct Nutrition: Codable {
     let modifiedCalories: Int
 }
 
+struct MacroRange: Codable {
+    let minimum: Double
+    let maximum: Double
+}
+
+struct MacroRangeResponse: Codable {
+    let protein: MacroRange
+    let carbohydrates: MacroRange
+    let fats: MacroRange
+    let calories: MacroRange
+}
+
 // MARK: - Main View
 struct NutritionView: View {
     
@@ -630,6 +642,15 @@ struct EditMeal: View {
     @State private var carbs: String = ""
     @State private var fats: String = ""
     @State private var calories: String = ""
+
+    @State private var minProtein: Double?
+    @State private var maxProtein: Double?
+    @State private var minCarbs: Double?
+    @State private var maxCarbs: Double?
+    @State private var minFats: Double?
+    @State private var maxFats: Double?
+    @State private var minCalories: Double?
+    @State private var maxCalories: Double?
     
     init(meal: Meal, onSave: @escaping () -> Void) {
         print("DEBUG - Raw Meal Values:")
@@ -646,6 +667,11 @@ struct EditMeal: View {
         let carbsValue = EditMeal.extractFirstNumber(from: meal.totalCarbs.value)
         let fatsValue = EditMeal.extractFirstNumber(from: meal.totalFats.value)
         let caloriesValue = EditMeal.extractFirstNumber(from: meal.totalCalories.value)
+
+        _protein = State(initialValue: proteinValue)
+        _carbs = State(initialValue: carbsValue)
+        _fats = State(initialValue: fatsValue)
+        _calories = State(initialValue: caloriesValue)
         
         print("DEBUG - Extracted Values:")
         print("Protein: \(proteinValue)")
@@ -680,11 +706,6 @@ struct EditMeal: View {
                         Text("Original Fats: \(meal.totalFats.value)")
                         Text("Original Calories: \(meal.totalCalories.value)")
                     }
-
-                    let (minProtein, maxProtein) = extractRangeValues(from: meal.totalProtein.value)
-                    let (minCarbs, maxCarbs) = extractRangeValues(from: meal.totalCarbs.value)
-                    let (minFats, maxFats) = extractRangeValues(from: meal.totalFats.value)
-                    let (minCalories, maxCalories) = extractRangeValues(from: meal.totalCalories.value)
                     
                     Section(header: Text("Edit Meal Nutrition")) {
                         VStack(alignment: .leading) {
@@ -843,20 +864,54 @@ struct EditMeal: View {
                     }
                 }
             }
+            .onAppear {
+                fetchMacroRanges()
+            }
         }
     }
     
-    private func extractRangeValues(from string: String) -> (minValue: Double?, maxValue: Double?) {
-        let components = string.split(separator: "-")
-        
-        if components.count == 2 {
-            let minValue = Double(components[0].trimmingCharacters(in: .whitespaces))
-            let maxValue = Double(components[1].trimmingCharacters(in: .whitespaces))
-            
-            return (minValue, maxValue)
-        } else {
-            return (nil, nil)
+    private func fetchMacroRanges() {
+        guard let mealId = globalSelectedMealId else {
+            print("DEBUG - Missing mealId")
+            return
         }
+        
+        let baseURL = "http://localhost:8080/nutrition/macroRanges"
+        guard let url = URL(string: "\(baseURL)/\(mealId)") else {
+            print("DEBUG - Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("DEBUG - Error fetching macro ranges: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let data = data else {
+                print("DEBUG - No data received")
+                return
+            }
+            
+            do {
+                let macroRanges = try JSONDecoder().decode(MacroRangeResponse.self, from: data)
+                DispatchQueue.main.async {
+                    self.minProtein = macroRanges.protein.minimum
+                    self.maxProtein = macroRanges.protein.maximum
+                    self.minCarbs = macroRanges.carbohydrates.minimum
+                    self.maxCarbs = macroRanges.carbohydrates.maximum
+                    self.minFats = macroRanges.fats.minimum
+                    self.maxFats = macroRanges.fats.maximum
+                    self.minCalories = macroRanges.calories.minimum
+                    self.maxCalories = macroRanges.calories.maximum
+                }
+            } catch {
+                print("DEBUG - Decoding error: \(error.localizedDescription)")
+            }
+        }.resume()
     }
     
     private func updateNutrition() {

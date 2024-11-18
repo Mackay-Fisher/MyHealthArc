@@ -10,6 +10,7 @@ struct NutritionController: RouteCollection {
         nutrition.delete(":nutritionID", use: self.deleteNutrition)
         nutrition.get("info", use: self.getNutritionInfo)
         nutrition.get("meals", use: self.getMealsForDay)
+        nutrition.get("macroRanges", ":mealID", use: self.getMacroRangesForMeal)
     }
 
     @Sendable
@@ -282,5 +283,34 @@ struct NutritionController: RouteCollection {
     private func generateRandomID(length: Int = 16) -> String {
         let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return String((0..<length).map { _ in characters.randomElement()! })
+    }
+
+    struct MacroRange: Content {
+        let minimum: Double
+        let maximum: Double
+    }
+
+    struct MacroRangeResponse: Content {
+        let protein: MacroRange
+        let carbohydrates: MacroRange
+        let fats: MacroRange
+        let calories: MacroRange
+    }
+
+    @Sendable
+    func getMacroRangesForMeal(req: Request) async throws -> MacroRangeResponse {
+        let mealID = try req.parameters.require("mealID", as: String.self)
+        guard let meal = try await Nutrition.find(mealID, on: req.db) else {
+            throw Abort(.notFound, reason: "Meal not found for ID \(mealID)")
+        }
+
+        let macroRanges = MacroRangeResponse(
+            protein: MacroRange(minimum: meal.proteinMinimum, maximum: meal.proteinMaximum),
+            carbohydrates: MacroRange(minimum: meal.carbohydratesMinimum, maximum: meal.carbohydratesMaximum),
+            fats: MacroRange(minimum: meal.fatsMinimum, maximum: meal.fatsMaximum),
+            calories: MacroRange(minimum: Double(meal.caloriesMinimum), maximum: Double(meal.caloriesMaximum))
+        )
+
+        return macroRanges
     }
 }

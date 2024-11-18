@@ -128,6 +128,7 @@
 				5AAA9B472CEDB6030051134F /* APIClient.swift */,
 				250FC23A2CC201430023AE43 /* Tabs.swift */,
 				5AB0CE292CEB0F9E003FC857 /* AppleHealthManager.swift */,
+				5AB0CE2D2CEB1059003FC857 /* AppleHealthView.swift */,
 				5AB0CE2B2CEB0FBA003FC857 /* ActivityManager.swift */,
 				5AB0CE252CEB0E43003FC857 /* myHealthArc_new_frontendApp.swift */,
 				8F161C302CC1B36400E726E7 /* Assets.xcassets */,
@@ -318,6 +319,7 @@
 				2555864A2CED326B00D1C638 /* GoalsView.swift in Sources */,
 				2528D6322CC9FB35000D5852 /* NutritionView.swift in Sources */,
 				8F161C2F2CC1B36200E726E7 /* ContentView.swift in Sources */,
+				5AB0CE2E2CEB1059003FC857 /* AppleHealthView.swift in Sources */,
 				2562C0812CCA10CC009E4284 /* MedicationWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

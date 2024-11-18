@@ -52,6 +52,7 @@ struct NutritionView: View {
     @State private var selectedMeal: Meal?
     @State private var showForm: Bool = false
     
+    
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
@@ -95,28 +96,7 @@ struct NutritionView: View {
             Spacer().frame(height: 20)
             
             // Calendar View
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ForEach(getCurrentWeek(), id: \.self) { date in
-                        VStack {
-                            Text(date, formatter: DateFormatter.dayOfWeekFormatter)
-                                .font(.subheadline)
-                            Text(date, formatter: DateFormatter.dayFormatter)
-                                .font(.title3)
-                                .fontWeight(Calendar.current.isDateInToday(date) ? .bold : .regular)
-                                .foregroundColor(Calendar.current.isDateInToday(date) ? .blue : .primary)
-                        }
-                        .padding()
-                        .background(Calendar.current.isDateInToday(date) ? Color.blue.opacity(0.2) : Color.clear)
-                        .cornerRadius(10)
-                        .onTapGesture {
-                            selectedDate = date
-                            fetchMealsForDay(date: selectedDate)
-                        }
-                    }
-                }
-                .padding(.horizontal)
-            }
+            calendarView
             
             // Meals List
             List(meals, id: \.id) { meal in
@@ -192,6 +172,46 @@ struct NutritionView: View {
             fetchMealsForDay(date: selectedDate)
         }
     }
+    //MARK: - Calendar view
+    private var calendarView: some View {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    ForEach(getCurrentWeek(), id: \.self) { date in
+                        VStack {
+                            Text(date, formatter: DateFormatter.dayOfWeekFormatter)
+                                .font(.subheadline)
+                            Text(date, formatter: DateFormatter.dayFormatter)
+                                .font(.title3)
+                                .fontWeight(isSelectedDate(date) ? .bold : .regular)
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(isSelectedDate(date) ? Color.blue.opacity(0.2) : Color.clear)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(isSelectedDate(date) ? Color.blue : Color.clear, lineWidth: 1)
+                        )
+                        .onTapGesture {
+                            selectedDate = Calendar.current.startOfDay(for: date)
+                            fetchMealsForDay(date: selectedDate)
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    private func isSelectedDate(_ date: Date) -> Bool {
+            Calendar.current.isDate(date, inSameDayAs: selectedDate)
+        }
+    // Generate current week dates centered around today
+    private func getCurrentWeek() -> [Date] {
+        let calendar = Calendar.current
+        let today = Date()
+        let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
+        return (0..<7).map { calendar.date(byAdding: .day, value: $0, to: startOfWeek)! }
+    }
     
     // MARK: - Add Meal Popup
     private var addMealPopup: some View {
@@ -236,13 +256,6 @@ struct NutritionView: View {
     }
     
     // MARK: - Helper Functions
-    // Generate current week dates centered around today
-            private func getCurrentWeek() -> [Date] {
-                let calendar = Calendar.current
-                let today = Date()
-                let startOfWeek = calendar.dateInterval(of: .weekOfMonth, for: today)?.start ?? today
-                return (0..<7).map { calendar.date(byAdding: .day, value: $0, to: startOfWeek)! }
-            }
     
     private func generateRandomID(length: Int = 16) -> String {
         let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

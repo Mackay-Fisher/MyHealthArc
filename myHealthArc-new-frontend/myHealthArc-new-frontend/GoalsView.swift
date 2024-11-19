@@ -487,14 +487,21 @@ struct StreakFlameView: View {
                 Image(systemName: "flame.fill")
                     .resizable()
                     .scaledToFit()
+
                     .foregroundColor(streak.color)
                     .frame(width: flameSize, height: flameSize)
+                Image(systemName: "flame")
+                    .resizable()
+                    .scaledToFit()
+
+                    .foregroundColor(streak.color)
+                    .frame(width: flameSize+1, height: flameSize+1)
                 
                 // Value
                 Text("\(streak.value)")
                     .font(.system(size: 15, weight: .bold))
                     .foregroundColor(.white)
-                    .offset(y: -2)
+                    //.offset(y: -2)
             }
             .frame(height: 60)
         }

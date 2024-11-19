@@ -690,8 +690,7 @@ struct EditMeal: View {
                         VStack(alignment: .leading) {
                             if let minProtein = minProtein, let maxProtein = maxProtein {
                                 VStack {
-                                    Text("Protein")
-                                        .font(.headline)
+                                    Text("Protein")                                         .font(.headline)
                                         .padding(.bottom, 5)
 
                                     HStack {

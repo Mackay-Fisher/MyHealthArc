@@ -5,11 +5,7 @@ import Foundation
 var globalSelectedMealId: String?
 
 // MARK: - Models
-<<<<<<< HEAD
-struct Meal {
-=======
 struct Meal: Identifiable {
->>>>>>> 1a7c938 (finally back to where we were with updated colors)
     let id: String
     let name: String
     let totalProtein: Macro
@@ -110,25 +106,6 @@ struct NutritionView: View {
                         Text(meal.name)
                             .font(.headline)
                         Spacer()
-<<<<<<< HEAD
-                        Button("Edit") {
-                            selectedMeal = meal
-                            globalSelectedMealId = meal.id
-                            showForm = true
-                        }
-                    }
-                    .padding(.bottom, 2)
-                    
-                    ForEach([meal.totalProtein, meal.totalCarbs, meal.totalFats, meal.totalCalories], id: \.name) { macro in
-                        HStack {
-                            Text(macro.name)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            Text(macro.value)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-=======
                         Button(action: {
                             selectedMeal = meal
                             globalSelectedMealId = meal.id
@@ -152,7 +129,6 @@ struct NutritionView: View {
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
->>>>>>> 1a7c938 (finally back to where we were with updated colors)
                         .padding(.bottom, 5)
                     }
                 }
@@ -191,22 +167,11 @@ struct NutritionView: View {
             }
         }
         .padding()
-<<<<<<< HEAD
-        .sheet(isPresented: $showForm) {
-            if let meal = selectedMeal {
-                EditMeal(meal: meal) {
-                    fetchMealsForDay(date: selectedDate)
-                }
-            }
-        }
-        .overlay(addMealPopup)
-=======
         .sheet(item: $selectedMeal) { meal in
             EditMeal(meal: meal) {
                 fetchMealsForDay(date: selectedDate)
             }
         }        .overlay(addMealPopup)
->>>>>>> 1a7c938 (finally back to where we were with updated colors)
         .onAppear {
             fetchMealsForDay(date: selectedDate)
         }
@@ -222,24 +187,12 @@ struct NutritionView: View {
                             Text(date, formatter: DateFormatter.dayFormatter)
                                 .font(.title3)
                                 .fontWeight(isSelectedDate(date) ? .bold : .regular)
-<<<<<<< HEAD
-                        }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(isSelectedDate(date) ? Color.blue.opacity(0.2) : Color.clear)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(isSelectedDate(date) ? Color.blue : Color.clear, lineWidth: 1)
-=======
                                 .foregroundColor(isSelectedDate(date) ? Color.mhaGreen : .primary)
                         }
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: 40)
                                 .fill(isSelectedDate(date) ? Color.mhaPurple.opacity(0.2) : Color.clear)
->>>>>>> 1a7c938 (finally back to where we were with updated colors)
                         )
                         .onTapGesture {
                             selectedDate = Calendar.current.startOfDay(for: date)
@@ -272,10 +225,6 @@ struct NutritionView: View {
                     
                     VStack(spacing: 20) {
                         TextField("Enter meal (comma-separated)", text: $mealInput)
-<<<<<<< HEAD
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .padding()
-=======
                             .padding(10)
                             .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
                             .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
@@ -284,40 +233,21 @@ struct NutritionView: View {
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(colorScheme == .dark ? Color.white : Color.gray, lineWidth: 0.5)
                             )
->>>>>>> 1a7c938 (finally back to where we were with updated colors)
                         
                         HStack(spacing: 20) {
                             Button("Add Meal") {
                                 addMeal()
                                 showPopup = false
                             }
-<<<<<<< HEAD
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-=======
                             .frame(width: 120, height: 40)
                             .background(Color.mhaGreen)
                             .cornerRadius(20)
                             .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
->>>>>>> 1a7c938 (finally back to where we were with updated colors)
                             
                             Button("Cancel") {
                                 showPopup = false
                             }
                             .padding()
-<<<<<<< HEAD
-                            .background(Color.red)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                        }
-                    }
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(15)
-                    .shadow(radius: 10)
-=======
                             .frame(width: 120, height: 40)
                             .background(Color.red.opacity(0.6))
                             .cornerRadius(20)
@@ -329,7 +259,6 @@ struct NutritionView: View {
                     .cornerRadius(16)
                     .frame(width: 350)
                     .shadow(radius: 20)
->>>>>>> 1a7c938 (finally back to where we were with updated colors)
                 }
             }
         }
@@ -754,30 +683,19 @@ struct EditMeal: View {
                         print("Calories: \(calories)")
                         updateNutrition()
                     }) {
-<<<<<<< HEAD
-                        Text("Save Changes")
-                            .frame(maxWidth: .infinity)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
-=======
                         Text("Save")
                             .frame(maxWidth: .infinity)
                             .foregroundColor(.white)
                             .padding()
                             .background(Color.mhaGreen)
->>>>>>> 1a7c938 (finally back to where we were with updated colors)
                             .cornerRadius(10)
                     }
                 }
             }
             .navigationTitle("Edit \(meal.name)")
-<<<<<<< HEAD
             .navigationBarItems(trailing: Button("Cancel") {
                 dismiss()
             })
-=======
->>>>>>> 1a7c938 (finally back to where we were with updated colors)
         }
     }
     

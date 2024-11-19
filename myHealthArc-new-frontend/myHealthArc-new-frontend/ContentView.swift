@@ -7,7 +7,6 @@ struct ContentView: View {
     
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
-
     var body: some View {
         NavigationView {
             ZStack {

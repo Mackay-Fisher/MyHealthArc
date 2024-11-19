@@ -119,18 +119,38 @@ struct NutritionView: View {
                     }
                     .padding(.bottom, 2)
                     
-                    
-                    ForEach([meal.totalProtein, meal.totalCarbs, meal.totalFats, meal.totalCalories], id: \.name) { macro in
-                        HStack {
-                            Text(macro.name)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            Text(macro.value)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                    HStack(spacing: 10) {
+                        ForEach([meal.totalProtein, meal.totalCarbs, meal.totalFats, meal.totalCalories], id: \.name) { macro in
+                            VStack(spacing: 8) {
+                                Text(macro.name)
+                                    .font(.subheadline)
+                                    .foregroundColor(colorForMacro(macro.name))
+                                
+                                ZStack {
+                                    Circle()
+                                        .stroke(colorForMacro(macro.name), lineWidth: 1)
+                                        .frame(width: 65, height: 65)
+                                    
+                                    Text(macro.value)
+                                        .font(.footnote)
+                                        .foregroundColor(colorForMacro(macro.name))
+                                }
+                                
+                                if(macro.name == "Calories:"){
+                                    Text("kcal")
+                                        .font(.caption)
+                                        .foregroundColor(colorScheme == .dark ? Color.white : Color.gray)
+                                }
+                                else{
+                                    Text("g")
+                                        .font(.caption)
+                                        .foregroundColor(colorScheme == .dark ? Color.white : Color.gray)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
                         }
-                        .padding(.bottom, 5)
                     }
+                    .padding(.vertical, 10)
                 }
             }
             .listStyle(PlainListStyle())
@@ -174,6 +194,21 @@ struct NutritionView: View {
         }        .overlay(addMealPopup)
         .onAppear {
             fetchMealsForDay(date: selectedDate)
+        }
+    }
+    
+    private func colorForMacro(_ macroName: String) -> Color {
+        switch macroName {
+        case "Protein:":
+            return Color.blue.opacity(0.8)
+        case "Carbs:":
+            return Color.orange.opacity(0.8)
+        case "Fats:":
+            return Color.red.opacity(0.8)
+        case "Calories:":
+            return Color.mhaGreen.opacity(0.8)
+        default:
+            return Color.gray.opacity(0.8) // literally just here so swift will shut up
         }
     }
     //MARK: - Calendar view
@@ -359,10 +394,10 @@ struct NutritionView: View {
                             return Meal(
                                 id: nutrition.id ?? generateRandomID(),
                                 name: nutrition.foodName,
-                                totalProtein: Macro(name: "Protein:", value: "\(proteinValue)g"),
-                                totalCarbs: Macro(name: "Carbs:", value: "\(carbsValue)g"),
-                                totalFats: Macro(name: "Fats:", value: "\(fatsValue)g"),
-                                totalCalories: Macro(name: "Calories:", value: "\(caloriesValue)kcal")
+                                totalProtein: Macro(name: "Protein:", value: "\(proteinValue)"),
+                                totalCarbs: Macro(name: "Carbs:", value: "\(carbsValue)"),
+                                totalFats: Macro(name: "Fats:", value: "\(fatsValue)"),
+                                totalCalories: Macro(name: "Calories:", value: "\(caloriesValue)")
                             )
                         }
                         print("DEBUG - Updated meals array with \(self.meals.count) items")
@@ -429,17 +464,17 @@ struct NutritionView: View {
                             totalCaloriesMax += Int(nutrients["caloriesMaximum"] ?? 0)
                         }
 
-                        let proteinRange = Macro(name: "Protein:", value: "\(totalProteinMin)g - \(totalProteinMax)g")
-                        let carbsRange = Macro(name: "Carbs:", value: "\(totalCarbsMin)g - \(totalCarbsMax)g")
-                        let fatsRange = Macro(name: "Fats:", value: "\(totalFatsMin)g - \(totalFatsMax)g")
-                        let caloriesRange = Macro(name: "Calories:", value: "\(totalCaloriesMin)kcal - \(totalCaloriesMax)kcal")
+                        let proteinRange = Macro(name: "Protein:", value: "\(totalProteinMin) - \(totalProteinMax)")
+                        let carbsRange = Macro(name: "Carbs:", value: "\(totalCarbsMin) - \(totalCarbsMax)")
+                        let fatsRange = Macro(name: "Fats:", value: "\(totalFatsMin) - \(totalFatsMax)")
+                        let caloriesRange = Macro(name: "Calories:", value: "\(totalCaloriesMin) - \(totalCaloriesMax)")
 
                         DispatchQueue.main.async {
                             totalNutrition = """
-                            Protein: \(totalProteinMin)g - \(totalProteinMax)g, \
-                            Carbs: \(totalCarbsMin)g - \(totalCarbsMax)g, \
-                            Fats: \(totalFatsMin)g - \(totalFatsMax)g, \
-                            Calories: \(totalCaloriesMin)kcal - \(totalCaloriesMax)kcal
+                            Protein: \(totalProteinMin) - \(totalProteinMax), \
+                            Carbs: \(totalCarbsMin) - \(totalCarbsMax), \
+                            Fats: \(totalFatsMin) - \(totalFatsMax), \
+                            Calories: \(totalCaloriesMin) - \(totalCaloriesMax)
                             """
                             meals.append(Meal(id: generateRandomID(), name: mealName, totalProtein: proteinRange, totalCarbs: carbsRange, totalFats: fatsRange, totalCalories: caloriesRange))
 
@@ -563,10 +598,10 @@ struct NutritionView: View {
                             let foodItem = firstFoodItem.key
                             let nutrients = firstFoodItem.value
                             foodInfo = """
-                            \(foodItem.capitalized) - Protein: \(nutrients["proteinMinimum"] ?? 0)g - \(nutrients["proteinMaximum"] ?? 0)g, \
-                            Carbs: \(nutrients["carbohydratesMinimum"] ?? 0)g - \(nutrients["carbohydratesMaximum"] ?? 0)g, \
-                            Fats: \(nutrients["fatsMinimum"] ?? 0)g - \(nutrients["fatsMaximum"] ?? 0)g, \
-                            Calories: \(nutrients["caloriesMinimum"] ?? 0)kcal - \(nutrients["caloriesMaximum"] ?? 0)kcal
+                            \(foodItem.capitalized) - Protein: \(nutrients["proteinMinimum"] ?? 0)g - \(nutrients["proteinMaximum"] ?? 0), \
+                            Carbs: \(nutrients["carbohydratesMinimum"] ?? 0) - \(nutrients["carbohydratesMaximum"] ?? 0), \
+                            Fats: \(nutrients["fatsMinimum"] ?? 0) - \(nutrients["fatsMaximum"] ?? 0), \
+                            Calories: \(nutrients["caloriesMinimum"] ?? 0) - \(nutrients["caloriesMaximum"] ?? 0)
                             """
                         } else {
                             foodInfo = "No information found."
@@ -636,73 +671,169 @@ struct EditMeal: View {
     
     var body: some View {
         NavigationView {
-            Form {
-                Section(header: Text("Current Values")) {
-                    Text("Original Protein: \(meal.totalProtein.value)")
-                    Text("Original Carbs: \(meal.totalCarbs.value)")
-                    Text("Original Fats: \(meal.totalFats.value)")
-                    Text("Original Calories: \(meal.totalCalories.value)")
-                }
-                
-                Section(header: Text("Edit Meal Nutrition")) {
-                    VStack(alignment: .leading) {
-                        Text("Protein: \(protein) g")
-                        Slider(value: Binding(
-                            get: { Double(protein) ?? 0 },
-                            set: { protein = String(format: "%.1f", $0) }
-                        ), in: 0...200, step: 0.1)
-                            .accentColor(.blue)
+            VStack {
+                // Your Form with sections
+                Form {
+                    Section(header: Text("Current Values")) {
+                        Text("Original Protein: \(meal.totalProtein.value)")
+                        Text("Original Carbs: \(meal.totalCarbs.value)")
+                        Text("Original Fats: \(meal.totalFats.value)")
+                        Text("Original Calories: \(meal.totalCalories.value)")
                     }
-                    .padding(.vertical)
 
-                    VStack(alignment: .leading) {
-                        Text("Carbs: \(carbs) g")
-                        Slider(value: Binding(
-                            get: { Double(carbs) ?? 0 },
-                            set: { carbs = String(format: "%.1f", $0) }
-                        ), in: 0...300, step: 0.1)
-                            .accentColor(.orange)
-                    }
-                    .padding(.vertical)
+                    let (minProtein, maxProtein) = extractRangeValues(from: meal.totalProtein.value)
+                    let (minCarbs, maxCarbs) = extractRangeValues(from: meal.totalCarbs.value)
+                    let (minFats, maxFats) = extractRangeValues(from: meal.totalFats.value)
+                    let (minCalories, maxCalories) = extractRangeValues(from: meal.totalCalories.value)
+                    
+                    Section(header: Text("Edit Meal Nutrition")) {
+                        VStack(alignment: .leading) {
+                            if let minProtein = minProtein, let maxProtein = maxProtein {
+                                VStack {
+                                    Text("Protein")                                         .font(.headline)
+                                        .padding(.bottom, 5)
 
-                    VStack(alignment: .leading) {
-                        Text("Fats: \(fats) g")
-                        Slider(value: Binding(
-                            get: { Double(fats) ?? 0 },
-                            set: { fats = String(format: "%.1f", $0) }
-                        ), in: 0...150, step: 0.1)
-                            .accentColor(.red)
-                    }
-                    .padding(.vertical)
+                                    HStack {
+                                        Text("\(minProtein, specifier: "%.1f")g")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
 
-                    VStack(alignment: .leading) {
-                        Text("Calories: \(calories) kcal")
-                        Slider(value: Binding(
-                            get: { Double(calories) ?? 0 },
-                            set: { calories = String(format: "%.0f", $0) }
-                        ), in: 0...1500, step: 1)
-                        .accentColor(Color.mhaGreen)
+                                        Slider(value: Binding(
+                                            get: { Double(protein) ?? 0 },
+                                            set: { protein = String(format: "%.1f", $0) }
+                                        ), in: minProtein...maxProtein, step: 0.1)
+                                        .accentColor(.blue)
+
+                                        Text("\(maxProtein, specifier: "%.1f")g")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                    }
+
+                                    Text("\(protein) g")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                        .padding(.top, 5)
+                                }
+                                .padding(.vertical)
+                            }
+                        }
+
+                        VStack(alignment: .leading) {
+                            if let minCarbs = minCarbs, let maxCarbs = maxCarbs {
+                                VStack {
+                                    Text("Carbs")
+                                        .font(.headline)
+                                        .padding(.bottom, 5)
+
+                                    HStack {
+                                        Text("\(minCarbs, specifier: "%.1f")g")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+
+                                        Slider(value: Binding(
+                                            get: { Double(carbs) ?? 0 },
+                                            set: { carbs = String(format: "%.1f", $0) }
+                                        ), in: minCarbs...maxCarbs, step: 0.1)
+                                        .accentColor(.orange)
+
+                                        Text("\(maxCarbs, specifier: "%.1f")g")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                    }
+
+                                    Text("\(carbs) g")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                        .padding(.top, 5)
+                                }
+                                .padding(.vertical)
+                            }
+                        }
+
+                        VStack(alignment: .leading) {
+                            if let minFats = minFats, let maxFats = maxFats {
+                                VStack {
+                                    Text("Fats")
+                                        .font(.headline)
+                                        .padding(.bottom, 5)
+
+                                    HStack {
+                                        Text("\(minFats, specifier: "%.1f")g")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+
+                                        Slider(value: Binding(
+                                            get: { Double(fats) ?? 0 },
+                                            set: { fats = String(format: "%.1f", $0) }
+                                        ), in: 0...150, step: 0.1)
+                                        .accentColor(.red)
+
+                                        Text("\(maxFats, specifier: "%.1f")g")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                    }
+
+                                    Text("\(fats) g")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                        .padding(.top, 5)
+                                }
+                                .padding(.vertical)
+                            }
+                        }
+
+                        VStack(alignment: .leading) {
+                            if let minCalories = minCalories, let maxCalories = maxCalories {
+                                VStack {
+                                    Text("Calories")
+                                        .font(.headline)
+                                        .padding(.bottom, 5)
+
+                                    HStack {
+                                        Text("\(minCalories, specifier: "%.0f") kcal")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+
+                                        Slider(value: Binding(
+                                            get: { Double(calories) ?? 0 },
+                                            set: { calories = String(format: "%.0f", $0) }
+                                        ), in: 0...1500, step: 1)
+                                        .accentColor(Color.mhaGreen)
+
+                                        Text("\(maxCalories, specifier: "%.0f") kcal")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                    }
+
+                                    Text("\(calories) kcal")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                        .padding(.top, 5)
+                                }
+                                .padding(.vertical)
+                            }
+                        }
                     }
-                    .padding(.vertical)
                 }
-                
-                Section {
-                    Button(action: {
-                        print("DEBUG - Saving values:")
-                        print("Protein: \(protein)")
-                        print("Carbs: \(carbs)")
-                        print("Fats: \(fats)")
-                        print("Calories: \(calories)")
-                        updateNutrition()
-                    }) {
-                        Text("Save")
-                            .frame(maxWidth: .infinity)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.mhaGreen)
-                            .cornerRadius(10)
-                    }
+
+
+                Button(action: {
+                    print("DEBUG - Saving values:")
+                    print("Protein: \(protein)")
+                    print("Carbs: \(carbs)")
+                    print("Fats: \(fats)")
+                    print("Calories: \(calories)")
+                    updateNutrition()
+                }) {
+                    Text("Save")
+                        .frame(width: 120, height: 40)
+                        .foregroundColor(.white)
+                        .background(Color.mhaGreen)
+                        .cornerRadius(20)
+                        .padding(.bottom)
                 }
+                .buttonStyle(PlainButtonStyle())
+                .padding(.horizontal)
             }
             .navigationTitle("Edit \(meal.name)")
 <<<<<<< HEAD
@@ -718,6 +849,19 @@ struct EditMeal: View {
                 }
             }
 >>>>>>> 49a3c23 (added sliders, still need min and max though)
+        }
+    }
+    
+    private func extractRangeValues(from string: String) -> (minValue: Double?, maxValue: Double?) {
+        let components = string.split(separator: "-")
+        
+        if components.count == 2 {
+            let minValue = Double(components[0].trimmingCharacters(in: .whitespaces))
+            let maxValue = Double(components[1].trimmingCharacters(in: .whitespaces))
+            
+            return (minValue, maxValue)
+        } else {
+            return (nil, nil)
         }
     }
     

@@ -31,11 +31,11 @@ struct Tabs: View {
                     Text("Profile")
             }
             // Temporary Placement
-            MacrosTrackingView()
+            /*MacrosTrackingView()
                 .tabItem {
                     Image(systemName: "chart.pie")
                     Text("Macros")
-                }
+                }*/
             /*MedicationsView()
                 .tabItem {
                     Image(systemName: "pills")

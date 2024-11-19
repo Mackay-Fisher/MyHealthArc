@@ -15,6 +15,21 @@ struct ChatbotView: View {
 
     var body: some View {
         VStack {
+            HStack{Image(systemName: "lightbulb.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(-2)
+                    .frame(width: 15)
+                Text("Recipe Assistant")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .padding()
+            }
+            
+            Divider()
+                .overlay(
+                    (colorScheme == .dark ? Color.white : Color.gray)
+                )
             VStack {
                 MessagesListView(messages: viewModel.messages)
                 
@@ -22,7 +37,7 @@ struct ChatbotView: View {
                 HStack {
                     ForEach(dietaryOptions, id: \.self) { option in
                         Button(action: {
-                            viewModel.sendUserMessage(option)
+                            handleDietaryOption(option: option)
                         }) {
                             Text(option)
                                 .font(.body)
@@ -40,6 +55,7 @@ struct ChatbotView: View {
                 }
                 .padding()
                 
+                /*
                 HStack {
                     TextField("Enter your message", text: $userMessage)
                         .padding(.horizontal)
@@ -61,7 +77,11 @@ struct ChatbotView: View {
                 }
                 .padding(.bottom)
                 .padding(.trailing)
+                 */
             }
+        }
+        .onAppear() {
+            viewModel.sendDefaultMessage()
         }
 
     }
@@ -71,6 +91,12 @@ struct ChatbotView: View {
         viewModel.sendUserMessage(userMessage)
         userMessage = ""
     }
+    
+    func handleDietaryOption(option: String) {
+        let dietary_send = "Make the recipe \(option.lowercased())"
+        viewModel.sendUserMessage(dietary_send)
+    }
+    
 }
 
 struct MessagesListView: View {
@@ -122,6 +148,6 @@ struct ChatMessage: Identifiable {
 
 struct ChatbotView_Previews: PreviewProvider {
     static var previews: some View {
-        ChatbotView(viewModel: ChatbotViewModel())
+        ChatbotView(viewModel: ChatbotViewModel(proteinLeft: 1, carbsLeft: 1, fatsLeft: 1)) //dummy values for preview purposes
     }
 }

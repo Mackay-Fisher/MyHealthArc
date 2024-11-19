@@ -10,7 +10,21 @@ import OpenAI
 
 final class ChatbotViewModel: ObservableObject {
     @Published var messages: [ChatMessage] = []
+    var proteinLeft: Double
+    var carbsLeft: Double
+    var fatsLeft: Double
 
+    init(proteinLeft: Double, carbsLeft: Double, fatsLeft: Double) {
+        self.proteinLeft = proteinLeft
+        self.carbsLeft = carbsLeft
+        self.fatsLeft = fatsLeft
+    }
+    
+    func sendDefaultMessage() {
+        let messagetoSend = "Suggest a recipe with approximately \(Int(proteinLeft))g protein, \(Int(carbsLeft))g carbs, and \(Int(fatsLeft))g fats."
+        sendUserMessage(messagetoSend)
+    }
+    
     func sendUserMessage(_ message: String) {
         let userMessage = ChatMessage(message: message, isUser: true)
         messages.append(userMessage)
@@ -18,25 +32,25 @@ final class ChatbotViewModel: ObservableObject {
         let openAI = OpenAI(apiToken: "")
         
         let query = ChatQuery(
-            messages: [.init(role: .user, content: "hello")!],
+            messages: [.init(role: .user, content: message)!],
                     model: .gpt3_5Turbo
                 )
                 
-            openAI.chats(query: query) { result in
-                switch result {
-                case .success(let success):
-                    guard let choice = success.choices.first else {
-                        return
+                openAI.chats(query: query) { result in
+                    switch result {
+                    case .success(let success):
+                        guard let choice = success.choices.first else {
+                            return
+                        }
+                        guard let message = choice.message.content?.string else { return }
+                        DispatchQueue.main.async {
+                            self.receiveChatbotMessage(message)
+                        }
+                    case .failure(let failure):
+                        self.receiveChatbotMessage("Chatbot is not working. Please try again later.")
+                        print(failure)
                     }
-                    guard let message = choice.message.content?.string else { return }
-                    DispatchQueue.main.async {
-                        self.receiveChatbotMessage(message)
-                    }
-                case .failure(let failure):
-                    self.receiveChatbotMessage("Chatbot is not working. Please try again.")
-                    print(failure)
                 }
-            }
     }
 
     private func receiveChatbotMessage(_ message: String) {

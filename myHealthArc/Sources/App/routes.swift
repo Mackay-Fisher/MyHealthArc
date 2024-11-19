@@ -21,5 +21,6 @@ func routes(_ app: Application) throws {
     
     try app.register(collection: MedicationCheckerController())
     try app.register(collection: NutritionController())
+    try app.register(collection: RecipeRecipeController())
     //try app.register(collection: HealthDataController())
 }

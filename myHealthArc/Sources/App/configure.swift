@@ -20,6 +20,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateHealthKit())
     app.migrations.add(CreateMedicationInteractions())
     app.migrations.add(CreateNutritionItem())
+    app.migrations.add(CreateRecipe())
 
 
     app.views.use(.leaf)

@@ -7,6 +7,13 @@ struct BodyDataController: RouteCollection {
         bodyData.post("update", use: self.updateBodyData)
         bodyData.get("load", use: self.loadBodyData)
         bodyData.post("dummyPath", use: self.logIncomingData)
+        bodyData.post("create", use: self.createBodyData)
+    }
+
+    func createBodyData(req: Request) async throws -> HTTPStatus {
+        let bodyData = try req.content.decode(BodyDataModel.self)
+        try await bodyData.save(on: req.db)
+        return .created
     }
 
     // MARK: - Update Body Data

@@ -54,30 +54,6 @@ struct ChatbotView: View {
                     }
                 }
                 .padding()
-                
-                /*
-                HStack {
-                    TextField("Enter your message", text: $userMessage)
-                        .padding(.horizontal)
-                        .padding(.vertical, 10)
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.gray, lineWidth: 0.5)
-                        )
-                        .padding()
-                    
-                    Button(action: sendMessage) {
-                        Text("Send")
-                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                    }
-                    .padding(10)
-                    .background(Color.mhaPurple)
-                    .cornerRadius(12)
-                }
-                .padding(.bottom)
-                .padding(.trailing)
-                 */
             }
         }
         .onAppear() {
@@ -126,6 +102,7 @@ struct MessagesListView: View {
                         .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                         .cornerRadius(20)
                         .shadow(radius: 5)
+                        .multilineTextAlignment(.leading)
                 } else {
                     Text(message.message)
                         .padding(12)
@@ -133,6 +110,7 @@ struct MessagesListView: View {
                         .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                         .cornerRadius(20)
                         .shadow(radius: 5)
+                        .multilineTextAlignment(.leading)
                     Spacer()
                 }
             }

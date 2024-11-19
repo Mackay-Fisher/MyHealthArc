@@ -22,27 +22,190 @@ struct FitnessGoal: Identifiable {
 }
 
 class FitnessGoalsViewModel: ObservableObject {
-    @Published var stepCount = 10000
-    @Published var exerciseMinutes = 30
-    @Published var caloriesBurned = 500
-    @Published var timeAsleep = 8
-    @Published var waterIntake = 8
-    @Published var workoutsPerWeek = 6
-    @Published var proteinGoal = 60
-    @Published var carbsGoal = 300
-    @Published var fatGoal = 50
-    @Published var caloriesConsumed = 2200
+    // MARK: - Published Properties
+    //idk if this is correct ngl
+    @Published var stepCount: Int {
+        didSet { saveGoals() }
+    }
+    @Published var exerciseMinutes: Int {
+        didSet { saveGoals() }
+    }
+    @Published var caloriesBurned: Int {
+        didSet { saveGoals() }
+    }
+    @Published var timeAsleep: Int {
+        didSet { saveGoals() }
+    }
+    @Published var waterIntake: Int {
+        didSet { saveGoals() }
+    }
+    @Published var workoutsPerWeek: Int {
+        didSet { saveGoals() }
+    }
+    @Published var proteinGoal: Int {
+        didSet { saveGoals() }
+    }
+    @Published var carbsGoal: Int {
+        didSet { saveGoals() }
+    }
+    @Published var fatGoal: Int {
+        didSet { saveGoals() }
+    }
+    @Published var caloriesConsumed: Int {
+        didSet { saveGoals() }
+    }
     
     // Streak variables
-    @Published var stepsStreak = 14
-    @Published var exerciseStreak = 14
-    @Published var calBurnedStreak = 14
-    @Published var sleepStreak = 14
-    @Published var waterStreak = 14
-    @Published var workoutsStreak = 14
-    @Published var nutritionStreak = 14
+    @Published var stepsStreak: Int {
+        didSet { saveStreaks() }
+    }
+    @Published var exerciseStreak: Int {
+        didSet { saveStreaks() }
+    }
+    @Published var calBurnedStreak: Int {
+        didSet { saveStreaks() }
+    }
+    @Published var sleepStreak: Int {
+        didSet { saveStreaks() }
+    }
+    @Published var waterStreak: Int {
+        didSet { saveStreaks() }
+    }
+    @Published var workoutsStreak: Int {
+        didSet { saveStreaks() }
+    }
+    @Published var nutritionStreak: Int {
+        didSet { saveStreaks() }
+    }
     
-    // Computed property to create streak array with consistent colors
+    init() {
+        // Initialize with default values
+        self.stepCount = UserDefaults.standard.integer(forKey: "stepCount")
+        self.exerciseMinutes = UserDefaults.standard.integer(forKey: "exerciseMinutes")
+        self.caloriesBurned = UserDefaults.standard.integer(forKey: "caloriesBurned")
+        self.timeAsleep = UserDefaults.standard.integer(forKey: "timeAsleep")
+        self.waterIntake = UserDefaults.standard.integer(forKey: "waterIntake")
+        self.workoutsPerWeek = UserDefaults.standard.integer(forKey: "workoutsPerWeek")
+        self.proteinGoal = UserDefaults.standard.integer(forKey: "proteinGoal")
+        self.carbsGoal = UserDefaults.standard.integer(forKey: "carbsGoal")
+        self.fatGoal = UserDefaults.standard.integer(forKey: "fatGoal")
+        self.caloriesConsumed = UserDefaults.standard.integer(forKey: "caloriesConsumed")
+        
+        // Initialize streaks - 0
+        self.stepsStreak = UserDefaults.standard.integer(forKey: "stepsStreak")
+        self.exerciseStreak = UserDefaults.standard.integer(forKey: "exerciseStreak")
+        self.calBurnedStreak = UserDefaults.standard.integer(forKey: "calBurnedStreak")
+        self.sleepStreak = UserDefaults.standard.integer(forKey: "sleepStreak")
+        self.waterStreak = UserDefaults.standard.integer(forKey: "waterStreak")
+        self.workoutsStreak = UserDefaults.standard.integer(forKey: "workoutsStreak")
+        self.nutritionStreak = UserDefaults.standard.integer(forKey: "nutritionStreak")
+        
+        // If no saved values exist, set defaults
+        if stepCount == 0 { self.stepCount = 10000 }
+        if exerciseMinutes == 0 { self.exerciseMinutes = 30 }
+        if caloriesBurned == 0 { self.caloriesBurned = 500 }
+        if timeAsleep == 0 { self.timeAsleep = 8 }
+        if waterIntake == 0 { self.waterIntake = 8 }
+        if workoutsPerWeek == 0 { self.workoutsPerWeek = 6 }
+        if proteinGoal == 0 { self.proteinGoal = 60 }
+        if carbsGoal == 0 { self.carbsGoal = 300 }
+        if fatGoal == 0 { self.fatGoal = 50 }
+        if caloriesConsumed == 0 { self.caloriesConsumed = 2200 }
+    }
+    
+    // MARK: - Persistence Functions
+
+    private func saveGoals() {
+        UserDefaults.standard.set(stepCount, forKey: "stepCount")
+        UserDefaults.standard.set(exerciseMinutes, forKey: "exerciseMinutes")
+        UserDefaults.standard.set(caloriesBurned, forKey: "caloriesBurned")
+        UserDefaults.standard.set(timeAsleep, forKey: "timeAsleep")
+        UserDefaults.standard.set(waterIntake, forKey: "waterIntake")
+        UserDefaults.standard.set(workoutsPerWeek, forKey: "workoutsPerWeek")
+        UserDefaults.standard.set(proteinGoal, forKey: "proteinGoal")
+        UserDefaults.standard.set(carbsGoal, forKey: "carbsGoal")
+        UserDefaults.standard.set(fatGoal, forKey: "fatGoal")
+        UserDefaults.standard.set(caloriesConsumed, forKey: "caloriesConsumed")
+    }
+    
+    private func saveStreaks() {
+        UserDefaults.standard.set(stepsStreak, forKey: "stepsStreak")
+        UserDefaults.standard.set(exerciseStreak, forKey: "exerciseStreak")
+        UserDefaults.standard.set(calBurnedStreak, forKey: "calBurnedStreak")
+        UserDefaults.standard.set(sleepStreak, forKey: "sleepStreak")
+        UserDefaults.standard.set(waterStreak, forKey: "waterStreak")
+        UserDefaults.standard.set(workoutsStreak, forKey: "workoutsStreak")
+        UserDefaults.standard.set(nutritionStreak, forKey: "nutritionStreak")
+    }
+    
+    // MARK: - Streak Functions
+    func updateStepsStreak(stepsCompleted: Int) {
+        if stepsCompleted >= stepCount {
+            stepsStreak += 1
+        } else {
+            stepsStreak = 0
+        }
+    }
+    
+    func updateExerciseStreak(minutesCompleted: Int) {
+        if minutesCompleted >= exerciseMinutes {
+            exerciseStreak += 1
+        } else {
+            exerciseStreak = 0
+        }
+    }
+    
+    func updateCalorieStreak(caloriesBurnedToday: Int) {
+        if caloriesBurnedToday >= caloriesBurned {
+            calBurnedStreak += 1
+        } else {
+            calBurnedStreak = 0
+        }
+    }
+    
+    func updateSleepStreak(hoursSlept: Int) {
+        if hoursSlept >= timeAsleep {
+            sleepStreak += 1
+        } else {
+            sleepStreak = 0
+        }
+    }
+    
+    func updateWaterStreak(glassesConsumed: Int) {
+        if glassesConsumed >= waterIntake {
+            waterStreak += 1
+        } else {
+            waterStreak = 0
+        }
+    }
+    
+    func updateWorkoutStreak(workoutsCompleted: Int) {
+        if workoutsCompleted >= workoutsPerWeek {
+            workoutsStreak += 1
+        } else {
+            workoutsStreak = 0
+        }
+    }
+    
+    func updateNutritionStreak(meetsNutritionGoals: Bool) {
+        if meetsNutritionGoals {
+            nutritionStreak += 1
+        } else {
+            nutritionStreak = 0
+        }
+    }
+    
+    //check if nutrition goals are met
+    func checkNutritionGoals(protein: Int, carbs: Int, fat: Int, calories: Int) -> Bool {
+        let proteinMet = protein >= proteinGoal
+        let carbsMet = carbs >= carbsGoal
+        let fatMet = fat >= fatGoal
+        let caloriesMet = calories <= caloriesConsumed
+        
+        return proteinMet && carbsMet && fatMet && caloriesMet
+    }
+    
+    //create streak array
     var streaks: [FitnessGoal] {
         [
             FitnessGoal(name: "Steps", value: stepsStreak, color: GoalColors.steps),
@@ -54,76 +217,7 @@ class FitnessGoalsViewModel: ObservableObject {
             FitnessGoal(name: "Nutrition", value: nutritionStreak, color: GoalColors.nutrition)
         ]
     }
-    
-    // Functions to update streaks
-        func updateStepsStreak(stepsCompleted: Int) {
-            if stepsCompleted >= stepCount {
-                stepsStreak += 1
-            } else {
-                stepsStreak = 0
-            }
-        }
-        
-        func updateExerciseStreak(minutesCompleted: Int) {
-            if minutesCompleted >= exerciseMinutes {
-                exerciseStreak += 1
-            } else {
-                exerciseStreak = 0
-            }
-        }
-        
-        func updateCalorieStreak(caloriesBurnedToday: Int) {
-            if caloriesBurnedToday >= caloriesBurned {
-                calBurnedStreak += 1
-            } else {
-                calBurnedStreak = 0
-            }
-        }
-        
-        func updateSleepStreak(hoursSlept: Int) {
-            if hoursSlept >= timeAsleep {
-                sleepStreak += 1
-            } else {
-                sleepStreak = 0
-            }
-        }
-        
-        func updateWaterStreak(glassesConsumed: Int) {
-            if glassesConsumed >= waterIntake {
-                waterStreak += 1
-            } else {
-                waterStreak = 0
-            }
-        }
-        
-        func updateWorkoutStreak(workoutsCompleted: Int) {
-            if workoutsCompleted >= workoutsPerWeek {
-                workoutsStreak += 1
-            } else {
-                workoutsStreak = 0
-            }
-        }
-        
-        func updateNutritionStreak(meetsNutritionGoals: Bool) {
-            if meetsNutritionGoals { //supposed to check all the shit
-                nutritionStreak += 1
-            } else {
-                nutritionStreak = 0
-            }
-        }
-        
-        // Function to check if nutrition goals are met (cuz its one streak)
-        func checkNutritionGoals(protein: Int, carbs: Int, fat: Int, calories: Int) -> Bool {
-            let proteinMet = protein >= proteinGoal
-            let carbsMet = carbs >= carbsGoal
-            let fatMet = fat >= fatGoal
-            let caloriesMet = calories >= caloriesConsumed // could be less than if its a limit??????? i dont fucking know
-            
-            return proteinMet && carbsMet && fatMet && caloriesMet
-        }
 }
-
-//TODO: change later when merging everyting
 
 struct GoalColors {
     static let steps = Color.blue
@@ -138,6 +232,43 @@ struct GoalColors {
 struct GoalsView: View {
     @StateObject private var viewModel = FitnessGoalsViewModel()
     @Environment(\.colorScheme) var colorScheme
+    
+    
+    // Add state to track current progress
+    @State private var currentSteps = 0
+    @State private var currentExerciseMinutes = 0
+    @State private var currentCaloriesBurned = 0
+    @State private var currentSleepHours = 0
+    @State private var currentWaterGlasses = 0
+    @State private var currentWorkouts = 0
+    @State private var currentProtein = 0
+    @State private var currentCarbs = 0
+    @State private var currentFat = 0
+    @State private var currentCalories = 0
+    
+    private func checkAndUpdateStreaks() {
+        viewModel.updateStepsStreak(stepsCompleted: currentSteps)
+        viewModel.updateExerciseStreak(minutesCompleted: currentExerciseMinutes)
+        viewModel.updateCalorieStreak(caloriesBurnedToday: currentCaloriesBurned)
+        viewModel.updateSleepStreak(hoursSlept: currentSleepHours)
+        viewModel.updateWaterStreak(glassesConsumed: currentWaterGlasses)
+        viewModel.updateWorkoutStreak(workoutsCompleted: currentWorkouts)
+        
+        let nutritionGoalsMet = viewModel.checkNutritionGoals(
+            protein: currentProtein,
+            carbs: currentCarbs,
+            fat: currentFat,
+            calories: currentCalories
+        )
+        viewModel.updateNutritionStreak(meetsNutritionGoals: nutritionGoalsMet)
+    }
+    
+    //idk if this actually will work just tried something
+    private func setupDailyStreakCheck() {
+        Timer.scheduledTimer(withTimeInterval: 86400, repeats: true) { _ in
+            checkAndUpdateStreaks()
+        }
+    }
     
     var body: some View {
         NavigationView {
@@ -160,7 +291,7 @@ struct GoalsView: View {
                 
                 ScrollView {
                     VStack(spacing: 30) {
-                        // Streaks Section
+                        // MARK: - Streaks Section
                         VStack(spacing: 15) {
                             Text("Streaks")
                                 .font(.title2)
@@ -173,26 +304,15 @@ struct GoalsView: View {
                                 GridItem(.flexible())
                             ], spacing: 20) {
                                 ForEach(viewModel.streaks) { streak in
-                                    VStack {
-                                        Text(streak.name)
-                                            .font(.caption)
-                                        ZStack {
-                                            Circle()
-                                                .fill(streak.color.opacity(0.2))
-                                                .frame(width: 60, height: 60)
-                                            Text("\(streak.value)")
-                                                .foregroundColor(streak.color)
-                                                .fontWeight(.bold)
-                                        }
-                                    }
+                                    StreakFlameView(streak: streak)
                                 }
                             }
                         }
                         
                         Divider()
                             .padding(.horizontal)
-                        // Fitness Goals Section
-                        //NOTE: the step is how much its incrementing by cuz in most cases it shouldnt be 1
+                        
+                        // MARK: - Fitness Goals Section
                         VStack(spacing: 15) {
                             Text("Manage Fitness Goals")
                                 .font(.title2)
@@ -235,8 +355,7 @@ struct GoalsView: View {
                         Divider()
                             .padding(.horizontal)
                         
-                        // Nutrition Goals Section
-                        //TODO: these need to pull from the stuff james calculates so the values need to be updated accordingly
+                        // MARK: - Nutrition Goals Section
                         VStack(spacing: 15) {
                             Text("Manage Nutrition Goals")
                                 .font(.title2)
@@ -270,39 +389,34 @@ struct GoalsView: View {
                 }
             }
         }
+        .onAppear {
+            setupDailyStreakCheck()
+        }
     }
 }
-
-
+//MARK: - Plus/Minus Button functionality
 struct GoalAdjusterView: View {
     let title: String
     @Binding var value: Int
     let unit: String
     let step: Int
     
-    // Get the appropriate color based on the goal title - probably need to change these colors later also smhhhhhh
     private var buttonColor: Color {
         switch title {
         case "Step Count":
-            return .blue
+            return GoalColors.steps
         case "Exercise Minutes":
-            return .purple
+            return GoalColors.exercise
         case "Calories Burned":
-            return .pink
+            return GoalColors.calories
         case "Time Asleep":
-            return .teal
+            return GoalColors.sleep
         case "Water Intake":
-            return .blue
+            return GoalColors.water
         case "Workouts":
-            return .green
-        case "Protein":
-            return .blue
-        case "Carbs":
-            return .orange
-        case "Fat":
-            return .red
-        case "Calories Consumed":
-            return .green
+            return GoalColors.workouts
+        case "Protein", "Carbs", "Fat", "Calories Consumed":
+            return GoalColors.nutrition
         default:
             return .blue
         }
@@ -312,9 +426,15 @@ struct GoalAdjusterView: View {
         VStack(alignment: .center, spacing: 10) {
             Text(title)
                 .font(.subheadline)
+            
             Divider()
+            
             HStack {
-                Button(action: { value -= step }) {
+                Button(action: {
+                    if value > step {  // Prevent negative values
+                        value -= step
+                    }
+                }) {
                     Image(systemName: "minus.circle.fill")
                         .foregroundColor(buttonColor)
                 }
@@ -326,7 +446,6 @@ struct GoalAdjusterView: View {
                 Button(action: { value += step }) {
                     Image(systemName: "plus.circle.fill")
                         .foregroundColor(buttonColor)
-                        
                 }
             }
             
@@ -339,6 +458,57 @@ struct GoalAdjusterView: View {
         .cornerRadius(15)
     }
 }
-#Preview {
-    GoalsView()
+//MARK: - Streaks flame thing - THEY GROW WITH THE NUMBER OF STREAKSSSSSSugheruighe
+struct StreakFlameView: View {
+    let streak: FitnessGoal
+    
+    private var flameSize: CGFloat {
+        // Adjust size based on streak value
+        let baseSize: CGFloat = 30
+        let maxIncrease: CGFloat = 15
+        let increase = min(CGFloat(streak.value) / 30.0, 1.0) * maxIncrease
+        return baseSize + increase
+    }
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(streak.name)
+                .font(.caption)
+            
+            ZStack {
+                // Background glow
+                Image(systemName: "flame.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundColor(streak.color.opacity(0.2))
+                    .frame(width: flameSize + 10, height: flameSize + 10)
+                
+                // Main flame
+                Image(systemName: "flame.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundColor(streak.color)
+                    .frame(width: flameSize, height: flameSize)
+                
+                // Value
+                Text("\(streak.value)")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(.white)
+                    .offset(y: -2)
+            }
+            .frame(height: 60)
+        }
+    }
+}
+
+
+// Preview provider
+struct GoalsView_Previews: PreviewProvider {
+    static var previews: some View {
+        GoalsView()
+            .preferredColorScheme(.light)
+        
+        GoalsView()
+            .preferredColorScheme(.dark)
+    }
 }

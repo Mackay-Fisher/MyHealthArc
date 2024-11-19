@@ -645,33 +645,45 @@ struct EditMeal: View {
                 }
                 
                 Section(header: Text("Edit Meal Nutrition")) {
-                    HStack {
-                        Text("Protein:")
-                        TextField("Enter protein (g)", text: $protein)
-                            .keyboardType(.decimalPad)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    VStack(alignment: .leading) {
+                        Text("Protein: \(protein) g")
+                        Slider(value: Binding(
+                            get: { Double(protein) ?? 0 },
+                            set: { protein = String(format: "%.1f", $0) }
+                        ), in: 0...200, step: 0.1)
+                            .accentColor(.blue)
                     }
-                    
-                    HStack {
-                        Text("Carbs:")
-                        TextField("Enter carbs (g)", text: $carbs)
-                            .keyboardType(.decimalPad)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.vertical)
+
+                    VStack(alignment: .leading) {
+                        Text("Carbs: \(carbs) g")
+                        Slider(value: Binding(
+                            get: { Double(carbs) ?? 0 },
+                            set: { carbs = String(format: "%.1f", $0) }
+                        ), in: 0...300, step: 0.1)
+                            .accentColor(.orange)
                     }
-                    
-                    HStack {
-                        Text("Fats:")
-                        TextField("Enter fats (g)", text: $fats)
-                            .keyboardType(.decimalPad)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.vertical)
+
+                    VStack(alignment: .leading) {
+                        Text("Fats: \(fats) g")
+                        Slider(value: Binding(
+                            get: { Double(fats) ?? 0 },
+                            set: { fats = String(format: "%.1f", $0) }
+                        ), in: 0...150, step: 0.1)
+                            .accentColor(.red)
                     }
-                    
-                    HStack {
-                        Text("Calories:")
-                        TextField("Enter calories", text: $calories)
-                            .keyboardType(.decimalPad)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.vertical)
+
+                    VStack(alignment: .leading) {
+                        Text("Calories: \(calories) kcal")
+                        Slider(value: Binding(
+                            get: { Double(calories) ?? 0 },
+                            set: { calories = String(format: "%.0f", $0) }
+                        ), in: 0...1500, step: 1)
+                        .accentColor(Color.mhaGreen)
                     }
+                    .padding(.vertical)
                 }
                 
                 Section {
@@ -693,9 +705,19 @@ struct EditMeal: View {
                 }
             }
             .navigationTitle("Edit \(meal.name)")
+<<<<<<< HEAD
             .navigationBarItems(trailing: Button("Cancel") {
                 dismiss()
             })
+=======
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+            }
+>>>>>>> 49a3c23 (added sliders, still need min and max though)
         }
     }
     
@@ -760,6 +782,7 @@ struct EditMeal: View {
         }
     }
 }
+
 // MARK: - Date Formatter Extensions
 extension DateFormatter {
     static let dayFormatter: DateFormatter = {

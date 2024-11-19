@@ -15,25 +15,6 @@ struct ChatbotView: View {
 
     var body: some View {
         VStack {
-            Button(action: {
-            }) {
-                HStack {
-                    Image(systemName: "lightbulb.fill")
-                        .frame(width: 28, height: 28)
-                        .foregroundColor(.white)
-                    Text("Recipe Assistant")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                }
-                .padding(10)
-                .background(Color.mhaPurple)
-                .cornerRadius(12)
-                .shadow(radius: 5)
-                .padding(.leading, 20)
-                .padding(.top, 20)
-                Spacer()
-            }
             VStack {
                 MessagesListView(messages: viewModel.messages)
                 

@@ -4,14 +4,6 @@
 //
 //  Created by Anjali Hole on 11/19/24.
 //
-
-//
-//  GoalsPage.swift
-//  myHealthArc-new-frontend
-//
-//  Created by Anjali Hole on 11/19/24.
-//
-
 import SwiftUI
 
 struct FitnessGoal: Identifiable {
@@ -400,7 +392,7 @@ struct GoalAdjusterView: View {
     @Binding var value: Int
     let unit: String
     let step: Int
-    
+    //TODO: fix the colors later w everything else
     private var buttonColor: Color {
         switch title {
         case "Step Count":
@@ -415,7 +407,13 @@ struct GoalAdjusterView: View {
             return GoalColors.water
         case "Workouts":
             return GoalColors.workouts
-        case "Protein", "Carbs", "Fat", "Calories Consumed":
+        case "Protein":
+            return GoalColors.nutrition
+        case "Carbs":
+            return GoalColors.nutrition
+        case "Fats":
+            return GoalColors.nutrition
+        case "Calories Consumed":
             return GoalColors.nutrition
         default:
             return .blue

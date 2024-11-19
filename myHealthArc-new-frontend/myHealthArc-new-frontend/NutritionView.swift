@@ -162,8 +162,8 @@ struct NutritionView: View {
                 Button(action: fetchFoodInfo) {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.white)
-                        .padding(8)
-                        .background(Color.blue)
+                        .padding(5)
+                        .background(Color.mhaPurple)
                         .clipShape(Circle())
                 }
             }
@@ -690,7 +690,8 @@ struct EditMeal: View {
                         VStack(alignment: .leading) {
                             if let minProtein = minProtein, let maxProtein = maxProtein {
                                 VStack {
-                                    Text("Protein")                                         .font(.headline)
+                                    Text("Protein")
+                                        .font(.headline)
                                         .padding(.bottom, 5)
 
                                     HStack {
@@ -836,11 +837,6 @@ struct EditMeal: View {
                 .padding(.horizontal)
             }
             .navigationTitle("Edit \(meal.name)")
-<<<<<<< HEAD
-            .navigationBarItems(trailing: Button("Cancel") {
-                dismiss()
-            })
-=======
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -848,7 +844,6 @@ struct EditMeal: View {
                     }
                 }
             }
->>>>>>> 49a3c23 (added sliders, still need min and max though)
         }
     }
     

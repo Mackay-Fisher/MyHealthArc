@@ -70,7 +70,7 @@ struct MacrosTrackingView: View {
                     
                     HStack(spacing: 20) {
                         MacroProgressView(macroName: "Fats", value: fats_left, unit: "g", color: .red, progress: fats_progress_left)
-                        MacroProgressView(macroName: "Carbs", value: carbs_left, unit: "kcal", color: .green, progress: carbs_progress_left)
+                        MacroProgressView(macroName: "Calories", value: carbs_left, unit: "kcal", color: .green, progress: carbs_progress_left)
                     }
                 }
                 .padding()

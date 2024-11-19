@@ -9,6 +9,13 @@ import SwiftUI
 
 struct MacrosTrackingView: View {
     @Environment(\.colorScheme) var colorScheme
+    @State private var protein_left: Double = 22
+    @State private var carbs_left: Double = 7
+    @State private var fats_left: Double = 12
+    @State private var protein_progress_left: Double = 0.4
+    @State private var carbs_progress_left: Double = 0.7
+    @State private var fats_progress_left: Double = 0.3
+    @State private var showSheet = false
     
     var body: some View {
         NavigationView {
@@ -46,30 +53,27 @@ struct MacrosTrackingView: View {
                     .cornerRadius(10)
                 }
                 .padding(.horizontal)
-                Spacer()
-                    .frame(height:40)
                 
-                // Progress Section - change values to variables
+                // Progress Section
                 VStack(spacing: 20) {
                     HStack(spacing: 20) {
-                        MacroProgressView(macroName: "Protein", value: 55.0, unit: "g", color: .blue, progress: 0.8)
-                        MacroProgressView(macroName: "Carbs", value: 5.0, unit: "g", color: .orange, progress: 0.7)
+                        MacroProgressView(macroName: "Protein", value: protein_left, unit: "g", color: .blue, progress: protein_progress_left)
+                        MacroProgressView(macroName: "Carbs", value: carbs_left, unit: "g", color: .orange, progress: carbs_progress_left)
                     }
                     
                     HStack(spacing: 20) {
-                        MacroProgressView(macroName: "Fats", value: 8.0, unit: "g", color: .red, progress: 0.2)
-                        MacroProgressView(macroName: "Carbs", value: 177.0, unit: "kcal", color: .green, progress: 0.5)
+                        MacroProgressView(macroName: "Fats", value: fats_left, unit: "g", color: .red, progress: fats_progress_left)
+                        MacroProgressView(macroName: "Carbs", value: carbs_left, unit: "kcal", color: .green, progress: carbs_progress_left)
                     }
                 }
                 .padding()
                 
                 Spacer()
-                    .frame(height:40)
+                    .frame(height:30)
                 
-                NavigationLink(destination: ChatbotView(viewModel: ChatbotViewModel())) {
+                Button(action: {showSheet = true}) {
                     Spacer()
                     HStack {
-                        
                         Image(systemName: "lightbulb.fill")
                             .frame(width: 28, height: 28)
                             .foregroundColor(.white)
@@ -85,7 +89,9 @@ struct MacrosTrackingView: View {
                     .padding(.leading, 20)
                     .padding(.top, 20)
                     .padding(.trailing, 20)
-                    
+                    .sheet(isPresented: $showSheet) {
+                        ChatbotView(viewModel: ChatbotViewModel(proteinLeft: protein_left, carbsLeft: carbs_left, fatsLeft: fats_left))
+                    }
                 }
             }
             .background(Color(.systemBackground))
@@ -104,12 +110,13 @@ struct MacroProgressView: View {
     var body: some View {
         VStack {
             Text(macroName)
+                .padding(.bottom)
             ZStack {
                 Circle()
-                    .stroke(Color(.systemGray5), lineWidth: 8)
+                    .stroke(Color(.systemGray5), lineWidth: 17)
                 Circle()
                     .trim(from: 0, to: progress)
-                    .stroke(color, lineWidth: 10)
+                    .stroke(color, lineWidth: 17)
                     .rotationEffect(.degrees(-90))
                 
                 VStack {
@@ -122,9 +129,10 @@ struct MacroProgressView: View {
                 }
             }
             .frame(width: 80, height: 80)
+            .padding(.bottom)
         }
         .padding()
-        .frame(width: 150, height: 150)
+        .frame(width: 175, height: 175)
         .background(Color(.systemGray6))
         .cornerRadius(10)
     }

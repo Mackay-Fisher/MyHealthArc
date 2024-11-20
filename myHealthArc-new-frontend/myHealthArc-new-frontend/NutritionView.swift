@@ -79,13 +79,12 @@ struct NutritionView: View {
                 Text("Meal Tracking")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .padding()
             }
             
             Divider()
                 .overlay(colorScheme == .dark ? Color.white : Color.gray)
             
-            Spacer().frame(height: 20)
+            Spacer().frame(height: 10)
             
             // Add Meal Button
             ZStack(alignment: .topTrailing) {
@@ -106,7 +105,7 @@ struct NutritionView: View {
                 }
             }
             
-            Spacer().frame(height: 20)
+            Spacer().frame(height: 5)
             
             // Calendar View
             calendarView
@@ -136,12 +135,13 @@ struct NutritionView: View {
                             VStack(spacing: 8) {
                                 Text(macro.name)
                                     .font(.subheadline)
+                                    .fontWeight(.semibold)
                                     .foregroundColor(colorForMacro(macro.name))
                                 
                                 ZStack {
                                     Circle()
-                                        .stroke(colorForMacro(macro.name), lineWidth: 1)
-                                        .frame(width: 65, height: 65)
+                                        .stroke(colorForMacro(macro.name), lineWidth: 2)
+                                        .frame(width: 60, height: 60)
                                     
                                     Text(macro.value)
                                         .font(.footnote)
@@ -156,13 +156,13 @@ struct NutritionView: View {
                                 else{
                                     Text("g")
                                         .font(.caption)
-                                        .foregroundColor(colorScheme == .dark ? Color.white : Color.gray)
+                                        .foregroundColor(colorForMacro(macro.name))
                                 }
                             }
                             .frame(maxWidth: .infinity)
                         }
                     }
-                    .padding(.vertical, 10)
+                    .padding(.vertical,5)
                 }
             }
             .listStyle(PlainListStyle())
@@ -212,15 +212,15 @@ struct NutritionView: View {
     private func colorForMacro(_ macroName: String) -> Color {
         switch macroName {
         case "Protein:":
-            return Color.blue.opacity(0.8)
+            return Color.mhaBlue
         case "Carbs:":
-            return Color.orange.opacity(0.8)
+            return Color.mhaOrange
         case "Fats:":
-            return Color.red.opacity(0.8)
+            return Color.mhaSalmon
         case "Calories:":
-            return Color.mhaGreen.opacity(0.8)
+            return Color.mhaGreen
         default:
-            return Color.gray.opacity(0.8) // literally just here so swift will shut up
+            return Color.gray.opacity(0.8)
         }
     }
     //MARK: - Calendar view
@@ -250,9 +250,11 @@ struct NutritionView: View {
                 .padding(.horizontal)
             }
         }
+    
     private func isSelectedDate(_ date: Date) -> Bool {
             Calendar.current.isDate(date, inSameDayAs: selectedDate)
         }
+    
     // Generate current week dates centered around today
     private func getCurrentWeek() -> [Date] {
         let calendar = Calendar.current
@@ -271,7 +273,7 @@ struct NutritionView: View {
                         .onTapGesture { showPopup = false }
                     
                     VStack(spacing: 20) {
-                        TextField("Enter meal (comma-separated)", text: $mealInput)
+                        TextField("Enter Meal (comma-separated)", text: $mealInput)
                             .padding(10)
                             .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.white)
                             .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
@@ -289,16 +291,16 @@ struct NutritionView: View {
                             .frame(width: 120, height: 40)
                             .background(Color.mhaGreen)
                             .cornerRadius(20)
-                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                            .foregroundColor(colorScheme == .dark ? Color.black : Color.white)
                             
                             Button("Cancel") {
                                 showPopup = false
                             }
                             .padding()
                             .frame(width: 120, height: 40)
-                            .background(Color.red.opacity(0.6))
+                            .background(Color.mhaSalmon)
                             .cornerRadius(20)
-                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                            .foregroundColor(colorScheme == .dark ? Color.black : Color.white)
                         }
                     }
                     .padding()

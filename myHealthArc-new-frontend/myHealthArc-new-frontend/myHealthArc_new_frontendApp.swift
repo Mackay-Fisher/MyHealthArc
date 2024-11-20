@@ -27,6 +27,9 @@ extension Color {
     static let mhaPurple = Color(hex: "#C197D2")
     static let mhaGreen = Color(hex: "#5EB229")
     static let mhaGray = Color(hex: "#292828")
+    static let mhaBlue = Color(hex: "#41B8D5")
+    static let mhaOrange = Color(hex: "#F2A25C")
+    static let mhaSalmon = Color(hex: "#FF7D79")
     static let lightbackground = Color(hex: "#f2f2f2")
     
 }

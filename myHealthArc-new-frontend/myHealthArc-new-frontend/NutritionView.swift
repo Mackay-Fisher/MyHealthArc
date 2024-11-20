@@ -171,37 +171,11 @@ struct NutritionView: View {
                 }
             }
             .listStyle(PlainListStyle())
+
             
             // Search Bar
-            HStack {
-                TextField("Search for food", text: $foodSearch)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                Button(action: fetchFoodInfo) {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.white)
-                        .padding(5)
-                        .background(Color.mhaPurple)
-                        .clipShape(Circle())
-                }
-            }
-            .padding()
+            searchBar
             
-            if showFoodInfo {
-                VStack(alignment: .leading) {
-                    Text(foodInfo)
-                        .font(.headline)
-                    Button("Clear") {
-                        foodSearch = ""
-                        foodInfo = ""
-                        showFoodInfo = false
-                    }
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                }
-                .padding()
-            }
         }
         .padding()
         .sheet(item: $selectedMeal) { meal in
@@ -317,7 +291,94 @@ struct NutritionView: View {
             }
         }
     }
-    
+    //MARK: - Search Bar
+    private var searchBar: some View {
+        VStack {
+            // Search Bar
+            HStack {
+                TextField("Search for food", text: $foodSearch)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .cornerRadius(20)
+                Button(action: fetchFoodInfo) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.white)
+                        .padding(5)
+                        .background(Color.mhaPurple)
+                        .clipShape(Circle())
+                }
+            }
+            .padding()
+            
+            
+            // Search Results
+            if showFoodInfo {
+                VStack(alignment: .leading, spacing: 15) {
+                    // Food Name (first part before the first " - ")
+                    let items = foodInfo.split(separator: " - ", maxSplits: 1)
+                    if items.count == 2 {
+                        Text(String(items[0]).capitalized)
+                            .font(.headline)
+                            .padding(.bottom, 5)
+                        
+                        // Nutrients info
+                        let nutrients = String(items[1]).components(separatedBy: ", ")
+                        ForEach(nutrients, id: \.self) { nutrient in
+                            let parts = nutrient.split(separator: ":")
+                            if parts.count == 2 {
+                                let name = String(parts[0]) + ":"
+                                let values = String(parts[1]).trimmingCharacters(in: .whitespaces)
+                                
+                                HStack(spacing: 10) {
+                                    Circle()
+                                        .fill(colorForMacro(name))
+                                        .frame(width: 8, height: 8)
+                                    
+                                    Text(name)
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .frame(width: 80, alignment: .leading)
+                                    
+                                    Text(values)
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    
+                                    if name == "Calories:" {
+                                        Text("kcal")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    } else {
+                                        Text("g")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Clear Button
+                        Button(action: {
+                            foodSearch = ""
+                            foodInfo = ""
+                            showFoodInfo = false
+                        }) {
+                            Text("Clear")
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 8)
+                                .background(Color.mhaSalmon)
+                                .cornerRadius(20)
+                        }
+                        .padding(.top, 10)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                }
+                .padding()
+                .background(.white)
+                .cornerRadius(12)
+                .padding(.horizontal)
+            }
+        }
+    }
     // MARK: - Helper Functions
     
     private func generateRandomID(length: Int = 16) -> String {

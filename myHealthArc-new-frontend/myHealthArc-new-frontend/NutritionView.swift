@@ -145,17 +145,20 @@ struct NutritionView: View {
                                     
                                     Text(macro.value)
                                         .font(.footnote)
+                                        .fontWeight(.medium)
                                         .foregroundColor(colorForMacro(macro.name))
                                 }
                                 
                                 if(macro.name == "Calories:"){
                                     Text("kcal")
                                         .font(.caption)
-                                        .foregroundColor(colorScheme == .dark ? Color.white : Color.gray)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(Color.mhaGreen)
                                 }
                                 else{
                                     Text("g")
                                         .font(.caption)
+                                        .fontWeight(.medium)
                                         .foregroundColor(colorForMacro(macro.name))
                                 }
                             }

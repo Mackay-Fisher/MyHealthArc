@@ -122,9 +122,11 @@ struct NutritionView: View {
                             globalSelectedMealId = meal.id
                             showForm = true
                         }) {
-                            Image(systemName: "pencil")
-                                .foregroundColor(Color.mhaPurple)
+                            Image("pencil")
+                                .resizable()
+                                .scaledToFit()
                                 .padding(6)
+                                .frame(width: 30)
                         }
                         .buttonStyle(PlainButtonStyle())
                     }

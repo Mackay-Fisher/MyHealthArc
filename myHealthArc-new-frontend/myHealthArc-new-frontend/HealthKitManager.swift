@@ -1,4 +1,3 @@
-//
 //  HealthKitManager.swift
 //  myHealthArc-new-frontend
 //
@@ -59,7 +58,6 @@ class HealthKitBackgroundManager {
             }
         }
     }
-
 
     // MARK: - Perform Master Sync
     func syncMasterData(completion: @escaping (Bool) -> Void) {
@@ -166,43 +164,68 @@ extension HealthKitBackgroundManager {
 
     // MARK: - Sync Samples to Database
     private func syncSamplesToDatabase(samples: [HKQuantitySample], category: String) {
+        // Map HealthKit samples to dictionaries for JSON serialization
         let dataToSync = samples.map { sample -> [String: Any] in
             return [
-                "startDate": sample.startDate,
-                "endDate": sample.endDate,
+                "startDate": ISO8601DateFormatter().string(from: sample.startDate),
+                "endDate": ISO8601DateFormatter().string(from: sample.endDate),
                 "value": sample.quantity.doubleValue(for: HKUnit.count()), // Adjust the unit as needed
                 "type": sample.quantityType.identifier,
-                "category": category
+                "category": category,
+                "userHash": "realUserHash123" // Replace with actual user identifier if available
             ]
         }
 
-        // Log data for validation
-        print("Synced \(category.capitalized) Data:")
-        for data in dataToSync {
-            print(data)
+        // Wrap the array in a dictionary
+        let payload: [String: Any] = [
+            "data": dataToSync
+        ]
+
+        // Print the data being sent for debugging
+        print("\n===== Data Being Sent for \(category.capitalized) Sync =====")
+        print(payload)
+        print("====================================================\n")
+
+        // Ensure the URL is valid
+        guard let url = URL(string: "https://bbc6-198-217-29-75.ngrok-free.app/healthFitness/update\(category.capitalized)") else {
+            print("Invalid URL for \(category).")
+            return
         }
 
-        // Commented out the backend sync as it's not implemented yet
-        /*
-        guard let url = URL(string: "https://your-backend.com/health-data") else { return }
+        // Prepare the HTTP request
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         do {
-            let body = try JSONSerialization.data(withJSONObject: dataToSync, options: [])
+            // Serialize the payload into JSON
+            let body = try JSONSerialization.data(withJSONObject: payload, options: [])
             request.httpBody = body
 
+            // Perform the request
             URLSession.shared.dataTask(with: request) { data, response, error in
                 if let error = error {
-                    print("Error syncing data to database: \(error.localizedDescription)")
-                } else {
-                    print("\(category.capitalized) data successfully synced to database.")
+                    print("Error syncing \(category) data: \(error.localizedDescription)")
+                } else if let httpResponse = response as? HTTPURLResponse {
+                    print("\(category.capitalized) data sync response: \(httpResponse.statusCode)")
+                }
+
+                // Log response body for debugging
+                if let data = data, let responseBody = String(data: data, encoding: .utf8) {
+                    print("\(category.capitalized) data sync response body: \(responseBody)")
                 }
             }.resume()
         } catch {
-            print("Error serializing data: \(error.localizedDescription)")
+            print("Error serializing \(category) data: \(error.localizedDescription)")
         }
-        */
+    }
+
+
+}
+
+extension Date {
+    func iso8601String() -> String {
+        let formatter = ISO8601DateFormatter()
+        return formatter.string(from: self)
     }
 }

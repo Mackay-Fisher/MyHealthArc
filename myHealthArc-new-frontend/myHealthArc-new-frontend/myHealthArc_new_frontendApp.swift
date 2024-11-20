@@ -48,16 +48,19 @@ struct myHealthArc_new_frontendApp: App {
         }
         var body: some Scene {
             WindowGroup {
-                if isLoggedIn {
-                    Tabs(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
-                }
-                else if hasSignedUp {
-                    ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
-                }
-                else {
-                    //LoginView(isLoggedIn: $isLoggedIn)
-                    AppOpenScreen(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
-                }
-            }
+                        HealthSyncPreviewView()
+                    }
+//            WindowGroup {
+//                if isLoggedIn {
+//                    Tabs(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
+//                }
+//                else if hasSignedUp {
+//                    ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
+//                }
+//                else {
+//                    //LoginView(isLoggedIn: $isLoggedIn)
+//                    AppOpenScreen(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
+//                }
+//            }
         }
 }

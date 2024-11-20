@@ -26,6 +26,7 @@
 		8F161C3E2CC1B36400E726E7 /* myHealthArc_new_frontendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C3D2CC1B36400E726E7 /* myHealthArc_new_frontendTests.swift */; };
 		8F161C482CC1B36400E726E7 /* myHealthArc_new_frontendUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C472CC1B36400E726E7 /* myHealthArc_new_frontendUITests.swift */; };
 		8F161C4A2CC1B36400E726E7 /* myHealthArc_new_frontendUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C492CC1B36400E726E7 /* myHealthArc_new_frontendUITestsLaunchTests.swift */; };
+		F46F23792CEE94C200799029 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = F46F23782CEE94C200799029 /* SwiftKeychainWrapper */; };
 		F47367C02CE4026400D58353 /* ChatbotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47367BF2CE4026400D58353 /* ChatbotView.swift */; };
 		F47367C32CE4051800D58353 /* OpenAISwift in Frameworks */ = {isa = PBXBuildFile; productRef = F47367C22CE4051800D58353 /* OpenAISwift */; };
 		F47367C52CE4058D00D58353 /* ChatbotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47367C42CE4057C00D58353 /* ChatbotViewModel.swift */; };
@@ -86,6 +87,7 @@
 			files = (
 				F47367C82CE422AB00D58353 /* OpenAI in Frameworks */,
 				F47367C32CE4051800D58353 /* OpenAISwift in Frameworks */,
+				F46F23792CEE94C200799029 /* SwiftKeychainWrapper in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,6 +271,7 @@
 			packageReferences = (
 				F47367C12CE4051800D58353 /* XCRemoteSwiftPackageReference "OpenAISwift" */,
 				F47367C62CE422AB00D58353 /* XCRemoteSwiftPackageReference "OpenAI" */,
+				F46F23772CEE94C200799029 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 			);
 			productRefGroup = 8F161C2A2CC1B36200E726E7 /* Products */;
 			projectDirPath = "";
@@ -670,6 +673,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		F46F23772CEE94C200799029 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jrendel/SwiftKeychainWrapper";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.1;
+			};
+		};
 		F47367C12CE4051800D58353 /* XCRemoteSwiftPackageReference "OpenAISwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/adamrushy/OpenAISwift";
@@ -689,6 +700,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		F46F23782CEE94C200799029 /* SwiftKeychainWrapper */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F46F23772CEE94C200799029 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */;
+			productName = SwiftKeychainWrapper;
+		};
 		F47367C22CE4051800D58353 /* OpenAISwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F47367C12CE4051800D58353 /* XCRemoteSwiftPackageReference "OpenAISwift" */;

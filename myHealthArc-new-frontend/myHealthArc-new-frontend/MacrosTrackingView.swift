@@ -18,6 +18,7 @@ struct MacrosTrackingView: View {
     @State private var showSheet = false
     
     var body: some View {
+        
         NavigationView {
             VStack(spacing: 20) {
                     HStack{Image ("pills") //change to macros image
@@ -115,7 +116,7 @@ struct MacroProgressView: View {
                 Circle()
                     .stroke(Color(.systemGray5), lineWidth: 17)
                 Circle()
-                    .trim(from: 0, to: progress)
+                    .trim(from: 0, to: progress) // Adjust for progress
                     .stroke(color, lineWidth: 17)
                     .rotationEffect(.degrees(-90))
                 

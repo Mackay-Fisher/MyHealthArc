@@ -91,7 +91,7 @@ struct NutritionView: View {
                 HStack {
                     Spacer()
                     Text("Your Meals")
-                        .font(.title3)
+                        .font(.title2)
                         .padding(.top)
                     Spacer()
                 }
@@ -105,7 +105,7 @@ struct NutritionView: View {
                 }
             }
             
-            Spacer().frame(height: 5)
+            Spacer().frame(height: 2)
             
             // Calendar View
             calendarView
@@ -231,7 +231,7 @@ struct NutritionView: View {
     //MARK: - Calendar view
     private var calendarView: some View {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
+                HStack(spacing: 5) {
                     ForEach(getCurrentWeek(), id: \.self) { date in
                         VStack {
                             Text(date, formatter: DateFormatter.dayOfWeekFormatter)

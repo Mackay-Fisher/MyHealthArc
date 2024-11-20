@@ -701,10 +701,10 @@ struct EditMeal: View {
                 // Your Form with sections
                 Form {
                     Section(header: Text("Current Values")) {
-                        Text("Original Protein: \(meal.totalProtein.value)")
-                        Text("Original Carbs: \(meal.totalCarbs.value)")
-                        Text("Original Fats: \(meal.totalFats.value)")
-                        Text("Original Calories: \(meal.totalCalories.value)")
+                        Text("Protein: \(meal.totalProtein.value)")
+                        Text("Carbs: \(meal.totalCarbs.value)")
+                        Text("Fats: \(meal.totalFats.value)")
+                        Text("Calories: \(meal.totalCalories.value)")
                     }
                     
                     Section(header: Text("Edit Meal Nutrition")) {
@@ -786,7 +786,7 @@ struct EditMeal: View {
                                         Slider(value: Binding(
                                             get: { Double(fats) ?? 0 },
                                             set: { fats = String(format: "%.1f", $0) }
-                                        ), in: 0...150, step: 0.1)
+                                        ), in: minFats...maxFats, step: 0.1)
                                         .accentColor(.red)
 
                                         Text("\(maxFats, specifier: "%.1f")g")
@@ -818,7 +818,7 @@ struct EditMeal: View {
                                         Slider(value: Binding(
                                             get: { Double(calories) ?? 0 },
                                             set: { calories = String(format: "%.0f", $0) }
-                                        ), in: 0...1500, step: 1)
+                                        ), in: minCalories...maxCalories, step: 1)
                                         .accentColor(Color.mhaGreen)
 
                                         Text("\(maxCalories, specifier: "%.0f") kcal")

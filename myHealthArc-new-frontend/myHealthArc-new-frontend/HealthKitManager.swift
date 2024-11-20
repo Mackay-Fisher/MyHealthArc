@@ -99,7 +99,9 @@ extension HealthKitBackgroundManager {
 
         do {
             try await healthStore.requestAuthorization(toShare: [], read: healthTypesToRead)
-            return true
+            let isAuthorized = healthStore.authorizationStatus(for: HKObjectType.quantityType(forIdentifier: .heartRate)!) == .sharingAuthorized
+            print("HealthKit authorization status for heartRate: \(isAuthorized ? "Authorized" : "Not Authorized")")
+            return isAuthorized
         } catch {
             print("HealthKit authorization failed: \(error.localizedDescription)")
             return false
@@ -164,61 +166,49 @@ extension HealthKitBackgroundManager {
 
     // MARK: - Sync Samples to Database
     private func syncSamplesToDatabase(samples: [HKQuantitySample], category: String) {
-        // Map HealthKit samples to dictionaries for JSON serialization
         let dataToSync = samples.map { sample -> [String: Any] in
             return [
-                "startDate": ISO8601DateFormatter().string(from: sample.startDate),
-                "endDate": ISO8601DateFormatter().string(from: sample.endDate),
+                "startDate": sample.startDate.iso8601String(),
+                "endDate": sample.endDate.iso8601String(),
                 "value": sample.quantity.doubleValue(for: HKUnit.count()), // Adjust the unit as needed
                 "type": sample.quantityType.identifier,
                 "category": category,
-                "userHash": "realUserHash123" // Replace with actual user identifier if available
+                "userHash": "dummyHash123" // Add a dummy user hash for testing
             ]
         }
-
-        // Wrap the array in a dictionary
-        let payload: [String: Any] = [
-            "data": dataToSync
-        ]
-
-        // Print the data being sent for debugging
-        print("\n===== Data Being Sent for \(category.capitalized) Sync =====")
-        print(payload)
-        print("====================================================\n")
-
-        // Ensure the URL is valid
-        guard let url = URL(string: "https://bbc6-198-217-29-75.ngrok-free.app/healthFitness/update\(category.capitalized)") else {
-            print("Invalid URL for \(category).")
+        
+        print("Data being sent to dummyPath:", dataToSync)
+        
+        // Replace the placeholder with your actual ngrok URL
+        let ngrokUrl = "https://bbc6-198-217-29-75.ngrok-free.app" // Update with your active ngrok URL
+        guard let url = URL(string: "\(ngrokUrl)/healthFitness/dummyPath") else {
+            print("Invalid URL for dummyPath")
             return
         }
-
-        // Prepare the HTTP request
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         do {
-            // Serialize the payload into JSON
-            let body = try JSONSerialization.data(withJSONObject: payload, options: [])
+            let body = try JSONSerialization.data(withJSONObject: dataToSync, options: [])
             request.httpBody = body
 
-            // Perform the request
             URLSession.shared.dataTask(with: request) { data, response, error in
                 if let error = error {
-                    print("Error syncing \(category) data: \(error.localizedDescription)")
+                    print("Error sending to dummyPath:", error.localizedDescription)
                 } else if let httpResponse = response as? HTTPURLResponse {
-                    print("\(category.capitalized) data sync response: \(httpResponse.statusCode)")
-                }
-
-                // Log response body for debugging
-                if let data = data, let responseBody = String(data: data, encoding: .utf8) {
-                    print("\(category.capitalized) data sync response body: \(responseBody)")
+                    print("Response status code from dummyPath:", httpResponse.statusCode)
+                    if let responseData = data, let jsonString = String(data: responseData, encoding: .utf8) {
+                        print("Response body from dummyPath:", jsonString)
+                    }
                 }
             }.resume()
         } catch {
-            print("Error serializing \(category) data: \(error.localizedDescription)")
+            print("Error serializing data for dummyPath:", error.localizedDescription)
         }
     }
+
 
 
 }

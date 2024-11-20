@@ -32,6 +32,8 @@ struct SignUpView: View {
     @State private var acceptedTerms: Bool = false
     @State private var ageVerified: Bool = false
     @State private var showDatePicker: Bool = false
+    @State private var showAlert: Bool = true
+    @State private var navigateToServicesView: Bool = false
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
     
@@ -101,22 +103,27 @@ struct SignUpView: View {
                     }
                 }
                 if formIsValid {
-                        NavigationLink(destination: ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)) {
-                            Text("Sign Up")
-                                .frame(width: 200, height: 30)
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(Color.mhaPurple)
-                                .cornerRadius(50)
-                        }
-                    } else {
+                    NavigationLink(destination: ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp, showAlert: $showAlert), isActive: $navigateToServicesView) {
+                        EmptyView()
+                    }
+                    Button(action: {
+                        signUp()
+                    }) {
                         Text("Sign Up")
                             .frame(width: 200, height: 30)
                             .foregroundColor(.white)
                             .padding()
-                            .background(Color.gray)
+                            .background(Color.mhaPurple)
                             .cornerRadius(50)
-                    }
+                        }
+                } else {
+                    Text("Sign Up")
+                        .frame(width: 200, height: 30)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.gray)
+                        .cornerRadius(50)
+                }
             }
             .background(colorScheme == .dark ? Color.black : Color.lightbackground)
             .navigationTitle("Sign Up")
@@ -136,8 +143,8 @@ struct SignUpView: View {
             if let data = data {
                 if let user = try? JSONDecoder().decode(User.self, from: data) {
                     DispatchQueue.main.async {
-                        isLoggedIn = true
-                        
+                        //isLoggedIn = true
+                        navigateToServicesView = true
                     }
                 }
             }

@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import LocalAuthentication
+import SwiftKeychainWrapper
 
 struct LoginDTO: Codable {
     var email: String
@@ -16,6 +18,7 @@ struct LoginView: View {
     @State private var username = ""
     @State private var password = ""
     @Binding var isLoggedIn: Bool
+    @State private var showFaceIDPrompt: Bool = false
     
     @Environment(\.colorScheme) var colorScheme
     
@@ -71,6 +74,11 @@ struct LoginView: View {
                 .padding(.top)
                 .disabled(username.isEmpty || password.isEmpty)
             }
+            .onAppear {
+                if KeychainWrapper.standard.bool(forKey: "isFaceIDEnabled") == true {
+                    authenticateWithFaceID()
+                }
+            }
             
             /*.navigationDestination(isPresented: $isLoggedIn) {
                     View() // Destination view
@@ -79,7 +87,7 @@ struct LoginView: View {
        //}
     }
 
-    func login() {
+    private func login() {
         var request = URLRequest(url: URL(string: "http://localhost:8080/users/login")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -91,6 +99,7 @@ struct LoginView: View {
                 if let user = try? JSONDecoder().decode(User.self, from: data) {
                     DispatchQueue.main.async {
                         isLoggedIn = true
+                        KeychainWrapper.standard.set(user.userHash, forKey: "userHash")
                     }
                 } else {
                     DispatchQueue.main.async {
@@ -99,6 +108,64 @@ struct LoginView: View {
                 }
             }
         }.resume()
+    }
+
+    private func checkFaceID() {
+        if KeychainWrapper.standard.bool(forKey: "isFaceIDEnabled") == true {
+            authenticateWithFaceID()
+        }
+    }
+
+    private func authenticateWithFaceID() {
+        let context = LAContext()
+        var error: NSError?
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Log in with FaceID") { success, authenticationError in
+                DispatchQueue.main.async {
+                    if success {
+                        if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
+                            Task {
+                                do {
+                                    let user = try await fetchUserDetails(userHash: userHash)
+                                    isLoggedIn = true
+                                    print("FaceID authentication successful")
+                                } catch {
+                                    print("Failed to fetch user details: \(error.localizedDescription)")
+                                    isLoggedIn = false
+                                }
+                            }
+                        } else {
+                            print("KeychainWrapper: Failed to retrieve userHash")
+                        }
+                    } else {
+                        if let error = authenticationError {
+                            print("Authentication failed: \(error.localizedDescription)")
+                        }
+                        isLoggedIn = false
+                    }
+                }
+            }
+        } else {
+            if let error = error {
+                print("Biometrics not available: \(error.localizedDescription)")
+            }
+            isLoggedIn = false
+        }
+    }
+
+    private func fetchUserDetails(userHash: String) async throws -> User {
+        guard let url = URL(string: "http://localhost:8080/users/\(userHash)") else {
+            throw URLError(.badURL)
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        let user = try JSONDecoder().decode(User.self, from: data)
+        return user
     }
 }
 

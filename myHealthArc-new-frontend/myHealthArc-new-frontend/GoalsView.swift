@@ -15,99 +15,112 @@ struct FitnessGoal: Identifiable {
 
 class FitnessGoalsViewModel: ObservableObject {
     // MARK: - Published Properties
-    //idk if this is correct ngl
-    @Published var stepCount: Int {
-        didSet { saveGoals() }
-    }
-    @Published var exerciseMinutes: Int {
-        didSet { saveGoals() }
-    }
-    @Published var caloriesBurned: Int {
-        didSet { saveGoals() }
-    }
-    @Published var timeAsleep: Int {
-        didSet { saveGoals() }
-    }
-    @Published var waterIntake: Int {
-        didSet { saveGoals() }
-    }
-    @Published var workoutsPerWeek: Int {
-        didSet { saveGoals() }
-    }
-    @Published var proteinGoal: Int {
-        didSet { saveGoals() }
-    }
-    @Published var carbsGoal: Int {
-        didSet { saveGoals() }
-    }
-    @Published var fatGoal: Int {
-        didSet { saveGoals() }
-    }
-    @Published var caloriesConsumed: Int {
-        didSet { saveGoals() }
-    }
-    
-    // Streak variables
-    @Published var stepsStreak: Int {
-        didSet { saveStreaks() }
-    }
-    @Published var exerciseStreak: Int {
-        didSet { saveStreaks() }
-    }
-    @Published var calBurnedStreak: Int {
-        didSet { saveStreaks() }
-    }
-    @Published var sleepStreak: Int {
-        didSet { saveStreaks() }
-    }
-    @Published var waterStreak: Int {
-        didSet { saveStreaks() }
-    }
-    @Published var workoutsStreak: Int {
-        didSet { saveStreaks() }
-    }
-    @Published var nutritionStreak: Int {
-        didSet { saveStreaks() }
-    }
-    
-    init() {
-        // Initialize with default values
-        self.stepCount = UserDefaults.standard.integer(forKey: "stepCount")
-        self.exerciseMinutes = UserDefaults.standard.integer(forKey: "exerciseMinutes")
-        self.caloriesBurned = UserDefaults.standard.integer(forKey: "caloriesBurned")
-        self.timeAsleep = UserDefaults.standard.integer(forKey: "timeAsleep")
-        self.waterIntake = UserDefaults.standard.integer(forKey: "waterIntake")
-        self.workoutsPerWeek = UserDefaults.standard.integer(forKey: "workoutsPerWeek")
-        self.proteinGoal = UserDefaults.standard.integer(forKey: "proteinGoal")
-        self.carbsGoal = UserDefaults.standard.integer(forKey: "carbsGoal")
-        self.fatGoal = UserDefaults.standard.integer(forKey: "fatGoal")
-        self.caloriesConsumed = UserDefaults.standard.integer(forKey: "caloriesConsumed")
-        
-        // Initialize streaks - 0
-        self.stepsStreak = UserDefaults.standard.integer(forKey: "stepsStreak")
-        self.exerciseStreak = UserDefaults.standard.integer(forKey: "exerciseStreak")
-        self.calBurnedStreak = UserDefaults.standard.integer(forKey: "calBurnedStreak")
-        self.sleepStreak = UserDefaults.standard.integer(forKey: "sleepStreak")
-        self.waterStreak = UserDefaults.standard.integer(forKey: "waterStreak")
-        self.workoutsStreak = UserDefaults.standard.integer(forKey: "workoutsStreak")
-        self.nutritionStreak = UserDefaults.standard.integer(forKey: "nutritionStreak")
-        
-        // If no saved values exist, set defaults
-        if stepCount == 0 { self.stepCount = 10000 }
-        if exerciseMinutes == 0 { self.exerciseMinutes = 30 }
-        if caloriesBurned == 0 { self.caloriesBurned = 500 }
-        if timeAsleep == 0 { self.timeAsleep = 8 }
-        if waterIntake == 0 { self.waterIntake = 8 }
-        if workoutsPerWeek == 0 { self.workoutsPerWeek = 6 }
-        if proteinGoal == 0 { self.proteinGoal = 60 }
-        if carbsGoal == 0 { self.carbsGoal = 300 }
-        if fatGoal == 0 { self.fatGoal = 50 }
-        if caloriesConsumed == 0 { self.caloriesConsumed = 2200 }
-    }
-    
-    // MARK: - Persistence Functions
+    @Published var stepCount: Int
+    @Published var exerciseMinutes: Int
+    @Published var caloriesBurned: Int
+    @Published var timeAsleep: Int
+    @Published var waterIntake: Int
+    @Published var workoutsPerWeek: Int
+    @Published var proteinGoal: Int
+    @Published var carbsGoal: Int
+    @Published var fatGoal: Int
+    @Published var caloriesConsumed: Int
 
-    private func saveGoals() {
+    // Streak variables
+    @Published var stepsStreak: Int
+    @Published var exerciseStreak: Int
+    @Published var calBurnedStreak: Int
+    @Published var sleepStreak: Int
+    @Published var waterStreak: Int
+    @Published var workoutsStreak: Int
+    @Published var nutritionStreak: Int
+
+    private let apiClient = APIClient()
+    private let userHash = "dummy_user_hash"
+
+    init() {
+        // Load saved defaults as initial values
+        stepCount = UserDefaults.standard.integer(forKey: "stepCount")
+        exerciseMinutes = UserDefaults.standard.integer(forKey: "exerciseMinutes")
+        caloriesBurned = UserDefaults.standard.integer(forKey: "caloriesBurned")
+        timeAsleep = UserDefaults.standard.integer(forKey: "timeAsleep")
+        waterIntake = UserDefaults.standard.integer(forKey: "waterIntake")
+        workoutsPerWeek = UserDefaults.standard.integer(forKey: "workoutsPerWeek")
+        proteinGoal = UserDefaults.standard.integer(forKey: "proteinGoal")
+        carbsGoal = UserDefaults.standard.integer(forKey: "carbsGoal")
+        fatGoal = UserDefaults.standard.integer(forKey: "fatGoal")
+        caloriesConsumed = UserDefaults.standard.integer(forKey: "caloriesConsumed")
+
+        stepsStreak = UserDefaults.standard.integer(forKey: "stepsStreak")
+        exerciseStreak = UserDefaults.standard.integer(forKey: "exerciseStreak")
+        calBurnedStreak = UserDefaults.standard.integer(forKey: "calBurnedStreak")
+        sleepStreak = UserDefaults.standard.integer(forKey: "sleepStreak")
+        waterStreak = UserDefaults.standard.integer(forKey: "waterStreak")
+        workoutsStreak = UserDefaults.standard.integer(forKey: "workoutsStreak")
+        nutritionStreak = UserDefaults.standard.integer(forKey: "nutritionStreak")
+
+        // Fetch latest data from API
+        fetchGoalsFromAPI()
+        fetchStreaksFromAPI()
+    }
+
+    // MARK: - API Calls
+    private func fetchGoalsFromAPI() {
+        apiClient.fetchGoals(userHash: userHash) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let goals):
+                    self?.updateGoalsFromAPI(goals: goals)
+                case .failure(let error):
+                    print("Failed to fetch goals: \(error)")
+                }
+            }
+        }
+    }
+
+    private func fetchStreaksFromAPI() {
+        apiClient.fetchStreaks(userHash: userHash) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let streaks):
+                    self?.updateStreaksFromAPI(streaks: streaks)
+                case .failure(let error):
+                    print("Failed to fetch streaks: \(error)")
+                }
+            }
+        }
+    }
+
+    // MARK: - Update Methods
+    private func updateGoalsFromAPI(goals: [String: Int]) {
+        stepCount = goals["stepCount"] ?? stepCount
+        exerciseMinutes = goals["exerciseMinutes"] ?? exerciseMinutes
+        caloriesBurned = goals["caloriesBurned"] ?? caloriesBurned
+        timeAsleep = goals["timeAsleep"] ?? timeAsleep
+        waterIntake = goals["waterIntake"] ?? waterIntake
+        workoutsPerWeek = goals["workoutsPerWeek"] ?? workoutsPerWeek
+        proteinGoal = goals["proteinGoal"] ?? proteinGoal
+        carbsGoal = goals["carbsGoal"] ?? carbsGoal
+        fatGoal = goals["fatGoal"] ?? fatGoal
+        caloriesConsumed = goals["caloriesConsumed"] ?? caloriesConsumed
+
+        saveGoalsToUserDefaults()
+    }
+
+    private func updateStreaksFromAPI(streaks: [String: Int]) {
+        stepsStreak = streaks["stepsStreak"] ?? stepsStreak
+        exerciseStreak = streaks["exerciseStreak"] ?? exerciseStreak
+        calBurnedStreak = streaks["calBurnedStreak"] ?? calBurnedStreak
+        sleepStreak = streaks["sleepStreak"] ?? sleepStreak
+        waterStreak = streaks["waterStreak"] ?? waterStreak
+        workoutsStreak = streaks["workoutsStreak"] ?? workoutsStreak
+        nutritionStreak = streaks["nutritionStreak"] ?? nutritionStreak
+
+        saveStreaksToUserDefaults()
+    }
+
+    // MARK: - Persistence
+    private func saveGoalsToUserDefaults() {
         UserDefaults.standard.set(stepCount, forKey: "stepCount")
         UserDefaults.standard.set(exerciseMinutes, forKey: "exerciseMinutes")
         UserDefaults.standard.set(caloriesBurned, forKey: "caloriesBurned")
@@ -119,8 +132,8 @@ class FitnessGoalsViewModel: ObservableObject {
         UserDefaults.standard.set(fatGoal, forKey: "fatGoal")
         UserDefaults.standard.set(caloriesConsumed, forKey: "caloriesConsumed")
     }
-    
-    private func saveStreaks() {
+
+    private func saveStreaksToUserDefaults() {
         UserDefaults.standard.set(stepsStreak, forKey: "stepsStreak")
         UserDefaults.standard.set(exerciseStreak, forKey: "exerciseStreak")
         UserDefaults.standard.set(calBurnedStreak, forKey: "calBurnedStreak")
@@ -129,7 +142,7 @@ class FitnessGoalsViewModel: ObservableObject {
         UserDefaults.standard.set(workoutsStreak, forKey: "workoutsStreak")
         UserDefaults.standard.set(nutritionStreak, forKey: "nutritionStreak")
     }
-    
+
     // MARK: - Streak Functions
     func updateStepsStreak(stepsCompleted: Int) {
         if stepsCompleted >= stepCount {
@@ -139,6 +152,49 @@ class FitnessGoalsViewModel: ObservableObject {
         }
     }
     
+    var streaks: [FitnessGoal] {
+            [
+                FitnessGoal(name: "Steps", value: stepsStreak, color: GoalColors.steps),
+                FitnessGoal(name: "Exercise", value: exerciseStreak, color: GoalColors.exercise),
+                FitnessGoal(name: "Calories Burned", value: calBurnedStreak, color: GoalColors.calories),
+                FitnessGoal(name: "Sleep", value: sleepStreak, color: GoalColors.sleep),
+                FitnessGoal(name: "Water", value: waterStreak, color: GoalColors.water),
+                FitnessGoal(name: "Workouts", value: workoutsStreak, color: GoalColors.workouts),
+                FitnessGoal(name: "Nutrition", value: nutritionStreak, color: GoalColors.nutrition)
+            ]
+        }
+
+        func loadGoalsAndStreaks() {
+            let apiClient = APIClient()
+            let userHash = "dummy-user-hash" // Replace with dynamic user hash as needed
+            
+            apiClient.fetchGoals(userHash: userHash) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let goals):
+                        self.stepCount = goals["stepCount"] ?? self.stepCount
+                        self.exerciseMinutes = goals["exerciseMinutes"] ?? self.exerciseMinutes
+                        // Map other goals here...
+                    case .failure(let error):
+                        print("Failed to fetch goals: \(error)")
+                    }
+                }
+            }
+            
+            apiClient.fetchStreaks(userHash: userHash) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let streaks):
+                        self.stepsStreak = streaks["stepsStreak"] ?? self.stepsStreak
+                        self.exerciseStreak = streaks["exerciseStreak"] ?? self.exerciseStreak
+                        // Map other streaks here...
+                    case .failure(let error):
+                        print("Failed to fetch streaks: \(error)")
+                    }
+                }
+            }
+        }
+
     func updateExerciseStreak(minutesCompleted: Int) {
         if minutesCompleted >= exerciseMinutes {
             exerciseStreak += 1
@@ -146,7 +202,7 @@ class FitnessGoalsViewModel: ObservableObject {
             exerciseStreak = 0
         }
     }
-    
+
     func updateCalorieStreak(caloriesBurnedToday: Int) {
         if caloriesBurnedToday >= caloriesBurned {
             calBurnedStreak += 1
@@ -154,7 +210,7 @@ class FitnessGoalsViewModel: ObservableObject {
             calBurnedStreak = 0
         }
     }
-    
+
     func updateSleepStreak(hoursSlept: Int) {
         if hoursSlept >= timeAsleep {
             sleepStreak += 1
@@ -162,7 +218,7 @@ class FitnessGoalsViewModel: ObservableObject {
             sleepStreak = 0
         }
     }
-    
+
     func updateWaterStreak(glassesConsumed: Int) {
         if glassesConsumed >= waterIntake {
             waterStreak += 1
@@ -170,7 +226,7 @@ class FitnessGoalsViewModel: ObservableObject {
             waterStreak = 0
         }
     }
-    
+
     func updateWorkoutStreak(workoutsCompleted: Int) {
         if workoutsCompleted >= workoutsPerWeek {
             workoutsStreak += 1
@@ -178,7 +234,7 @@ class FitnessGoalsViewModel: ObservableObject {
             workoutsStreak = 0
         }
     }
-    
+
     func updateNutritionStreak(meetsNutritionGoals: Bool) {
         if meetsNutritionGoals {
             nutritionStreak += 1
@@ -186,28 +242,14 @@ class FitnessGoalsViewModel: ObservableObject {
             nutritionStreak = 0
         }
     }
-    
-    //check if nutrition goals are met
+
     func checkNutritionGoals(protein: Int, carbs: Int, fat: Int, calories: Int) -> Bool {
         let proteinMet = protein >= proteinGoal
         let carbsMet = carbs >= carbsGoal
         let fatMet = fat >= fatGoal
         let caloriesMet = calories <= caloriesConsumed
-        
+
         return proteinMet && carbsMet && fatMet && caloriesMet
-    }
-    
-    //create streak array
-    var streaks: [FitnessGoal] {
-        [
-            FitnessGoal(name: "Steps", value: stepsStreak, color: GoalColors.steps),
-            FitnessGoal(name: "Exercise", value: exerciseStreak, color: GoalColors.exercise),
-            FitnessGoal(name: "Cal Burned", value: calBurnedStreak, color: GoalColors.calories),
-            FitnessGoal(name: "Sleep", value: sleepStreak, color: GoalColors.sleep),
-            FitnessGoal(name: "Water", value: waterStreak, color: GoalColors.water),
-            FitnessGoal(name: "Workouts", value: workoutsStreak, color: GoalColors.workouts),
-            FitnessGoal(name: "Nutrition", value: nutritionStreak, color: GoalColors.nutrition)
-        ]
     }
 }
 

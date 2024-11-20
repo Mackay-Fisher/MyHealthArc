@@ -20,6 +20,8 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateHealthKit())
     app.migrations.add(CreateMedicationInteractions())
     app.migrations.add(CreateNutritionItem())
+    app.migrations.add(CreateUserGoals())  // Add fitness goals migration
+    app.migrations.add(CreateUserStreaks()) // Add fitness streaks migration
 
 
     app.views.use(.leaf)

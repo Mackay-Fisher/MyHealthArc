@@ -19,7 +19,6 @@
 		2528D6362CC9FB86000D5852 /* NutritionWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2528D6352CC9FB86000D5852 /* NutritionWidgetView.swift */; };
 		2562C0812CCA10CC009E4284 /* MedicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2562C0802CCA10CC009E4284 /* MedicationWidget.swift */; };
 		25D6E3B92CC9CBD2004A2B1A /* EditProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */; };
-		62DF06842CE0A726008C7F13 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 62DF06832CE0A726008C7F13 /* SwiftKeychainWrapper */; };
 		8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */; };
 		8F161C2F2CC1B36200E726E7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C2E2CC1B36200E726E7 /* ContentView.swift */; };
 		8F161C312CC1B36400E726E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8F161C302CC1B36400E726E7 /* Assets.xcassets */; };
@@ -27,6 +26,11 @@
 		8F161C3E2CC1B36400E726E7 /* myHealthArc_new_frontendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C3D2CC1B36400E726E7 /* myHealthArc_new_frontendTests.swift */; };
 		8F161C482CC1B36400E726E7 /* myHealthArc_new_frontendUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C472CC1B36400E726E7 /* myHealthArc_new_frontendUITests.swift */; };
 		8F161C4A2CC1B36400E726E7 /* myHealthArc_new_frontendUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C492CC1B36400E726E7 /* myHealthArc_new_frontendUITestsLaunchTests.swift */; };
+		F47367C02CE4026400D58353 /* ChatbotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47367BF2CE4026400D58353 /* ChatbotView.swift */; };
+		F47367C32CE4051800D58353 /* OpenAISwift in Frameworks */ = {isa = PBXBuildFile; productRef = F47367C22CE4051800D58353 /* OpenAISwift */; };
+		F47367C52CE4058D00D58353 /* ChatbotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47367C42CE4057C00D58353 /* ChatbotViewModel.swift */; };
+		F47367C82CE422AB00D58353 /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = F47367C72CE422AB00D58353 /* OpenAI */; };
+		F4ED25572CEC057600A3E53A /* MacrosTrackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4ED25562CEC057600A3E53A /* MacrosTrackingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +74,9 @@
 		8F161C432CC1B36400E726E7 /* myHealthArc-new-frontendUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "myHealthArc-new-frontendUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F161C472CC1B36400E726E7 /* myHealthArc_new_frontendUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myHealthArc_new_frontendUITests.swift; sourceTree = "<group>"; };
 		8F161C492CC1B36400E726E7 /* myHealthArc_new_frontendUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myHealthArc_new_frontendUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		F47367BF2CE4026400D58353 /* ChatbotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatbotView.swift; sourceTree = "<group>"; };
+		F47367C42CE4057C00D58353 /* ChatbotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatbotViewModel.swift; sourceTree = "<group>"; };
+		F4ED25562CEC057600A3E53A /* MacrosTrackingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacrosTrackingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,7 +84,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				62DF06842CE0A726008C7F13 /* SwiftKeychainWrapper in Frameworks */,
+				F47367C82CE422AB00D58353 /* OpenAI in Frameworks */,
+				F47367C32CE4051800D58353 /* OpenAISwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,7 +133,10 @@
 				5AD777E52CC330AF00DC2B8B /* myHealthArc-new-frontend.entitlements */,
 				8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */,
 				250FC23E2CC205900023AE43 /* AppOpenScreen.swift */,
+				F4ED25562CEC057600A3E53A /* MacrosTrackingView.swift */,
 				250FC23C2CC202C90023AE43 /* SignUpView.swift */,
+				F47367BF2CE4026400D58353 /* ChatbotView.swift */,
+				F47367C42CE4057C00D58353 /* ChatbotViewModel.swift */,
 				250FC2402CC208C80023AE43 /* TermsAndConditionsView.swift */,
 				250FC2362CC200D10023AE43 /* ServicesView.swift */,
 				250FC2322CC1F9CF0023AE43 /* LoginView.swift */,
@@ -183,9 +194,6 @@
 			dependencies = (
 			);
 			name = "myHealthArc-new-frontend";
-			packageProductDependencies = (
-				62DF06832CE0A726008C7F13 /* SwiftKeychainWrapper */,
-			);
 			productName = "myHealthArc-new-frontend";
 			productReference = 8F161C292CC1B36200E726E7 /* myHealthArc-new-frontend.app */;
 			productType = "com.apple.product-type.application";
@@ -259,7 +267,8 @@
 			);
 			mainGroup = 8F161C202CC1B36200E726E7;
 			packageReferences = (
-				62DF06822CE0A726008C7F13 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
+				F47367C12CE4051800D58353 /* XCRemoteSwiftPackageReference "OpenAISwift" */,
+				F47367C62CE422AB00D58353 /* XCRemoteSwiftPackageReference "OpenAI" */,
 			);
 			productRefGroup = 8F161C2A2CC1B36200E726E7 /* Products */;
 			projectDirPath = "";
@@ -305,9 +314,11 @@
 			files = (
 				25D6E3B92CC9CBD2004A2B1A /* EditProfilePage.swift in Sources */,
 				2528D6362CC9FB86000D5852 /* NutritionWidgetView.swift in Sources */,
+				F47367C52CE4058D00D58353 /* ChatbotViewModel.swift in Sources */,
 				250FC23B2CC201460023AE43 /* Tabs.swift in Sources */,
 				250FC23F2CC205900023AE43 /* AppOpenScreen.swift in Sources */,
 				2528D6282CC9DA8E000D5852 /* MedicationsView.swift in Sources */,
+				F4ED25572CEC057600A3E53A /* MacrosTrackingView.swift in Sources */,
 				250FC2412CC208C80023AE43 /* TermsAndConditionsView.swift in Sources */,
 				250FC2372CC200D10023AE43 /* ServicesView.swift in Sources */,
 				250FC2332CC1F9CF0023AE43 /* LoginView.swift in Sources */,
@@ -317,6 +328,7 @@
 				8F161C2F2CC1B36200E726E7 /* ContentView.swift in Sources */,
 				2562C0812CCA10CC009E4284 /* MedicationWidget.swift in Sources */,
 				8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */,
+				F47367C02CE4026400D58353 /* ChatbotView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,7 +417,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -462,7 +474,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -482,10 +494,9 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"myHealthArc-new-frontend/Preview Content\"";
-				DEVELOPMENT_TEAM = VN4F3T4H5F;
+				DEVELOPMENT_TEAM = K3F2M3VV44;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -516,10 +527,9 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"myHealthArc-new-frontend/Preview Content\"";
-				DEVELOPMENT_TEAM = VN4F3T4H5F;
+				DEVELOPMENT_TEAM = K3F2M3VV44;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -547,7 +557,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = VN4F3T4H5F;
+				DEVELOPMENT_TEAM = K3F2M3VV44;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
@@ -567,7 +577,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = VN4F3T4H5F;
+				DEVELOPMENT_TEAM = K3F2M3VV44;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
@@ -586,7 +596,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = VN4F3T4H5F;
+				DEVELOPMENT_TEAM = K3F2M3VV44;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
@@ -605,7 +615,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = VN4F3T4H5F;
+				DEVELOPMENT_TEAM = K3F2M3VV44;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
@@ -660,21 +670,34 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		62DF06822CE0A726008C7F13 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */ = {
+		F47367C12CE4051800D58353 /* XCRemoteSwiftPackageReference "OpenAISwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/jrendel/SwiftKeychainWrapper.git";
+			repositoryURL = "https://github.com/adamrushy/OpenAISwift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.1;
+				minimumVersion = 1.4.1;
+			};
+		};
+		F47367C62CE422AB00D58353 /* XCRemoteSwiftPackageReference "OpenAI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MacPaw/OpenAI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		62DF06832CE0A726008C7F13 /* SwiftKeychainWrapper */ = {
+		F47367C22CE4051800D58353 /* OpenAISwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 62DF06822CE0A726008C7F13 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */;
-			productName = SwiftKeychainWrapper;
+			package = F47367C12CE4051800D58353 /* XCRemoteSwiftPackageReference "OpenAISwift" */;
+			productName = OpenAISwift;
+		};
+		F47367C72CE422AB00D58353 /* OpenAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F47367C62CE422AB00D58353 /* XCRemoteSwiftPackageReference "OpenAI" */;
+			productName = OpenAI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

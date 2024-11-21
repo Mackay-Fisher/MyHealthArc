@@ -6,74 +6,185 @@
 //
 
 import SwiftUI
+import HealthKit
 
 struct VitalInfoView: View {
     let containerHeight: CGFloat // Height passed from the parent view
 
-    @State private var heartRate: Int = 72 // Heart rate in bpm
-    @State private var respiratoryRate: Int = 15 // Breaths per minute
-    @State private var systolicBP: Int = 120 // Systolic blood pressure
-    @State private var diastolicBP: Int = 80 // Diastolic blood pressure
-    @State private var heartRateData: [(String, Double)] = [ // Example heart rate data
-        ("12:00", 72), ("12:01", 74), ("12:02", 70),
-        ("12:03", 75), ("12:04", 72), ("12:05", 68)
-    ]
-    @State private var respiratoryData: [(String, Double)] = [ // Example respiratory rate data
-        ("12:00", 12), ("12:01", 13), ("12:02", 15),
-        ("12:03", 14), ("12:04", 15), ("12:05", 16)
-    ]
+    @State private var heartRate: Int = 0 // Heart rate in bpm
+    @State private var respiratoryRate: Int = 0 // Breaths per minute
+    @State private var systolicBP: Int = 0 // Systolic blood pressure
+    @State private var diastolicBP: Int = 0 // Diastolic blood pressure
+    @State private var heartRateData: [(String, Double)] = []
+    @State private var respiratoryData: [(String, Double)] = []
+    @State private var isLoading: Bool = true // Loading state
+
+    private let healthStore = HKHealthStore()
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                // Blood Pressure Section
-                VStack(spacing: 10) {
-                    Text("Blood Pressure")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    HStack {
-                        Text("Systolic: \(systolicBP) mmHg")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                        Spacer()
-                        Text("Diastolic: \(diastolicBP) mmHg")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
+        Group {
+            if isLoading {
+                ProgressView("Loading Vital Information...")
+                    .foregroundColor(.white)
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .background(Color.black.edgesIgnoringSafeArea(.all))
+            } else {
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Blood Pressure Section
+                        VStack(spacing: 10) {
+                            Text("Blood Pressure")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            HStack {
+                                Text("Systolic: \(systolicBP) mmHg")
+                                    .font(.subheadline)
+                                    .foregroundColor(.white)
+                                Spacer()
+                                Text("Diastolic: \(diastolicBP) mmHg")
+                                    .font(.subheadline)
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(15)
+
+                        // Heart Rate Section
+                        VitalSection(
+                            title: "Heart Rate",
+                            value: "\(heartRate) bpm",
+                            icon: "heart.fill",
+                            iconColor: .red,
+                            data: heartRateData,
+                            lineColor: .red,
+                            fillColor: Color.red.opacity(0.2)
+                        )
+
+                        // Respiratory Rate Section
+                        VitalSection(
+                            title: "Respiratory Rate",
+                            value: "\(respiratoryRate) breaths/min",
+                            icon: "lungs.fill",
+                            iconColor: .blue,
+                            data: respiratoryData,
+                            lineColor: .blue,
+                            fillColor: Color.blue.opacity(0.2)
+                        )
+                    }
+                    .padding()
+                    .frame(minHeight: containerHeight) // Dynamically adjust the height
+                }
+                .background(Color.black.edgesIgnoringSafeArea(.all))
+            }
+        }
+        .onAppear {
+            fetchVitalData()
+        }
+    }
+
+    // MARK: - Fetch Vital Data
+    private func fetchVitalData() {
+        let now = Date()
+        let startDate = Calendar.current.date(byAdding: .hour, value: -1, to: now)!
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: now, options: .strictStartDate)
+
+        let dispatchGroup = DispatchGroup()
+
+        // Fetch heart rate
+        dispatchGroup.enter()
+        fetchQuantityData(for: .heartRate, unit: HKUnit.count().unitDivided(by: HKUnit.minute()), predicate: predicate) { values in
+            if let latest = values.last {
+                self.heartRate = Int(latest.1)
+            }
+            self.heartRateData = values
+            dispatchGroup.leave()
+        }
+
+        // Fetch respiratory rate
+        dispatchGroup.enter()
+        fetchQuantityData(for: .respiratoryRate, unit: HKUnit.count().unitDivided(by: HKUnit.minute()), predicate: predicate) { values in
+            if let latest = values.last {
+                self.respiratoryRate = Int(latest.1)
+            }
+            self.respiratoryData = values
+            dispatchGroup.leave()
+        }
+
+        // Fetch blood pressure
+        dispatchGroup.enter()
+        fetchBloodPressureData(predicate: predicate) { systolic, diastolic in
+            self.systolicBP = systolic
+            self.diastolicBP = diastolic
+            dispatchGroup.leave()
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            self.isLoading = false
+        }
+    }
+
+    // MARK: - Fetch Quantity Data Helper
+    private func fetchQuantityData(for identifier: HKQuantityTypeIdentifier, unit: HKUnit, predicate: NSPredicate, completion: @escaping ([(String, Double)]) -> Void) {
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: identifier) else {
+            completion([])
+            return
+        }
+
+        let query = HKSampleQuery(sampleType: quantityType, predicate: predicate, limit: 10, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]) { _, samples, _ in
+            var results: [(String, Double)] = []
+            if let samples = samples as? [HKQuantitySample] {
+                for sample in samples {
+                    let timestamp = DateFormatter.localizedString(from: sample.startDate, dateStyle: .none, timeStyle: .short)
+                    let value = sample.quantity.doubleValue(for: unit)
+                    results.append((timestamp, value))
+                }
+            }
+            DispatchQueue.main.async {
+                completion(results)
+            }
+        }
+
+        healthStore.execute(query)
+    }
+
+    // MARK: - Fetch Blood Pressure Data Helper
+    private func fetchBloodPressureData(predicate: NSPredicate, completion: @escaping (Int, Int) -> Void) {
+        guard let systolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureSystolic),
+              let diastolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureDiastolic) else {
+            completion(0, 0)
+            return
+        }
+
+        let systolicQuery = HKSampleQuery(sampleType: systolicType, predicate: predicate, limit: 1, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]) { _, samples, _ in
+            let systolicValue = (samples?.first as? HKQuantitySample)?.quantity.doubleValue(for: HKUnit.millimeterOfMercury()) ?? 0
+            DispatchQueue.main.async {
+                let systolic = Int(systolicValue)
+
+                let diastolicQuery = HKSampleQuery(sampleType: diastolicType, predicate: predicate, limit: 1, sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]) { _, samples, _ in
+                    let diastolicValue = (samples?.first as? HKQuantitySample)?.quantity.doubleValue(for: HKUnit.millimeterOfMercury()) ?? 0
+                    DispatchQueue.main.async {
+                        let diastolic = Int(diastolicValue)
+                        completion(systolic, diastolic)
                     }
                 }
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(15)
-
-                // Heart Rate Section
-                VitalSection(
-                    title: "Heart Rate",
-                    value: "\(heartRate) bpm",
-                    icon: "heart.fill",
-                    iconColor: .red,
-                    data: heartRateData,
-                    lineColor: .red,
-                    fillColor: Color.red.opacity(0.2)
-                )
-
-                // Respiratory Rate Section
-                VitalSection(
-                    title: "Respiratory Rate",
-                    value: "\(respiratoryRate) breaths/min",
-                    icon: "lungs.fill",
-                    iconColor: .blue,
-                    data: respiratoryData,
-                    lineColor: .blue,
-                    fillColor: Color.blue.opacity(0.2)
-                )
+                self.healthStore.execute(diastolicQuery)
             }
-            .padding()
-            .frame(minHeight: containerHeight) // Dynamically adjust the height
         }
-        .background(Color.black.edgesIgnoringSafeArea(.all))
+
+        healthStore.execute(systolicQuery)
     }
 }
+
+// Preview
+struct VitalInfoView_Previews: PreviewProvider {
+    static var previews: some View {
+        VitalInfoView(containerHeight: 600)
+            .preferredColorScheme(.dark)
+    }
+}
+
 
 struct VitalSection: View {
     let title: String
@@ -223,14 +334,6 @@ struct GraphView: View {
             )
         }
         .frame(height: 150) // Adjust graph height as needed
-    }
-}
-
-// Preview
-struct VitalInfoView_Previews: PreviewProvider {
-    static var previews: some View {
-        VitalInfoView(containerHeight: 600)
-            .preferredColorScheme(.dark)
     }
 }
 

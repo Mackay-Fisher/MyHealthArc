@@ -6,16 +6,19 @@
 //
 
 import SwiftUI
+import HealthKit
 
 struct FitnessDataView: View {
     let containerHeight: CGFloat // Height passed from the parent view
 
-    @State private var stepCount: Int = 5548
-    @State private var caloriesBurned: Int = 177
-    @State private var distance: Double = 0.22 // in miles
-    @State private var exerciseTime: Int = 30 // in minutes
-    @State private var elevationGain: Int = 300 // in feet
-    @State private var activeEnergy: Int = 500 // Active calories burned
+    @State private var stepCount: Int = 0
+    @State private var caloriesBurned: Int = 0
+    @State private var distance: Double = 0.0 // in miles
+    @State private var exerciseTime: Int = 0 // in minutes
+    @State private var flightsClimbed: Int = 0 // in flights
+    @State private var moveMinutes: Int = 0 // Move minutes
+
+    private let healthStore = HKHealthStore()
 
     var body: some View {
         ScrollView {
@@ -45,13 +48,9 @@ struct FitnessDataView: View {
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(15)
-                .onTapGesture {
-                    // Add navigation or functionality for "Manage Goals"
-                    print("Manage Goals tapped!")
-                }
 
                 // Data Widgets Grid
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
+                LazyVGrid(columns: [GridItem(.flexible(minimum: 150)), GridItem(.flexible(minimum: 150))], spacing: 20) {
                     FitnessWidget(
                         title: "Step Count",
                         value: "\(stepCount)",
@@ -89,20 +88,20 @@ struct FitnessDataView: View {
                     )
 
                     FitnessWidget(
-                        title: "Elevation Gain",
-                        value: "\(elevationGain) ft",
-                        goal: "500 ft",
-                        progress: Double(elevationGain) / 500,
-                        icon: "triangle.fill",
+                        title: "Flights Climbed",
+                        value: "\(flightsClimbed)",
+                        goal: "20",
+                        progress: Double(flightsClimbed) / 20,
+                        icon: "airplane.departure",
                         iconColor: .orange
                     )
 
                     FitnessWidget(
-                        title: "Active Energy",
-                        value: "\(activeEnergy) kcal",
-                        goal: "800 kcal",
-                        progress: Double(activeEnergy) / 800,
-                        icon: "bolt.fill",
+                        title: "Move Minutes",
+                        value: "\(moveMinutes) min",
+                        goal: "30 min",
+                        progress: Double(moveMinutes) / 30,
+                        icon: "clock.fill",
                         iconColor: .yellow
                     )
                 }
@@ -111,6 +110,81 @@ struct FitnessDataView: View {
             .frame(minHeight: containerHeight) // Dynamically set the height
         }
         .background(Color.black.edgesIgnoringSafeArea(.all))
+        .onAppear {
+            fetchFitnessData()
+        }
+    }
+
+    // MARK: - Fetch Fitness Data
+    private func fetchFitnessData() {
+        let now = Date()
+        let startDate = Calendar.current.startOfDay(for: now)
+
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: now, options: .strictStartDate)
+        let dispatchGroup = DispatchGroup()
+
+        // Fetch step count
+        dispatchGroup.enter()
+        fetchQuantity(for: .stepCount, unit: HKUnit.count(), predicate: predicate) { value in
+            self.stepCount = Int(value)
+            dispatchGroup.leave()
+        }
+
+        // Fetch calories burned
+        dispatchGroup.enter()
+        fetchQuantity(for: .activeEnergyBurned, unit: HKUnit.kilocalorie(), predicate: predicate) { value in
+            self.caloriesBurned = Int(value)
+            dispatchGroup.leave()
+        }
+
+        // Fetch distance walked
+        dispatchGroup.enter()
+        fetchQuantity(for: .distanceWalkingRunning, unit: HKUnit.mile(), predicate: predicate) { value in
+            self.distance = value
+            dispatchGroup.leave()
+        }
+
+        // Fetch exercise time
+        dispatchGroup.enter()
+        fetchQuantity(for: .appleExerciseTime, unit: HKUnit.minute(), predicate: predicate) { value in
+            self.exerciseTime = Int(value)
+            dispatchGroup.leave()
+        }
+
+        // Fetch flights climbed
+        dispatchGroup.enter()
+        fetchQuantity(for: .flightsClimbed, unit: HKUnit.count(), predicate: predicate) { value in
+            self.flightsClimbed = Int(value)
+            dispatchGroup.leave()
+        }
+
+        // Fetch move minutes
+        dispatchGroup.enter()
+        fetchQuantity(for: .appleStandTime, unit: HKUnit.minute(), predicate: predicate) { value in
+            self.moveMinutes = Int(value)
+            dispatchGroup.leave()
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            print("All fitness data updated.")
+        }
+    }
+
+    // MARK: - Helper to Fetch Quantity
+    private func fetchQuantity(for identifier: HKQuantityTypeIdentifier, unit: HKUnit, predicate: NSPredicate, completion: @escaping (Double) -> Void) {
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: identifier) else {
+            completion(0)
+            return
+        }
+
+        let query = HKStatisticsQuery(quantityType: quantityType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in
+            let value = result?.sumQuantity()?.doubleValue(for: unit) ?? 0
+            DispatchQueue.main.async {
+                completion(value)
+            }
+        }
+
+        healthStore.execute(query)
     }
 }
 
@@ -126,31 +200,29 @@ struct FitnessWidget: View {
     var body: some View {
         VStack(spacing: 10) {
             ZStack {
-                // Background Circle
                 Circle()
                     .stroke(lineWidth: 10)
                     .fill(Color(.systemGray5))
 
-                // Progress Circle
                 Circle()
                     .trim(from: 0.0, to: CGFloat(min(progress, 1.0)))
                     .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round))
                     .fill(iconColor)
                     .rotationEffect(Angle(degrees: -90))
 
-                // Icon
                 Image(systemName: icon)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 30, height: 30)
+                    .frame(width: 40, height: 40) // Ensure the icon has a fixed size
                     .foregroundColor(iconColor)
             }
-            .frame(width: 80, height: 80)
+            .frame(width: 100, height: 100) // Ensure the circle size is consistent
 
-            // Title and Values
             Text(title)
                 .font(.headline)
                 .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity) // Make the text wrap if needed
 
             Text(value)
                 .font(.title2)
@@ -160,12 +232,15 @@ struct FitnessWidget: View {
             Text("To Go: \(goal)")
                 .font(.subheadline)
                 .foregroundColor(.gray)
+                .multilineTextAlignment(.center)
         }
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(15)
+        .frame(width: 170, height: 230) // Fixed size for the entire widget
     }
 }
+
 
 // Preview
 struct FitnessDataView_Previews: PreviewProvider {

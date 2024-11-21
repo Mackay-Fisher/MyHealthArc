@@ -7,13 +7,13 @@ import HealthKit
 import BackgroundTasks
 
 class HealthKitBackgroundManager {
-    private let healthStore = HKHealthStore()
-    private var healthAnchor: HKQueryAnchor? // Anchor for health data updates
-    private var fitnessAnchor: HKQueryAnchor? // Anchor for fitness data updates
+    public let healthStore = HKHealthStore()
+    public var healthAnchor: HKQueryAnchor? // Anchor for health data updates
+    public var fitnessAnchor: HKQueryAnchor? // Anchor for fitness data updates
 
     static let shared = HealthKitBackgroundManager() // Singleton instance
 
-    private init() {}
+    public init() {}
 
     // MARK: - Background Task Registration
     func registerBackgroundTasks() {
@@ -99,14 +99,15 @@ extension HealthKitBackgroundManager {
 
         do {
             try await healthStore.requestAuthorization(toShare: [], read: healthTypesToRead)
-            let isAuthorized = healthStore.authorizationStatus(for: HKObjectType.quantityType(forIdentifier: .heartRate)!) == .sharingAuthorized
-            print("HealthKit authorization status for heartRate: \(isAuthorized ? "Authorized" : "Not Authorized")")
-            return isAuthorized
+            print("HealthKit authorization requested.")
+            return true
         } catch {
             print("HealthKit authorization failed: \(error.localizedDescription)")
             return false
         }
     }
+
+
 
     // MARK: - Health Data Sync
     func syncHealthData(completion: @escaping (Bool) -> Void) {
@@ -131,7 +132,7 @@ extension HealthKitBackgroundManager {
     }
 
     // MARK: - Perform Anchored Query
-    private func performAnchoredQuery(for types: [HKQuantityTypeIdentifier], anchor: HKQueryAnchor?, completion: @escaping ([HKQuantitySample], HKQueryAnchor?) -> Void) {
+    public func performAnchoredQuery(for types: [HKQuantityTypeIdentifier], anchor: HKQueryAnchor?, completion: @escaping ([HKQuantitySample], HKQueryAnchor?) -> Void) {
         let group = DispatchGroup()
         var allSamples: [HKQuantitySample] = []
         var latestAnchor: HKQueryAnchor? = anchor // Create a local copy of the anchor
@@ -165,7 +166,7 @@ extension HealthKitBackgroundManager {
     }
 
     // MARK: - Sync Samples to Database
-    private func syncSamplesToDatabase(samples: [HKQuantitySample], category: String) {
+    public func syncSamplesToDatabase(samples: [HKQuantitySample], category: String) {
         let dataToSync = samples.map { sample -> [String: Any] in
             return [
                 "startDate": sample.startDate.iso8601String(),

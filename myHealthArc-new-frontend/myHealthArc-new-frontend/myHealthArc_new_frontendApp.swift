@@ -33,22 +33,22 @@ extension Color {
 struct myHealthArc_new_frontendApp: App {
     @State private var isLoggedIn = false
     @State private var hasSignedUp = false
-    init() {
-            // Register background tasks on app initialization
-            HealthKitBackgroundManager.shared.registerBackgroundTasks()
-            Task {
-                    if await HealthKitBackgroundManager.shared.requestHealthKitAuthorization() {
-                        HealthKitBackgroundManager.shared.syncMasterData { success in
-                            print("Initial sync completed: \(success ? "Success" : "Failure")")
-                        }
-                    } else {
-                        print("HealthKit authorization not granted.")
-                    }
-                }
-        }
+//    init() {
+//            // Register background tasks on app initialization
+//            HealthKitBackgroundManager.shared.registerBackgroundTasks()
+//            Task {
+//                    if await HealthKitBackgroundManager.shared.requestHealthKitAuthorization() {
+//                        HealthKitBackgroundManager.shared.syncMasterData { success in
+//                            print("Initial sync completed: \(success ? "Success" : "Failure")")
+//                        }
+//                    } else {
+//                        print("HealthKit authorization not granted.")
+//                    }
+//                }
+//        }
         var body: some Scene {
             WindowGroup {
-                        HealthSyncPreviewView()
+                FitnessDataView(containerHeight: 600)
                     }
 //            WindowGroup {
 //                if isLoggedIn {

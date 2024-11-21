@@ -5,8 +5,18 @@
 //  Created by Mackay Fisher on 11/18/24.
 //
 import SwiftUI
+import HealthKit
 
 struct SleepDataView: View {
+    @State private var authorizationStatus: String = "Not Requested"
+    @State private var totalSleepHours: Double = 0
+    @State private var lastSleepHours: Double = 0
+    @State private var fallAsleepTime: Date? = nil
+    @State private var wakeUpTime: Date? = nil
+    @State private var sleepHoursByDay: [Date: Double] = [:] // For graph data
+
+    private let healthStore = HKHealthStore()
+
     var body: some View {
         VStack(spacing: 20) {
             // Goal Completion Section
@@ -16,23 +26,23 @@ struct SleepDataView: View {
                     .foregroundColor(.white)
                 
                 HStack {
-                    ProgressBar(value: 0.6) // 60% completion
+                    ProgressBar(value: min(totalSleepHours / 56.0, 1.0)) // 8-hour/night goal over 7 days
                         .frame(height: 10)
                     
-                    Text("60%")
+                    Text("\(String(format: "%.1f", totalSleepHours)) hrs")
                         .font(.subheadline)
                         .foregroundColor(.white)
                         .bold()
                 }
                 
                 HStack {
-                    Text("5h 4m")
+                    Text("\(String(format: "%.1f", totalSleepHours)) hrs this week")
                         .font(.caption)
                         .foregroundColor(.white)
                     
                     Spacer()
                     
-                    Text("8h")
+                    Text("56 hrs goal")
                         .font(.caption)
                         .foregroundColor(.white)
                 }
@@ -45,10 +55,10 @@ struct SleepDataView: View {
             HStack(spacing: 20) {
                 // Circular Sleep Chart
                 VStack {
-                    CircularSleepChart(hoursSlept: 5.0)
+                    CircularSleepChart(hoursSlept: lastSleepHours)
                         .frame(width: 80, height: 80)
                     
-                    Text("Total Sleep")
+                    Text("Last Sleep")
                         .font(.caption)
                         .foregroundColor(.white)
                 }
@@ -66,7 +76,7 @@ struct SleepDataView: View {
                             .font(.subheadline)
                             .foregroundColor(.white)
                     }
-                    Text("11:24 PM")
+                    Text(fallAsleepTime != nil ? "\(fallAsleepTime!, formatter: timeFormatter)" : "N/A")
                         .font(.headline)
                         .foregroundColor(.white)
                     
@@ -80,7 +90,7 @@ struct SleepDataView: View {
                             .font(.subheadline)
                             .foregroundColor(.white)
                     }
-                    Text("4:05 AM")
+                    Text(wakeUpTime != nil ? "\(wakeUpTime!, formatter: timeFormatter)" : "N/A")
                         .font(.headline)
                         .foregroundColor(.white)
                 }
@@ -90,29 +100,156 @@ struct SleepDataView: View {
                 .cornerRadius(15)
             }
 
-            // Sleep Stages Graph
+            // Sleep Graph Section
             VStack(alignment: .leading, spacing: 10) {
-                Text("Sleep Data")
+                Text("Sleep Graph (Last Week)")
                     .font(.headline)
                     .foregroundColor(.white)
                 
-                SleepStageGraph()
-                    .frame(height: 100)
-                
-                HStack {
-                    LegendItem(color: .green, text: "Awake")
-                    LegendItem(color: .purple, text: "Light")
-                    LegendItem(color: .orange, text: "Deep")
-                }
+                SleepGraphView(data: sleepHoursByDay)
+                    .frame(height: 150)
             }
             .padding()
             .background(Color(.systemGray6))
             .cornerRadius(15)
 
             Spacer()
+
+            Button(action: fetchSleepData) {
+                Text("Fetch Sleep Data")
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+            }
         }
         .padding()
         .background(Color.black.edgesIgnoringSafeArea(.all))
+        .onAppear {
+            requestAuthorization()
+        }
+    }
+
+    // MARK: - Request HealthKit Authorization
+    private func requestAuthorization() {
+        let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
+        healthStore.requestAuthorization(toShare: [], read: [sleepType]) { success, error in
+            DispatchQueue.main.async {
+                authorizationStatus = success ? "Authorized" : "Denied"
+            }
+        }
+    }
+
+    // MARK: - Fetch Sleep Data
+    // MARK: - Fetch Sleep Data
+    private func fetchSleepData() {
+        let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
+        
+        // Calculate the start of the current week (Sunday)
+        let today = Date()
+        let calendar = Calendar.current
+        let weekday = calendar.component(.weekday, from: today)
+        let daysToSubtract = weekday - calendar.firstWeekday
+        let startOfWeek = calendar.date(byAdding: .day, value: -daysToSubtract, to: calendar.startOfDay(for: today))!
+        let endOfWeek = calendar.date(byAdding: .day, value: 7, to: startOfWeek)!
+
+        print("Fetching sleep data from \(startOfWeek) to \(endOfWeek)")
+
+        let predicate = HKQuery.predicateForSamples(withStart: startOfWeek, end: endOfWeek, options: .strictStartDate)
+
+        let query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { query, samples, error in
+            // Debug: Check if the query executed
+            if let error = error {
+                print("Error executing sleep query: \(error.localizedDescription)")
+                return
+            }
+
+            // Debug: Check the returned samples
+            print("Fetched \(samples?.count ?? 0) sleep samples")
+
+            guard let samples = samples as? [HKCategorySample] else {
+                print("No valid sleep samples found")
+                return
+            }
+
+            DispatchQueue.main.async {
+                var totalHours = 0.0
+                var mostRecentSleep: Double? = nil
+                var dailySleep: [Date: Double] = [:]
+
+                for sample in samples {
+                    let start = sample.startDate
+                    let end = sample.endDate
+                    let duration = end.timeIntervalSince(start) / 3600.0
+
+                    print("Sample - Start: \(start), End: \(end), Duration: \(duration) hours")
+
+                    totalHours += duration
+                    if sample == samples.last {
+                        mostRecentSleep = duration
+                    }
+
+                    let day = calendar.startOfDay(for: start)
+                    dailySleep[day, default: 0.0] += duration
+                }
+
+                // Debug: Output aggregated results
+                print("Total Sleep Hours: \(totalHours)")
+                print("Most Recent Sleep Duration: \(mostRecentSleep ?? 0)")
+                print("Daily Sleep Hours: \(dailySleep)")
+
+                // Update UI state
+                totalSleepHours = totalHours
+                lastSleepHours = mostRecentSleep ?? 0
+                sleepHoursByDay = dailySleep
+            }
+        }
+
+        healthStore.execute(query)
+        print("HealthKit sleep query executed")
+    }
+
+
+
+    private var timeFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter
+    }
+}
+
+// MARK: - Sleep Graph View
+struct SleepGraphView: View {
+    let data: [Date: Double]
+
+    var body: some View {
+        GeometryReader { geometry in
+            let sortedData = data.sorted(by: { $0.key < $1.key })
+            let maxHours = sortedData.map { $0.value }.max() ?? 8
+            let width = geometry.size.width / CGFloat(sortedData.count)
+
+            HStack(alignment: .bottom, spacing: 4) {
+                ForEach(sortedData, id: \.key) { entry in
+                    let height = CGFloat(entry.value / maxHours) * geometry.size.height
+                    VStack {
+                        Spacer()
+                        Rectangle()
+                            .fill(Color.green)
+                            .frame(width: width * 0.8, height: height)
+                        Text(entry.key, formatter: shortDateFormatter)
+                            .font(.caption)
+                            .foregroundColor(.white)
+                    }
+                }
+            }
+        }
+    }
+
+    private var shortDateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "E"
+        return formatter
     }
 }
 
@@ -153,53 +290,6 @@ struct ProgressBar: View {
                     .foregroundColor(.purple)
             }
             .cornerRadius(5)
-        }
-    }
-}
-
-// Sleep Stages Graph
-struct SleepStageGraph: View {
-    var body: some View {
-        GeometryReader { geometry in
-            Path { path in
-                let width = geometry.size.width
-                let height = geometry.size.height
-                
-                // Mock data points for sleep stages
-                let dataPoints: [Double] = [1, 2, 3, 2, 1, 3, 1]
-                
-                // Calculate the spacing
-                let spacing = width / CGFloat(dataPoints.count - 1)
-                
-                // Scale the data points to fit the graph height
-                let maxY = dataPoints.max() ?? 1
-                let scaleFactor = height / CGFloat(maxY)
-                
-                // Draw the graph
-                path.move(to: CGPoint(x: 0, y: height - CGFloat(dataPoints[0]) * scaleFactor))
-                for (index, value) in dataPoints.enumerated() {
-                    path.addLine(to: CGPoint(x: CGFloat(index) * spacing, y: height - CGFloat(value) * scaleFactor))
-                }
-            }
-            .stroke(Color.white, lineWidth: 2)
-        }
-    }
-}
-
-// Legend Item for Sleep Stages
-struct LegendItem: View {
-    let color: Color
-    let text: String
-    
-    var body: some View {
-        HStack {
-            Circle()
-                .fill(color)
-                .frame(width: 10, height: 10)
-            
-            Text(text)
-                .font(.caption)
-                .foregroundColor(.white)
         }
     }
 }

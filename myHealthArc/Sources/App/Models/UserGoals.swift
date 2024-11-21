@@ -53,4 +53,4 @@ final class UserStreaks: Model, Content {
 //flights climbed,
 //exercise time,
 //calories burned,
-//move minutes
+//move minutes,

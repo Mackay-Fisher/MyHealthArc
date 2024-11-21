@@ -8,8 +8,7 @@
 import SwiftUI
 import HealthKit
 
-struct FitnessDataView: View {
-    let containerHeight: CGFloat // Height passed from the parent view
+struct FitnessDataView: View { // Height passed from the parent view
 
     @State private var stepCount: Int = 0
     @State private var caloriesBurned: Int = 0
@@ -106,7 +105,6 @@ struct FitnessDataView: View {
                 }
             }
             .padding()
-            .frame(minHeight: containerHeight) // Dynamically set the height
         }
         .background(Color.black.edgesIgnoringSafeArea(.all))
         .onAppear {
@@ -244,7 +242,7 @@ struct FitnessWidget: View {
 // Preview
 struct FitnessDataView_Previews: PreviewProvider {
     static var previews: some View {
-        FitnessDataView(containerHeight: 800)
+        FitnessDataView()
             .preferredColorScheme(.dark)
     }
 }

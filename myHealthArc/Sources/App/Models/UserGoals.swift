@@ -46,3 +46,11 @@ final class UserStreaks: Model, Content {
         self.lastUpdated = lastUpdated
     }
 }
+
+
+//step count,
+//distance,
+//flights climbed,
+//exercise time,
+//calories burned,
+//move minutes

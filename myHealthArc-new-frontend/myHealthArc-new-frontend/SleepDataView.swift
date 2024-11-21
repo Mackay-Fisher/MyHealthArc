@@ -18,116 +18,118 @@ struct SleepDataView: View {
     private let healthStore = HKHealthStore()
 
     var body: some View {
-        VStack(spacing: 20) {
-            // Goal Completion Section
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Goal Completion")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                
-                HStack {
-                    ProgressBar(value: min(totalSleepHours / 56.0, 1.0)) // 8-hour/night goal over 7 days
-                        .frame(height: 10)
-                    
-                    Text("\(String(format: "%.1f", totalSleepHours)) hrs")
-                        .font(.subheadline)
+        ScrollView{
+            VStack(spacing: 20) {
+                // Goal Completion Section
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Goal Completion")
+                        .font(.headline)
                         .foregroundColor(.white)
-                        .bold()
+                    
+                    HStack {
+                        ProgressBar(value: min(totalSleepHours / 56.0, 1.0)) // 8-hour/night goal over 7 days
+                            .frame(height: 10)
+                        
+                        Text("\(String(format: "%.1f", totalSleepHours)) hrs")
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+                            .bold()
+                    }
+                    
+                    HStack {
+                        Text("\(String(format: "%.1f", totalSleepHours)) hrs this week")
+                            .font(.caption)
+                            .foregroundColor(.white)
+                        
+                        Spacer()
+                        
+                        Text("56 hrs goal")
+                            .font(.caption)
+                            .foregroundColor(.white)
+                    }
                 }
-                
-                HStack {
-                    Text("\(String(format: "%.1f", totalSleepHours)) hrs this week")
-                        .font(.caption)
-                        .foregroundColor(.white)
-                    
-                    Spacer()
-                    
-                    Text("56 hrs goal")
-                        .font(.caption)
-                        .foregroundColor(.white)
-                }
-            }
-            .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(15)
-
-            // Sleep Summary Section
-            HStack(spacing: 20) {
-                // Circular Sleep Chart
-                VStack {
-                    CircularSleepChart(hoursSlept: lastSleepHours)
-                        .frame(width: 80, height: 80)
-                    
-                    Text("Last Sleep")
-                        .font(.caption)
-                        .foregroundColor(.white)
-                }
-                .frame(maxWidth: .infinity)
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(15)
                 
-                // Fall Asleep and Wake Up Times
-                VStack(spacing: 10) {
-                    HStack {
-                        Image(systemName: "moon.fill")
-                            .foregroundColor(.yellow)
-                        Text("Fall Asleep")
-                            .font(.subheadline)
+                // Sleep Summary Section
+                HStack(spacing: 20) {
+                    // Circular Sleep Chart
+                    VStack {
+                        CircularSleepChart(hoursSlept: lastSleepHours)
+                            .frame(width: 80, height: 80)
+                        
+                        Text("Last Sleep")
+                            .font(.caption)
                             .foregroundColor(.white)
                     }
-                    Text(fallAsleepTime != nil ? "\(fallAsleepTime!, formatter: timeFormatter)" : "N/A")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    
-                    Divider()
-                        .background(Color.white)
-                    
-                    HStack {
-                        Image(systemName: "sunrise.fill")
-                            .foregroundColor(.orange)
-                        Text("Wake Up")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                    }
-                    Text(wakeUpTime != nil ? "\(wakeUpTime!, formatter: timeFormatter)" : "N/A")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(15)
-            }
-
-            // Sleep Graph Section
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Sleep Graph (Last Week)")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                
-                SleepGraphView(data: sleepHoursByDay)
-                    .frame(height: 150)
-            }
-            .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(15)
-
-            Spacer()
-
-            Button(action: fetchSleepData) {
-                Text("Fetch Sleep Data")
-                    .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(15)
+                    
+                    // Fall Asleep and Wake Up Times
+                    VStack(spacing: 10) {
+                        HStack {
+                            Image(systemName: "moon.fill")
+                                .foregroundColor(.yellow)
+                            Text("Fall Asleep")
+                                .font(.subheadline)
+                                .foregroundColor(.white)
+                        }
+                        Text(fallAsleepTime != nil ? "\(fallAsleepTime!, formatter: timeFormatter)" : "N/A")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        
+                        Divider()
+                            .background(Color.white)
+                        
+                        HStack {
+                            Image(systemName: "sunrise.fill")
+                                .foregroundColor(.orange)
+                            Text("Wake Up")
+                                .font(.subheadline)
+                                .foregroundColor(.white)
+                        }
+                        Text(wakeUpTime != nil ? "\(wakeUpTime!, formatter: timeFormatter)" : "N/A")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(15)
+                }
+                
+                // Sleep Graph Section
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Sleep Graph (Last Week)")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    
+                    SleepGraphView(data: sleepHoursByDay)
+                        .frame(height: 150)
+                }
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(15)
+                
+                Spacer()
+                
+                Button(action: fetchSleepData) {
+                    Text("Fetch Sleep Data")
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
             }
-        }
-        .padding()
-        .background(Color.black.edgesIgnoringSafeArea(.all))
-        .onAppear {
-            requestAuthorization()
+            .padding()
+            .background(Color.black.edgesIgnoringSafeArea(.all))
+            .onAppear {
+                requestAuthorization()
+            }
         }
     }
 

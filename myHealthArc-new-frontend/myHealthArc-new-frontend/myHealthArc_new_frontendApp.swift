@@ -48,7 +48,7 @@ struct myHealthArc_new_frontendApp: App {
 //        }
         var body: some Scene {
             WindowGroup {
-                FitnessDataView(containerHeight: 600)
+                AppleHealthHomeView()
                     }
 //            WindowGroup {
 //                if isLoggedIn {

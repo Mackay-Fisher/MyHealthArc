@@ -34,7 +34,6 @@ struct FitnessDataView: View {
                         .font(.headline)
                         .foregroundColor(.gray)
                 }
-                .padding(.bottom)
 
                 // Manage Goals Button
                 HStack {

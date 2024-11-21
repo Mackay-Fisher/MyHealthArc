@@ -17,19 +17,23 @@
 		2528D6282CC9DA8E000D5852 /* MedicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2528D6272CC9DA8E000D5852 /* MedicationsView.swift */; };
 		2528D6322CC9FB35000D5852 /* NutritionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2528D6312CC9FB35000D5852 /* NutritionView.swift */; };
 		2528D6362CC9FB86000D5852 /* NutritionWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2528D6352CC9FB86000D5852 /* NutritionWidgetView.swift */; };
-		2555864A2CED326B00D1C638 /* GoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 255586492CED326500D1C638 /* GoalsView.swift */; };
 		2562C0812CCA10CC009E4284 /* MedicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2562C0802CCA10CC009E4284 /* MedicationWidget.swift */; };
 		25D6E3B92CC9CBD2004A2B1A /* EditProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */; };
 		5A02A49F2CEBCE9200E83C60 /* FitnessDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */; };
 		5A02A4A12CEBF01000E83C60 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02A4A02CEBF00F00E83C60 /* HealthKitManager.swift */; };
 		5A2504BD2CED99B60092C149 /* HealthSyncPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2504BC2CED99B60092C149 /* HealthSyncPreviewView.swift */; };
-		5AAA9B482CEDB6030051134F /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAA9B472CEDB6030051134F /* APIClient.swift */; };
-		8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */; };
+		5AB0CE282CEB0E43003FC857 /* myHealthArc_new_frontendApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0CE252CEB0E43003FC857 /* myHealthArc_new_frontendApp.swift */; };
+		5AB0CE2A2CEB0F9E003FC857 /* AppleHealthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0CE292CEB0F9E003FC857 /* AppleHealthManager.swift */; };
+		5AB0CE2C2CEB0FBA003FC857 /* ActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0CE2B2CEB0FBA003FC857 /* ActivityManager.swift */; };
+		5AB0CE2E2CEB1059003FC857 /* AppleHealthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0CE2D2CEB1059003FC857 /* AppleHealthView.swift */; };
 		5AB0CE302CEB15A3003FC857 /* BodyInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0CE2F2CEB15A2003FC857 /* BodyInfoView.swift */; };
 		5AB0CE322CEB15A8003FC857 /* SleepDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0CE312CEB15A8003FC857 /* SleepDataView.swift */; };
 		5AB0CE342CEB15AF003FC857 /* VitalInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0CE332CEB15AF003FC857 /* VitalInfoView.swift */; };
 		8F161C2F2CC1B36200E726E7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C2E2CC1B36200E726E7 /* ContentView.swift */; };
 		8F161C312CC1B36400E726E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8F161C302CC1B36400E726E7 /* Assets.xcassets */; };
+		5AAA9B482CEDB6030051134F /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAA9B472CEDB6030051134F /* APIClient.swift */; };
+		2555864A2CED326B00D1C638 /* GoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 255586492CED326500D1C638 /* GoalsView.swift */; };
+		8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */; };
 		8F161C342CC1B36400E726E7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8F161C332CC1B36400E726E7 /* Preview Assets.xcassets */; };
 		8F161C3E2CC1B36400E726E7 /* myHealthArc_new_frontendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C3D2CC1B36400E726E7 /* myHealthArc_new_frontendTests.swift */; };
 		8F161C482CC1B36400E726E7 /* myHealthArc_new_frontendUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F161C472CC1B36400E726E7 /* myHealthArc_new_frontendUITests.swift */; };
@@ -64,18 +68,22 @@
 		2528D6272CC9DA8E000D5852 /* MedicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationsView.swift; sourceTree = "<group>"; };
 		2528D6312CC9FB35000D5852 /* NutritionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionView.swift; sourceTree = "<group>"; };
 		2528D6352CC9FB86000D5852 /* NutritionWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionWidgetView.swift; sourceTree = "<group>"; };
-		255586492CED326500D1C638 /* GoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsView.swift; sourceTree = "<group>"; };
 		2562C0802CCA10CC009E4284 /* MedicationWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationWidget.swift; sourceTree = "<group>"; };
 		25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfilePage.swift; sourceTree = "<group>"; };
 		5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessDataView.swift; sourceTree = "<group>"; };
 		5A02A4A02CEBF00F00E83C60 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		5A2504BC2CED99B60092C149 /* HealthSyncPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthSyncPreviewView.swift; sourceTree = "<group>"; };
-		5AAA9B472CEDB6030051134F /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		5AB0CE252CEB0E43003FC857 /* myHealthArc_new_frontendApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myHealthArc_new_frontendApp.swift; sourceTree = "<group>"; };
+		5AB0CE292CEB0F9E003FC857 /* AppleHealthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleHealthManager.swift; sourceTree = "<group>"; };
+		5AB0CE2B2CEB0FBA003FC857 /* ActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityManager.swift; sourceTree = "<group>"; };
+		5AB0CE2D2CEB1059003FC857 /* AppleHealthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleHealthView.swift; sourceTree = "<group>"; };
 		5AB0CE2F2CEB15A2003FC857 /* BodyInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyInfoView.swift; sourceTree = "<group>"; };
 		5AB0CE312CEB15A8003FC857 /* SleepDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataView.swift; sourceTree = "<group>"; };
 		5AB0CE332CEB15AF003FC857 /* VitalInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VitalInfoView.swift; sourceTree = "<group>"; };
+		5AAA9B472CEDB6030051134F /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		5AD777E52CC330AF00DC2B8B /* myHealthArc-new-frontend.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "myHealthArc-new-frontend.entitlements"; sourceTree = "<group>"; };
 		8F161C292CC1B36200E726E7 /* myHealthArc-new-frontend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "myHealthArc-new-frontend.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myHealthArc_new_frontendApp.swift; sourceTree = "<group>"; };
 		8F161C2E2CC1B36200E726E7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8F161C302CC1B36400E726E7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8F161C332CC1B36400E726E7 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -83,6 +91,7 @@
 		8F161C3D2CC1B36400E726E7 /* myHealthArc_new_frontendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myHealthArc_new_frontendTests.swift; sourceTree = "<group>"; };
 		8F161C432CC1B36400E726E7 /* myHealthArc-new-frontendUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "myHealthArc-new-frontendUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F161C472CC1B36400E726E7 /* myHealthArc_new_frontendUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myHealthArc_new_frontendUITests.swift; sourceTree = "<group>"; };
+		255586492CED326500D1C638 /* GoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsView.swift; sourceTree = "<group>"; };
 		8F161C492CC1B36400E726E7 /* myHealthArc_new_frontendUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myHealthArc_new_frontendUITestsLaunchTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -137,7 +146,6 @@
 				5AD777E52CC330AF00DC2B8B /* myHealthArc-new-frontend.entitlements */,
 				8F161C2E2CC1B36200E726E7 /* ContentView.swift */,
 				250FC2322CC1F9CF0023AE43 /* LoginView.swift */,
-				5AAA9B472CEDB6030051134F /* APIClient.swift */,
 				250FC23A2CC201430023AE43 /* Tabs.swift */,
 				5AB0CE292CEB0F9E003FC857 /* AppleHealthManager.swift */,
 				5AB0CE2D2CEB1059003FC857 /* AppleHealthView.swift */,
@@ -162,6 +170,8 @@
 				2528D6312CC9FB35000D5852 /* NutritionView.swift */,
 				255586492CED326500D1C638 /* GoalsView.swift */,
 				8F161C322CC1B36400E726E7 /* Preview Content */,
+				5AAA9B472CEDB6030051134F /* APIClient.swift */,
+				8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */,
 			);
 			path = "myHealthArc-new-frontend";
 			sourceTree = "<group>";
@@ -324,7 +334,6 @@
 				25D6E3B92CC9CBD2004A2B1A /* EditProfilePage.swift in Sources */,
 				2528D6362CC9FB86000D5852 /* NutritionWidgetView.swift in Sources */,
 				250FC23B2CC201460023AE43 /* Tabs.swift in Sources */,
-				5AAA9B482CEDB6030051134F /* APIClient.swift in Sources */,
 				250FC23F2CC205900023AE43 /* AppOpenScreen.swift in Sources */,
 				2528D6282CC9DA8E000D5852 /* MedicationsView.swift in Sources */,
 				5AB0CE342CEB15AF003FC857 /* VitalInfoView.swift in Sources */,
@@ -337,7 +346,7 @@
 				250FC23D2CC202D10023AE43 /* SignUpView.swift in Sources */,
 				5A2504BD2CED99B60092C149 /* HealthSyncPreviewView.swift in Sources */,
 				250FC2392CC200DF0023AE43 /* SettingsView.swift in Sources */,
-				2555864A2CED326B00D1C638 /* GoalsView.swift in Sources */,
+				5AB0CE282CEB0E43003FC857 /* myHealthArc_new_frontendApp.swift in Sources */,
 				2528D6322CC9FB35000D5852 /* NutritionView.swift in Sources */,
 				8F161C2F2CC1B36200E726E7 /* ContentView.swift in Sources */,
 				5AB0CE2E2CEB1059003FC857 /* AppleHealthView.swift in Sources */,
@@ -345,6 +354,9 @@
 				5AB0CE322CEB15A8003FC857 /* SleepDataView.swift in Sources */,
 				5A02A49F2CEBCE9200E83C60 /* FitnessDataView.swift in Sources */,
 				2562C0812CCA10CC009E4284 /* MedicationWidget.swift in Sources */,
+				8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */,
+				2555864A2CED326B00D1C638 /* GoalsView.swift in Sources */,
+				5AAA9B482CEDB6030051134F /* APIClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -575,6 +587,7 @@
 		8F161C512CC1B36400E726E7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -594,6 +607,7 @@
 		8F161C522CC1B36400E726E7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -613,6 +627,7 @@
 		8F161C542CC1B36400E726E7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = K3F2M3VV44;
@@ -631,6 +646,7 @@
 		8F161C552CC1B36400E726E7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = K3F2M3VV44;

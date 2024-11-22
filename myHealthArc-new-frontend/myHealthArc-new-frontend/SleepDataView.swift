@@ -6,6 +6,8 @@
 //
 import SwiftUI
 import HealthKit
+import SwiftUI
+import HealthKit
 
 struct SleepDataView: View {
     @State private var authorizationStatus: String = "Not Requested"
@@ -14,121 +16,129 @@ struct SleepDataView: View {
     @State private var fallAsleepTime: Date? = nil
     @State private var wakeUpTime: Date? = nil
     @State private var sleepHoursByDay: [Date: Double] = [:] // For graph data
+    @State private var noDataAvailable: Bool = false // Flag for no data
 
     private let healthStore = HKHealthStore()
 
     var body: some View {
-        ScrollView{
+        ScrollView {
             VStack(spacing: 20) {
-                // Goal Completion Section
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Goal Completion")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    
-                    HStack {
-                        ProgressBar(value: min(totalSleepHours / 56.0, 1.0)) // 8-hour/night goal over 7 days
-                            .frame(height: 10)
-                        
-                        Text("\(String(format: "%.1f", totalSleepHours)) hrs")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                            .bold()
-                    }
-                    
-                    HStack {
-                        Text("\(String(format: "%.1f", totalSleepHours)) hrs this week")
-                            .font(.caption)
-                            .foregroundColor(.white)
-                        
-                        Spacer()
-                        
-                        Text("56 hrs goal")
-                            .font(.caption)
-                            .foregroundColor(.white)
-                    }
-                }
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(15)
-                
-                // Sleep Summary Section
-                HStack(spacing: 20) {
-                    // Circular Sleep Chart
-                    VStack {
-                        CircularSleepChart(hoursSlept: lastSleepHours)
-                            .frame(width: 80, height: 80)
-                        
-                        Text("Last Sleep")
-                            .font(.caption)
-                            .foregroundColor(.white)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(15)
-                    
-                    // Fall Asleep and Wake Up Times
+                if noDataAvailable {
+                    // No Data Fallback Message
                     VStack(spacing: 10) {
-                        HStack {
-                            Image(systemName: "moon.fill")
-                                .foregroundColor(.yellow)
-                            Text("Fall Asleep")
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                        }
-                        Text(fallAsleepTime != nil ? "\(fallAsleepTime!, formatter: timeFormatter)" : "N/A")
-                            .font(.headline)
+                        Text("No Sleep Data Available")
+                            .font(.title2)
+                            .fontWeight(.bold)
                             .foregroundColor(.white)
                         
-                        Divider()
-                            .background(Color.white)
-                        
-                        HStack {
-                            Image(systemName: "sunrise.fill")
-                                .foregroundColor(.orange)
-                            Text("Wake Up")
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                        }
-                        Text(wakeUpTime != nil ? "\(wakeUpTime!, formatter: timeFormatter)" : "N/A")
-                            .font(.headline)
-                            .foregroundColor(.white)
+                        Text("This page is designed for wearable devices such as Apple Watches. To use this feature, please sync your sleep data with the Apple Health app.")
+                            .font(.body)
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                            .padding()
                     }
-                    .frame(maxWidth: .infinity)
+                } else {
+                    // Data Available
+                    // Goal Completion Section
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Goal Completion")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        
+                        HStack {
+                            ProgressBar(value: min(totalSleepHours / 56.0, 1.0)) // 8-hour/night goal over 7 days
+                                .frame(height: 10)
+                            
+                            Text("\(String(format: "%.1f", totalSleepHours)) hrs")
+                                .font(.subheadline)
+                                .foregroundColor(.white)
+                                .bold()
+                        }
+                        
+                        HStack {
+                            Text("\(String(format: "%.1f", totalSleepHours)) hrs this week")
+                                .font(.caption)
+                                .foregroundColor(.white)
+                            
+                            Spacer()
+                            
+                            Text("56 hrs goal")
+                                .font(.caption)
+                                .foregroundColor(.white)
+                        }
+                    }
                     .padding()
                     .background(Color(.systemGray6))
                     .cornerRadius(15)
-                }
-                
-                // Sleep Graph Section
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Sleep Graph (Last Week)")
-                        .font(.headline)
-                        .foregroundColor(.white)
                     
-                    SleepGraphView(data: sleepHoursByDay)
-                        .frame(height: 150)
-                }
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(15)
-                
-                Spacer()
-                
-                Button(action: fetchSleepData) {
-                    Text("Fetch Sleep Data")
-                        .padding()
+                    // Sleep Summary Section
+                    HStack(spacing: 20) {
+                        // Circular Sleep Chart
+                        VStack {
+                            CircularSleepChart(hoursSlept: lastSleepHours)
+                                .frame(width: 80, height: 80)
+                            
+                            Text("Last Sleep")
+                                .font(.caption)
+                                .foregroundColor(.white)
+                        }
                         .frame(maxWidth: .infinity)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(15)
+                        
+                        // Fall Asleep and Wake Up Times
+                        VStack(spacing: 10) {
+                            HStack {
+                                Image(systemName: "moon.fill")
+                                    .foregroundColor(.yellow)
+                                Text("Fall Asleep")
+                                    .font(.subheadline)
+                                    .foregroundColor(.white)
+                            }
+                            Text(fallAsleepTime != nil ? "\(fallAsleepTime!, formatter: timeFormatter)" : "N/A")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                            
+                            Divider()
+                                .background(Color.white)
+                            
+                            HStack {
+                                Image(systemName: "sunrise.fill")
+                                    .foregroundColor(.orange)
+                                Text("Wake Up")
+                                    .font(.subheadline)
+                                    .foregroundColor(.white)
+                            }
+                            Text(wakeUpTime != nil ? "\(wakeUpTime!, formatter: timeFormatter)" : "N/A")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(15)
+                    }
+                    
+                    // Sleep Graph Section
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Sleep Graph (Last Week)")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        
+                        SleepGraphView(data: sleepHoursByDay)
+                            .frame(height: 150)
+                    }
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(15)
                 }
             }
             .padding()
             .background(Color.black.edgesIgnoringSafeArea(.all))
             .onAppear {
                 requestAuthorization()
+                fetchSleepData()
             }
         }
     }
@@ -144,34 +154,25 @@ struct SleepDataView: View {
     }
 
     // MARK: - Fetch Sleep Data
-    // MARK: - Fetch Sleep Data
     private func fetchSleepData() {
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
         
         // Calculate the start of the current week (Sunday)
         let today = Date()
         let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: today)
-        let daysToSubtract = weekday - calendar.firstWeekday
-        let startOfWeek = calendar.date(byAdding: .day, value: -daysToSubtract, to: calendar.startOfDay(for: today))!
-        let endOfWeek = calendar.date(byAdding: .day, value: 7, to: startOfWeek)!
+        let startOfWeek = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: today))!
+        let predicate = HKQuery.predicateForSamples(withStart: startOfWeek, end: today, options: .strictStartDate)
 
-        print("Fetching sleep data from \(startOfWeek) to \(endOfWeek)")
-
-        let predicate = HKQuery.predicateForSamples(withStart: startOfWeek, end: endOfWeek, options: .strictStartDate)
-
-        let query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { query, samples, error in
-            // Debug: Check if the query executed
-            if let error = error {
-                print("Error executing sleep query: \(error.localizedDescription)")
+        let query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, error in
+            guard error == nil else {
+                print("Error fetching sleep data: \(error!)")
                 return
             }
 
-            // Debug: Check the returned samples
-            print("Fetched \(samples?.count ?? 0) sleep samples")
-
-            guard let samples = samples as? [HKCategorySample] else {
-                print("No valid sleep samples found")
+            guard let samples = samples as? [HKCategorySample], !samples.isEmpty else {
+                DispatchQueue.main.async {
+                    noDataAvailable = true
+                }
                 return
             }
 
@@ -185,8 +186,6 @@ struct SleepDataView: View {
                     let end = sample.endDate
                     let duration = end.timeIntervalSince(start) / 3600.0
 
-                    print("Sample - Start: \(start), End: \(end), Duration: \(duration) hours")
-
                     totalHours += duration
                     if sample == samples.last {
                         mostRecentSleep = duration
@@ -196,23 +195,15 @@ struct SleepDataView: View {
                     dailySleep[day, default: 0.0] += duration
                 }
 
-                // Debug: Output aggregated results
-                print("Total Sleep Hours: \(totalHours)")
-                print("Most Recent Sleep Duration: \(mostRecentSleep ?? 0)")
-                print("Daily Sleep Hours: \(dailySleep)")
-
-                // Update UI state
                 totalSleepHours = totalHours
                 lastSleepHours = mostRecentSleep ?? 0
                 sleepHoursByDay = dailySleep
+                noDataAvailable = false // Data found
             }
         }
 
         healthStore.execute(query)
-        print("HealthKit sleep query executed")
     }
-
-
 
     private var timeFormatter: DateFormatter {
         let formatter = DateFormatter()
@@ -220,6 +211,7 @@ struct SleepDataView: View {
         return formatter
     }
 }
+
 
 // MARK: - Sleep Graph View
 struct SleepGraphView: View {

@@ -17,6 +17,8 @@ struct GoalsView: View {
     @State private var carbsGoal = 0
     @State private var fatGoal = 0
     @State private var caloriesConsumed = 0
+    @State private var elevationGained = 0 // New goal for elevation in feet
+    @State private var distanceTraveled = 0 // New goal for distance in miles
 
     @State private var isLoading = true
 
@@ -36,19 +38,19 @@ struct GoalsView: View {
                     Text("Goals")
                         .font(.largeTitle)
                         .fontWeight(.bold)
-                        .padding()
                 }
 
                 Divider()
                     .overlay(Color.gray.opacity(0.6))
-                    .frame(height: 2)
+                    .frame(height: 0)
 
                 // Main Content
                 if isLoading {
                     ProgressView("Loading Goals...")
                         .padding()
                 } else {
-                    ScrollView {
+                    //Add scroll view here for testing
+                    ScrollView{
                         VStack(spacing: 30) {
                             // MARK: - Fitness Goals Section
                             SectionHeaderView(title: "Manage Fitness Goals")
@@ -59,11 +61,13 @@ struct GoalsView: View {
                                 GoalAdjusterView(title: "Time Asleep", value: $timeAsleep, unit: "hrs/day", step: 1)
                                 GoalAdjusterView(title: "Water Intake", value: $waterIntake, unit: "glasses/day", step: 1)
                                 GoalAdjusterView(title: "Workouts", value: $workoutsPerWeek, unit: "workouts/week", step: 1)
+                                GoalAdjusterView(title: "Elevation Gained", value: $elevationGained, unit: "feet/day", step: 100)
+                                GoalAdjusterView(title: "Distance Traveled", value: $distanceTraveled, unit: "miles/day", step: 1)
                             }
-
+                            
                             Divider()
                                 .padding(.horizontal)
-
+                            
                             // MARK: - Nutrition Goals Section
                             SectionHeaderView(title: "Manage Nutrition Goals")
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
@@ -74,20 +78,20 @@ struct GoalsView: View {
                             }
                         }
                         .padding()
+                        
+                        // Save Button
+                        Button(action: saveGoalsToAPI) {
+                            Text("Save Goals")
+                                .font(.title2)
+                                .bold()
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.green)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        .padding()
                     }
-
-                    // Save Button
-                    Button(action: saveGoalsToAPI) {
-                        Text("Save Goals")
-                            .font(.title2)
-                            .bold()
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.green)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
-                    .padding()
                 }
             }
             .onAppear(perform: fetchGoalsFromAPI)
@@ -111,16 +115,19 @@ struct GoalsView: View {
             do {
                 if let goals = try JSONSerialization.jsonObject(with: data) as? [String: Int] {
                     DispatchQueue.main.async {
-                        stepCount = goals["stepCount"] ?? 0
-                        exerciseMinutes = goals["exerciseMinutes"] ?? 0
-                        caloriesBurned = goals["caloriesBurned"] ?? 0
-                        timeAsleep = goals["timeAsleep"] ?? 0
-                        waterIntake = goals["waterIntake"] ?? 0
-                        workoutsPerWeek = goals["workoutsPerWeek"] ?? 0
-                        proteinGoal = goals["proteinGoal"] ?? 0
-                        carbsGoal = goals["carbsGoal"] ?? 0
-                        fatGoal = goals["fatGoal"] ?? 0
-                        caloriesConsumed = goals["caloriesConsumed"] ?? 0
+                        // Assign values to individual goals
+                        stepCount = goals["step-count"] ?? 0
+                        exerciseMinutes = goals["exercise-minutes"] ?? 0
+                        caloriesBurned = goals["calories-burned"] ?? 0
+                        timeAsleep = goals["time-asleep"] ?? 0
+                        waterIntake = goals["water-intake"] ?? 0
+                        workoutsPerWeek = goals["workouts-per-week"] ?? 0
+                        proteinGoal = goals["protein-goal"] ?? 0
+                        carbsGoal = goals["carbs-goal"] ?? 0
+                        fatGoal = goals["fat-goal"] ?? 0
+                        caloriesConsumed = goals["calories-consumed"] ?? 0
+                        elevationGained = goals["elevation-gained"] ?? 0
+                        distanceTraveled = goals["distance-traveled"] ?? 0
                     }
                 }
             } catch {
@@ -140,16 +147,18 @@ struct GoalsView: View {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let goals: [String: Int] = [
-            "stepCount": stepCount,
-            "exerciseMinutes": exerciseMinutes,
-            "caloriesBurned": caloriesBurned,
-            "timeAsleep": timeAsleep,
-            "waterIntake": waterIntake,
-            "workoutsPerWeek": workoutsPerWeek,
-            "proteinGoal": proteinGoal,
-            "carbsGoal": carbsGoal,
-            "fatGoal": fatGoal,
-            "caloriesConsumed": caloriesConsumed
+            "step-count": stepCount,
+            "exercise-minutes": exerciseMinutes,
+            "calories-burned": caloriesBurned,
+            "time-asleep": timeAsleep,
+            "water-intake": waterIntake,
+            "workouts-per-week": workoutsPerWeek,
+            "protein-goal": proteinGoal,
+            "carbs-goal": carbsGoal,
+            "fat-goal": fatGoal,
+            "calories-consumed": caloriesConsumed,
+            "elevation-gained": elevationGained,
+            "distance-traveled": distanceTraveled
         ]
 
         let requestBody = ["userId": userId, "goals": goals] as [String: Any]
@@ -174,7 +183,6 @@ struct SectionHeaderView: View {
             .font(.title2)
             .fontWeight(.bold)
             .multilineTextAlignment(.center)
-            .padding()
     }
 }
 

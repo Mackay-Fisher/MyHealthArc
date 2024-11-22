@@ -54,7 +54,6 @@ struct AppleHealthHomeView: View {
                 ZStack {
                     if selectedSection == .bmi {
                         BodyInfoView(
-                            containerHeight: geometry.size.height - geometry.safeAreaInsets.top - 150,
                             height: $height,
                             weight: $weight,
                             age: $age
@@ -62,7 +61,7 @@ struct AppleHealthHomeView: View {
                     } else if selectedSection == .sleep {
                         SleepDataView()
                     } else if selectedSection == .vitals {
-                        VitalInfoView( containerHeight: geometry.size.height - geometry.safeAreaInsets.top - 150)
+                        VitalInfoView()
                     }
                 }
                 .frame(height: geometry.size.height - geometry.safeAreaInsets.top - 100) // Adjust height dynamically

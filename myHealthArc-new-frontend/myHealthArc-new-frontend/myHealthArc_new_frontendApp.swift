@@ -48,7 +48,7 @@ struct myHealthArc_new_frontendApp: App {
 //        }
         var body: some Scene {
             WindowGroup {
-                GoalsView()
+                AppleHealthHomeView()
                     }
 //            WindowGroup {
 //                if isLoggedIn {

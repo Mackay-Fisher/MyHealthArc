@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct BodyInfoView: View {
-    let containerHeight: CGFloat // Height passed from the parent view
 
     @Binding var height: Double // Dynamic height (in inches)
     @Binding var weight: Double // Dynamic weight (in pounds)
@@ -58,7 +57,6 @@ struct BodyInfoView: View {
                     }
                     .padding()
                 }
-                .frame(height: containerHeight)
                 .onAppear {
                     Task { await loadBodyData() }
                 }
@@ -331,7 +329,7 @@ struct BodyInfoView_Previews: PreviewProvider {
     @State static var age: Int = 22
 
     static var previews: some View {
-        BodyInfoView(containerHeight: 600, height: $height, weight: $weight, age: $age)
+        BodyInfoView(height: $height, weight: $weight, age: $age)
             .preferredColorScheme(.dark)
     }
 }

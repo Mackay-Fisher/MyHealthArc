@@ -8,14 +8,13 @@
 import SwiftUI
 import HealthKit
 
-struct FitnessDataView: View { // Height passed from the parent view
-
-    @State private var stepCount: Int = 0
-    @State private var caloriesBurned: Int = 0
-    @State private var distance: Double = 0.0 // in miles
-    @State private var exerciseTime: Int = 0 // in minutes
-    @State private var flightsClimbed: Int = 0 // in flights
-    @State private var moveMinutes: Int = 0 // Move minutes
+struct FitnessDataView: View {
+    @State private var stepCount: Int?
+    @State private var caloriesBurned: Int?
+    @State private var distance: Double? // in miles
+    @State private var exerciseTime: Int? // in minutes
+    @State private var flightsClimbed: Int? // in flights
+    @State private var moveMinutes: Int? // Move minutes
 
     private let healthStore = HKHealthStore()
 
@@ -49,59 +48,71 @@ struct FitnessDataView: View { // Height passed from the parent view
 
                 // Data Widgets Grid
                 LazyVGrid(columns: [GridItem(.flexible(minimum: 150)), GridItem(.flexible(minimum: 150))], spacing: 20) {
-                    FitnessWidget(
-                        title: "Step Count",
-                        value: "\(stepCount)",
-                        goal: "10,000",
-                        progress: Double(stepCount) / 10000,
-                        icon: "figure.walk",
-                        iconColor: .blue
-                    )
+                    if let stepCount = stepCount, stepCount > 0 {
+                        FitnessWidget(
+                            title: "Step Count",
+                            value: "\(stepCount)",
+                            goal: "10,000",
+                            progress: Double(stepCount) / 10000,
+                            icon: "figure.walk",
+                            iconColor: .blue
+                        )
+                    }
 
-                    FitnessWidget(
-                        title: "Calories Burned",
-                        value: "\(caloriesBurned) kcal",
-                        goal: "400 kcal",
-                        progress: Double(caloriesBurned) / 400,
-                        icon: "flame.fill",
-                        iconColor: .red
-                    )
+                    if let caloriesBurned = caloriesBurned, caloriesBurned > 0 {
+                        FitnessWidget(
+                            title: "Calories Burned",
+                            value: "\(caloriesBurned) kcal",
+                            goal: "400 kcal",
+                            progress: Double(caloriesBurned) / 400,
+                            icon: "flame.fill",
+                            iconColor: .red
+                        )
+                    }
 
-                    FitnessWidget(
-                        title: "Distance",
-                        value: "\(String(format: "%.2f", distance)) mi",
-                        goal: "1.0 mi",
-                        progress: distance / 1.0,
-                        icon: "map.fill",
-                        iconColor: .green
-                    )
+                    if let distance = distance, distance > 0 {
+                        FitnessWidget(
+                            title: "Distance",
+                            value: "\(String(format: "%.2f", distance)) mi",
+                            goal: "1.0 mi",
+                            progress: distance / 1.0,
+                            icon: "map.fill",
+                            iconColor: .green
+                        )
+                    }
 
-                    FitnessWidget(
-                        title: "Exercise Time",
-                        value: "\(exerciseTime) min",
-                        goal: "60 min",
-                        progress: Double(exerciseTime) / 60,
-                        icon: "dumbbell.fill",
-                        iconColor: .purple
-                    )
+                    if let exerciseTime = exerciseTime, exerciseTime > 0 {
+                        FitnessWidget(
+                            title: "Exercise Time",
+                            value: "\(exerciseTime) min",
+                            goal: "60 min",
+                            progress: Double(exerciseTime) / 60,
+                            icon: "dumbbell.fill",
+                            iconColor: .purple
+                        )
+                    }
 
-                    FitnessWidget(
-                        title: "Flights Climbed",
-                        value: "\(flightsClimbed)",
-                        goal: "20",
-                        progress: Double(flightsClimbed) / 20,
-                        icon: "airplane.departure",
-                        iconColor: .orange
-                    )
+                    if let flightsClimbed = flightsClimbed, flightsClimbed > 0 {
+                        FitnessWidget(
+                            title: "Flights Climbed",
+                            value: "\(flightsClimbed)",
+                            goal: "20",
+                            progress: Double(flightsClimbed) / 20,
+                            icon: "airplane.departure",
+                            iconColor: .orange
+                        )
+                    }
 
-                    FitnessWidget(
-                        title: "Move Minutes",
-                        value: "\(moveMinutes) min",
-                        goal: "30 min",
-                        progress: Double(moveMinutes) / 30,
-                        icon: "clock.fill",
-                        iconColor: .yellow
-                    )
+                    if let moveMinutes = moveMinutes, moveMinutes > 0 {
+                        FitnessWidget(
+                            title: "Move Minutes",
+                            value: "\(moveMinutes) min",
+                            goal: "30 min",
+                            progress: Double(moveMinutes) / 30,
+                            icon: "clock.fill",
+                            iconColor: .yellow
+                        )
+                    }
                 }
             }
             .padding()
@@ -123,42 +134,42 @@ struct FitnessDataView: View { // Height passed from the parent view
         // Fetch step count
         dispatchGroup.enter()
         fetchQuantity(for: .stepCount, unit: HKUnit.count(), predicate: predicate) { value in
-            self.stepCount = Int(value)
+            self.stepCount = value > 0 ? Int(value) : nil
             dispatchGroup.leave()
         }
 
         // Fetch calories burned
         dispatchGroup.enter()
         fetchQuantity(for: .activeEnergyBurned, unit: HKUnit.kilocalorie(), predicate: predicate) { value in
-            self.caloriesBurned = Int(value)
+            self.caloriesBurned = value > 0 ? Int(value) : nil
             dispatchGroup.leave()
         }
 
         // Fetch distance walked
         dispatchGroup.enter()
         fetchQuantity(for: .distanceWalkingRunning, unit: HKUnit.mile(), predicate: predicate) { value in
-            self.distance = value
+            self.distance = value > 0 ? value : nil
             dispatchGroup.leave()
         }
 
         // Fetch exercise time
         dispatchGroup.enter()
         fetchQuantity(for: .appleExerciseTime, unit: HKUnit.minute(), predicate: predicate) { value in
-            self.exerciseTime = Int(value)
+            self.exerciseTime = value > 0 ? Int(value) : nil
             dispatchGroup.leave()
         }
 
         // Fetch flights climbed
         dispatchGroup.enter()
         fetchQuantity(for: .flightsClimbed, unit: HKUnit.count(), predicate: predicate) { value in
-            self.flightsClimbed = Int(value)
+            self.flightsClimbed = value > 0 ? Int(value) : nil
             dispatchGroup.leave()
         }
 
         // Fetch move minutes
         dispatchGroup.enter()
         fetchQuantity(for: .appleStandTime, unit: HKUnit.minute(), predicate: predicate) { value in
-            self.moveMinutes = Int(value)
+            self.moveMinutes = value > 0 ? Int(value) : nil
             dispatchGroup.leave()
         }
 
@@ -184,6 +195,7 @@ struct FitnessDataView: View { // Height passed from the parent view
         healthStore.execute(query)
     }
 }
+
 
 // Widget Component
 struct FitnessWidget: View {

@@ -9,40 +9,48 @@ import SwiftUI
 import HealthKit
 
 struct VitalInfoView: View {
-    let containerHeight: CGFloat // Height passed from the parent view
 
-    @State private var heartRate: Int = 0 // Heart rate in bpm
-    @State private var respiratoryRate: Int = 0 // Breaths per minute
-    @State private var systolicBP: Int = 0 // Systolic blood pressure
-    @State private var diastolicBP: Int = 0 // Diastolic blood pressure
+    @State private var heartRate: Int? // Heart rate in bpm
+    @State private var respiratoryRate: Int? // Breaths per minute
+    @State private var systolicBP: Int? // Systolic blood pressure
+    @State private var diastolicBP: Int? // Diastolic blood pressure
     @State private var heartRateData: [(String, Double)] = []
     @State private var respiratoryData: [(String, Double)] = []
-    @State private var isLoading: Bool = true // Loading state
+    @State private var noDataAvailable: Bool = false // No data flag
 
     private let healthStore = HKHealthStore()
 
     var body: some View {
-        Group {
-            if isLoading {
-                ProgressView("Loading Vital Information...")
-                    .foregroundColor(.white)
-                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    .background(Color.black.edgesIgnoringSafeArea(.all))
-            } else {
-                ScrollView {
-                    VStack(spacing: 20) {
-                        // Blood Pressure Section
+        ScrollView {
+            VStack(spacing: 20) {
+                if noDataAvailable {
+                    // No Data Fallback Message
+                    VStack(spacing: 10) {
+                        Text("No Vital Data Available")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+
+                        Text("This page is designed for wearable devices such as Apple Watches. To use this feature, please sync your vital data with the Apple Health app.")
+                            .font(.body)
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                    }
+                } else {
+                    // Blood Pressure Section
+                    if let systolic = systolicBP, let diastolic = diastolicBP {
                         VStack(spacing: 10) {
                             Text("Blood Pressure")
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             HStack {
-                                Text("Systolic: \(systolicBP) mmHg")
+                                Text("Systolic: \(systolic) mmHg")
                                     .font(.subheadline)
                                     .foregroundColor(.white)
                                 Spacer()
-                                Text("Diastolic: \(diastolicBP) mmHg")
+                                Text("Diastolic: \(diastolic) mmHg")
                                     .font(.subheadline)
                                     .foregroundColor(.white)
                             }
@@ -50,8 +58,10 @@ struct VitalInfoView: View {
                         .padding()
                         .background(Color(.systemGray6))
                         .cornerRadius(15)
+                    }
 
-                        // Heart Rate Section
+                    // Heart Rate Section
+                    if let heartRate = heartRate {
                         VitalSection(
                             title: "Heart Rate",
                             value: "\(heartRate) bpm",
@@ -61,8 +71,10 @@ struct VitalInfoView: View {
                             lineColor: .red,
                             fillColor: Color.red.opacity(0.2)
                         )
+                    }
 
-                        // Respiratory Rate Section
+                    // Respiratory Rate Section
+                    if let respiratoryRate = respiratoryRate {
                         VitalSection(
                             title: "Respiratory Rate",
                             value: "\(respiratoryRate) breaths/min",
@@ -73,14 +85,13 @@ struct VitalInfoView: View {
                             fillColor: Color.blue.opacity(0.2)
                         )
                     }
-                    .padding()
-                    .frame(minHeight: containerHeight) // Dynamically adjust the height
                 }
-                .background(Color.black.edgesIgnoringSafeArea(.all))
             }
-        }
-        .onAppear {
-            fetchVitalData()
+            .padding()
+            .background(Color.black.edgesIgnoringSafeArea(.all))
+            .onAppear {
+                fetchVitalData()
+            }
         }
     }
 
@@ -92,11 +103,16 @@ struct VitalInfoView: View {
 
         let dispatchGroup = DispatchGroup()
 
+        var heartRateFound = false
+        var respiratoryRateFound = false
+        var bloodPressureFound = false
+
         // Fetch heart rate
         dispatchGroup.enter()
         fetchQuantityData(for: .heartRate, unit: HKUnit.count().unitDivided(by: HKUnit.minute()), predicate: predicate) { values in
             if let latest = values.last {
                 self.heartRate = Int(latest.1)
+                heartRateFound = true
             }
             self.heartRateData = values
             dispatchGroup.leave()
@@ -107,6 +123,7 @@ struct VitalInfoView: View {
         fetchQuantityData(for: .respiratoryRate, unit: HKUnit.count().unitDivided(by: HKUnit.minute()), predicate: predicate) { values in
             if let latest = values.last {
                 self.respiratoryRate = Int(latest.1)
+                respiratoryRateFound = true
             }
             self.respiratoryData = values
             dispatchGroup.leave()
@@ -115,13 +132,18 @@ struct VitalInfoView: View {
         // Fetch blood pressure
         dispatchGroup.enter()
         fetchBloodPressureData(predicate: predicate) { systolic, diastolic in
-            self.systolicBP = systolic
-            self.diastolicBP = diastolic
+            if systolic > 0 || diastolic > 0 {
+                self.systolicBP = systolic
+                self.diastolicBP = diastolic
+                bloodPressureFound = true
+            }
             dispatchGroup.leave()
         }
 
         dispatchGroup.notify(queue: .main) {
-            self.isLoading = false
+            if !heartRateFound && !respiratoryRateFound && !bloodPressureFound {
+                self.noDataAvailable = true
+            }
         }
     }
 
@@ -180,7 +202,7 @@ struct VitalInfoView: View {
 // Preview
 struct VitalInfoView_Previews: PreviewProvider {
     static var previews: some View {
-        VitalInfoView(containerHeight: 600)
+        VitalInfoView()
             .preferredColorScheme(.dark)
     }
 }

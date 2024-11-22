@@ -39,20 +39,35 @@ struct myHealthArc_new_frontendApp: App {
     @AppStorage("isLoggedIn") var isLoggedIn = false
     @State private var hasSignedUp = false
     @State private var showAlert = true
-        
+//    init() {
+//            // Register background tasks on app initialization
+//            HealthKitBackgroundManager.shared.registerBackgroundTasks()
+//            Task {
+//                    if await HealthKitBackgroundManager.shared.requestHealthKitAuthorization() {
+//                        HealthKitBackgroundManager.shared.syncMasterData { success in
+//                            print("Initial sync completed: \(success ? "Success" : "Failure")")
+//                        }
+//                    } else {
+//                        print("HealthKit authorization not granted.")
+//                    }
+//                }
+//        }
         var body: some Scene {
             WindowGroup {
-                if isLoggedIn {
-                    Tabs(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
-                }
-                else if hasSignedUp {
-                    ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp, showAlert: $showAlert)
-                }
-                else {
-                    //LoginView(isLoggedIn: $isLoggedIn)
-                    AppOpenScreen(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
-                }
-            }
+                AppleHealthHomeView()
+                    }
+//            WindowGroup {
+//                if isLoggedIn {
+//                    Tabs(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
+//                }
+//                else if hasSignedUp {
+//                    ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
+//                }
+//                else {
+//                    //LoginView(isLoggedIn: $isLoggedIn)
+//                    AppOpenScreen(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
+//                }
+//            }
         }
 
     private func authenticateWithFaceID() {

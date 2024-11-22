@@ -17,13 +17,12 @@
 		2528D6282CC9DA8E000D5852 /* MedicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2528D6272CC9DA8E000D5852 /* MedicationsView.swift */; };
 		2528D6322CC9FB35000D5852 /* NutritionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2528D6312CC9FB35000D5852 /* NutritionView.swift */; };
 		2528D6362CC9FB86000D5852 /* NutritionWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2528D6352CC9FB86000D5852 /* NutritionWidgetView.swift */; };
-		2555864A2CED326B00D1C638 /* GoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 255586492CED326500D1C638 /* GoalsView.swift */; };
 		2562C0812CCA10CC009E4284 /* MedicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2562C0802CCA10CC009E4284 /* MedicationWidget.swift */; };
 		25D6E3B92CC9CBD2004A2B1A /* EditProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */; };
 		5A02A49F2CEBCE9200E83C60 /* FitnessDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */; };
 		5A02A4A12CEBF01000E83C60 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02A4A02CEBF00F00E83C60 /* HealthKitManager.swift */; };
 		5A2504BD2CED99B60092C149 /* HealthSyncPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2504BC2CED99B60092C149 /* HealthSyncPreviewView.swift */; };
-		5A9615F52CEF0F500004F56E /* GoalsView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9615F42CEF0F500004F56E /* GoalsView2.swift */; };
+		5A9615F52CEF0F500004F56E /* GoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9615F42CEF0F500004F56E /* GoalsView.swift */; };
 		5A9615FD2CF02D400004F56E /* StreaksViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9615FC2CF02D400004F56E /* StreaksViewModel.swift */; };
 		5A9615FF2CF02D7C0004F56E /* CombinedGoalsAndStreaksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9615FE2CF02D7C0004F56E /* CombinedGoalsAndStreaksView.swift */; };
 		5AAA9B482CEDB6030051134F /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAA9B472CEDB6030051134F /* APIClient.swift */; };
@@ -71,13 +70,12 @@
 		2528D6272CC9DA8E000D5852 /* MedicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationsView.swift; sourceTree = "<group>"; };
 		2528D6312CC9FB35000D5852 /* NutritionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionView.swift; sourceTree = "<group>"; };
 		2528D6352CC9FB86000D5852 /* NutritionWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionWidgetView.swift; sourceTree = "<group>"; };
-		255586492CED326500D1C638 /* GoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsView.swift; sourceTree = "<group>"; };
 		2562C0802CCA10CC009E4284 /* MedicationWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationWidget.swift; sourceTree = "<group>"; };
 		25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfilePage.swift; sourceTree = "<group>"; };
 		5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessDataView.swift; sourceTree = "<group>"; };
 		5A02A4A02CEBF00F00E83C60 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		5A2504BC2CED99B60092C149 /* HealthSyncPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthSyncPreviewView.swift; sourceTree = "<group>"; };
-		5A9615F42CEF0F500004F56E /* GoalsView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsView2.swift; sourceTree = "<group>"; };
+		5A9615F42CEF0F500004F56E /* GoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsView.swift; sourceTree = "<group>"; };
 		5A9615FC2CF02D400004F56E /* StreaksViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreaksViewModel.swift; sourceTree = "<group>"; };
 		5A9615FE2CF02D7C0004F56E /* CombinedGoalsAndStreaksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedGoalsAndStreaksView.swift; sourceTree = "<group>"; };
 		5AAA9B472CEDB6030051134F /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
@@ -175,8 +173,7 @@
 				250FC23E2CC205900023AE43 /* AppOpenScreen.swift */,
 				2562C0802CCA10CC009E4284 /* MedicationWidget.swift */,
 				2528D6312CC9FB35000D5852 /* NutritionView.swift */,
-				255586492CED326500D1C638 /* GoalsView.swift */,
-				5A9615F42CEF0F500004F56E /* GoalsView2.swift */,
+				5A9615F42CEF0F500004F56E /* GoalsView.swift */,
 				5A9615FE2CF02D7C0004F56E /* CombinedGoalsAndStreaksView.swift */,
 				8F161C322CC1B36400E726E7 /* Preview Content */,
 				5AAA9B472CEDB6030051134F /* APIClient.swift */,
@@ -347,7 +344,7 @@
 				250FC23F2CC205900023AE43 /* AppOpenScreen.swift in Sources */,
 				2528D6282CC9DA8E000D5852 /* MedicationsView.swift in Sources */,
 				5AB0CE342CEB15AF003FC857 /* VitalInfoView.swift in Sources */,
-				5A9615F52CEF0F500004F56E /* GoalsView2.swift in Sources */,
+				5A9615F52CEF0F500004F56E /* GoalsView.swift in Sources */,
 				250FC2412CC208C80023AE43 /* TermsAndConditionsView.swift in Sources */,
 				5AB0CE2A2CEB0F9E003FC857 /* AppleHealthManager.swift in Sources */,
 				5A02A4A12CEBF01000E83C60 /* HealthKitManager.swift in Sources */,
@@ -367,7 +364,6 @@
 				2562C0812CCA10CC009E4284 /* MedicationWidget.swift in Sources */,
 				5A9615FF2CF02D7C0004F56E /* CombinedGoalsAndStreaksView.swift in Sources */,
 				8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */,
-				2555864A2CED326B00D1C638 /* GoalsView.swift in Sources */,
 				5AAA9B482CEDB6030051134F /* APIClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

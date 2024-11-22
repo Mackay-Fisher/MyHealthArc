@@ -45,12 +45,23 @@ func updateUserGoals(req: Request) async throws -> HTTPStatus {
         .filter(\.$userId == updatedGoals.userId)
         .first() ?? UserStreaks(userId: updatedGoals.userId, streaks: [:], lastUpdated: Date())
 
-    // Add streaks for any new goals, including grouped nutrition goals
+    // Group goals (e.g., handle nutrition goals)
     let groupedGoals = groupGoals(updatedGoals.goals)
-    for goal in groupedGoals.keys where userStreaks.streaks[goal] == nil {
-        userStreaks.streaks[goal] = 0 // Initialize streak to 0 for new goals
+
+    // Add streaks for new goals or remove streaks for zero-value goals
+    for goal in groupedGoals.keys {
+        if let goalValue = groupedGoals[goal], goalValue > 0 {
+            // Add streak for valid non-zero goal
+            if userStreaks.streaks[goal] == nil {
+                userStreaks.streaks[goal] = 0 // Initialize streak if it doesn't exist
+            }
+        } else {
+            // Remove streak if the goal is zero
+            userStreaks.streaks.removeValue(forKey: goal)
+        }
     }
 
+    // Save the updated streaks
     try await userStreaks.save(on: req.db)
 
     return .ok

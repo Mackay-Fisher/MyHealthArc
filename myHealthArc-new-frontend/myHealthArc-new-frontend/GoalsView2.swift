@@ -78,6 +78,7 @@ struct GoalsView: View {
                             }
                         }
                         .padding()
+                    }
                         
                         // Save Button
                         Button(action: saveGoalsToAPI) {
@@ -92,7 +93,6 @@ struct GoalsView: View {
                         }
                         .padding()
                     }
-                }
             }
             .onAppear(perform: fetchGoalsFromAPI)
         }

@@ -156,14 +156,14 @@ struct StreaksView: View {
 
                 Divider()
                     .overlay(Color.gray.opacity(0.6))
-                    .frame(height: 2)
+                    .frame(height: 0)
 
                 if viewModel.isLoading {
                     ProgressView("Loading Streaks...")
                         .padding()
                 } else {
                     ScrollView {
-                        VStack(spacing: 30) {
+                        VStack(spacing: 0) {
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
                                 ForEach(viewModel.streaks) { streak in
                                     StreakFlameView(streak: streak)

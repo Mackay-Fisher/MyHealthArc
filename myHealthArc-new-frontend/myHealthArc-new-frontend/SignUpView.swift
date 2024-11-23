@@ -4,7 +4,6 @@
 //
 //  Created by Anjali Hole on 10/17/24.
 //
-//TODO: need to add checks to ensure the information being entered is of correct input type
 
 import SwiftUI
 
@@ -51,21 +50,52 @@ struct SignUpView: View {
         
     @Environment(\.colorScheme) var colorScheme
     
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = #"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$"#
+        let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
+        return emailPredicate.evaluate(with: email)
+    }
+    
+    private var passwordsMatch: Bool {
+        return password == password2 && !password.isEmpty
+    }
+    
     var body: some View {
         NavigationView {
-            VStack{
+            VStack {
                 Form {
                     Section(header: Text("Personal Information")) {
                         TextField("Name", text: $name)
                             .textContentType(.name)
-                        TextField("Email", text: $email)
-                            .keyboardType(.emailAddress)
-                            .textContentType(.emailAddress)
-                            .autocapitalization(.none)
-                        SecureField("Password", text: $password)
-                            .textContentType(.newPassword)
-                        SecureField("Re-Enter Password", text: $password2)
-                            .textContentType(.newPassword)
+                        
+                        VStack(alignment: .leading) {
+                            TextField("Email", text: $email)
+                                .keyboardType(.emailAddress)
+                                .textContentType(.emailAddress)
+                                .autocapitalization(.none)
+                            
+                            if !email.isEmpty && !isValidEmail(email) {
+                                Text("Please enter a valid email address")
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                            }
+                        }
+                        
+                        VStack(alignment: .leading) {
+                            SecureField("Password", text: $password)
+                                .textContentType(.newPassword)
+                        }
+                        VStack(alignment: .leading) {
+                            SecureField("Re-Enter Password", text: $password2)
+                                .textContentType(.newPassword)
+                        }
+                        if !password.isEmpty && !password2.isEmpty && !passwordsMatch {
+                            Text("Passwords do not match")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                        }
+                        
+                        
                         TextField("Age", text: $age)
                             .keyboardType(.numberPad)
                             
@@ -136,6 +166,7 @@ struct SignUpView: View {
                         }
                     }
                 }
+                
                 if formIsValid {
                     NavigationLink(destination: ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp, showAlert: $showAlert), isActive: $navigateToServicesView) {
                         EmptyView()
@@ -149,7 +180,7 @@ struct SignUpView: View {
                             .padding()
                             .background(Color.mhaPurple)
                             .cornerRadius(50)
-                        }
+                    }
                 } else {
                     Text("Sign Up")
                         .frame(width: 200, height: 30)
@@ -189,10 +220,13 @@ struct SignUpView: View {
         let heightFeetValid = Int(heightFeet) ?? 0 > 0
         let heightInchesValid = (Int(heightInches) ?? 0) >= 0 && (Int(heightInches) ?? 0) < 12
         let weightValid = Double(weight) ?? 0 > 0
+        let emailValid = isValidEmail(email)
         
         return !name.isEmpty &&
                !email.isEmpty &&
+               emailValid &&
                !password.isEmpty &&
+               passwordsMatch &&
                !age.isEmpty &&
                acceptedTerms &&
                ageVerified &&

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import OpenAI
+import SwiftKeychainWrapper
 
 final class ChatbotViewModel: ObservableObject {
     @Published var messages: [ChatMessage] = []
@@ -64,5 +65,57 @@ final class ChatbotViewModel: ObservableObject {
     private func receiveChatbotMessage(_ message: String) {
         let receivedMessage = ChatMessage(message: message, isUser: false)
         messages.append(receivedMessage)
+        saveRecipe(name: "Suggested Recipe", content: message)
     }
+
+    private func saveRecipe(name: String, content: String) {
+        guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
+            print("DEBUG - Failed to retrieve userHash from Keychain")
+            return
+        }
+        
+        let recipe = Recipe(name: name, content: content, userHash: userHash)
+        
+        guard let url = URL(string: "http://localhost:8080/recipes") else {
+            print("DEBUG - Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            let jsonData = try JSONEncoder().encode(recipe)
+            request.httpBody = jsonData
+        } catch {
+            print("DEBUG - Error encoding recipe: \(error)")
+            return
+        }
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("DEBUG - Error saving recipe: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let data = data else {
+                print("DEBUG - No data received")
+                return
+            }
+            
+            do {
+                let savedRecipe = try JSONDecoder().decode(Recipe.self, from: data)
+                print("DEBUG - Recipe saved successfully: \(savedRecipe)")
+            } catch {
+                print("DEBUG - Error decoding response: \(error)")
+            }
+        }.resume()
+    }
+}
+
+struct Recipe: Codable {
+    var name: String
+    var content: String
+    var userHash: String
 }

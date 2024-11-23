@@ -21,6 +21,9 @@
 		254013EA2CF11C8F00004E36 /* OpenAISwift in Frameworks */ = {isa = PBXBuildFile; productRef = 254013E92CF11C8F00004E36 /* OpenAISwift */; };
 		254013EC2CF11C9200004E36 /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 254013EB2CF11C9200004E36 /* OpenAI */; };
 		254013EE2CF11C9400004E36 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 254013ED2CF11C9400004E36 /* SwiftKeychainWrapper */; };
+		254013F02CF18D4700004E36 /* HealthWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254013EF2CF18D4700004E36 /* HealthWidget.swift */; };
+		254013F42CF1954700004E36 /* FitnessWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254013F32CF1954700004E36 /* FitnessWidgetView.swift */; };
+		254013F62CF19A5300004E36 /* RecipesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254013F52CF19A5300004E36 /* RecipesView.swift */; };
 		2562C0812CCA10CC009E4284 /* MedicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2562C0802CCA10CC009E4284 /* MedicationWidget.swift */; };
 		25D6E3B92CC9CBD2004A2B1A /* EditProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */; };
 		5A02A49F2CEBCE9200E83C60 /* FitnessDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */; };
@@ -76,6 +79,9 @@
 		2528D6312CC9FB35000D5852 /* NutritionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionView.swift; sourceTree = "<group>"; };
 		2528D6352CC9FB86000D5852 /* NutritionWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionWidgetView.swift; sourceTree = "<group>"; };
 		254013E62CF1193700004E36 /* VitalInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VitalInfoView.swift; sourceTree = "<group>"; };
+		254013EF2CF18D4700004E36 /* HealthWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthWidget.swift; sourceTree = "<group>"; };
+		254013F32CF1954700004E36 /* FitnessWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessWidgetView.swift; sourceTree = "<group>"; };
+		254013F52CF19A5300004E36 /* RecipesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipesView.swift; sourceTree = "<group>"; };
 		2562C0802CCA10CC009E4284 /* MedicationWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationWidget.swift; sourceTree = "<group>"; };
 		25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfilePage.swift; sourceTree = "<group>"; };
 		5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessDataView.swift; sourceTree = "<group>"; };
@@ -93,7 +99,7 @@
 		5AB0CE312CEB15A8003FC857 /* SleepDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataView.swift; sourceTree = "<group>"; };
 		5AB0CE332CEB15AF003FC857 /* VitalInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VitalInfoView.swift; sourceTree = "<group>"; };
 		5AD777E52CC330AF00DC2B8B /* myHealthArc-new-frontend.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "myHealthArc-new-frontend.entitlements"; sourceTree = "<group>"; };
-		8F161C292CC1B36200E726E7 /* myHealthArc-new-frontend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "myHealthArc-new-frontend.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F161C292CC1B36200E726E7 /* myHealthArc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = myHealthArc.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F161C2C2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myHealthArc_new_frontendApp.swift; sourceTree = "<group>"; };
 		8F161C2E2CC1B36200E726E7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8F161C302CC1B36400E726E7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -167,7 +173,7 @@
 		8F161C2A2CC1B36200E726E7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8F161C292CC1B36200E726E7 /* myHealthArc-new-frontend.app */,
+				8F161C292CC1B36200E726E7 /* myHealthArc.app */,
 				8F161C392CC1B36400E726E7 /* myHealthArc-new-frontendTests.xctest */,
 				8F161C432CC1B36400E726E7 /* myHealthArc-new-frontendUITests.xctest */,
 			);
@@ -189,11 +195,14 @@
 				5A2504BC2CED99B60092C149 /* HealthSyncPreviewView.swift */,
 				5AB0CE2F2CEB15A2003FC857 /* BodyInfoView.swift */,
 				5AB0CE312CEB15A8003FC857 /* SleepDataView.swift */,
+				254013EF2CF18D4700004E36 /* HealthWidget.swift */,
 				5AB0CE2B2CEB0FBA003FC857 /* ActivityManager.swift */,
 				F47367BF2CE4026400D58353 /* ChatbotView.swift */,
 				F47367C42CE4057C00D58353 /* ChatbotViewModel.swift */,
 				F4ED25562CEC057600A3E53A /* MacrosTrackingView.swift */,
+				254013F32CF1954700004E36 /* FitnessWidgetView.swift */,
 				250FC2322CC1F9CF0023AE43 /* LoginView.swift */,
+				254013F52CF19A5300004E36 /* RecipesView.swift */,
 				250FC23A2CC201430023AE43 /* Tabs.swift */,
 				250FC23C2CC202C90023AE43 /* SignUpView.swift */,
 				250FC2382CC200DF0023AE43 /* SettingsView.swift */,
@@ -256,7 +265,7 @@
 			);
 			name = "myHealthArc-new-frontend";
 			productName = "myHealthArc-new-frontend";
-			productReference = 8F161C292CC1B36200E726E7 /* myHealthArc-new-frontend.app */;
+			productReference = 8F161C292CC1B36200E726E7 /* myHealthArc.app */;
 			productType = "com.apple.product-type.application";
 		};
 		8F161C382CC1B36400E726E7 /* myHealthArc-new-frontendTests */ = {
@@ -387,6 +396,7 @@
 				5A02A4A12CEBF01000E83C60 /* HealthKitManager.swift in Sources */,
 				250FC2372CC200D10023AE43 /* ServicesView.swift in Sources */,
 				5AB0CE2C2CEB0FBA003FC857 /* ActivityManager.swift in Sources */,
+				254013F42CF1954700004E36 /* FitnessWidgetView.swift in Sources */,
 				250FC2332CC1F9CF0023AE43 /* LoginView.swift in Sources */,
 				250FC23D2CC202D10023AE43 /* SignUpView.swift in Sources */,
 				5A2504BD2CED99B60092C149 /* HealthSyncPreviewView.swift in Sources */,
@@ -394,6 +404,7 @@
 				2528D6322CC9FB35000D5852 /* NutritionView.swift in Sources */,
 				8F161C2F2CC1B36200E726E7 /* ContentView.swift in Sources */,
 				5AB0CE2E2CEB1059003FC857 /* AppleHealthView.swift in Sources */,
+				254013F02CF18D4700004E36 /* HealthWidget.swift in Sources */,
 				5AB0CE302CEB15A3003FC857 /* BodyInfoView.swift in Sources */,
 				5AB0CE322CEB15A8003FC857 /* SleepDataView.swift in Sources */,
 				5A02A49F2CEBCE9200E83C60 /* FitnessDataView.swift in Sources */,
@@ -403,6 +414,7 @@
 				F4ED25572CEC057600A3E53A /* MacrosTrackingView.swift in Sources */,
 				F47367C02CE4026400D58353 /* ChatbotView.swift in Sources */,
 				8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */,
+				254013F62CF19A5300004E36 /* RecipesView.swift in Sources */,
 				5AAA9B482CEDB6030051134F /* APIClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -587,7 +599,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "myHealthArc.myHealthArc-new-frontend";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = myHealthArc;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -623,7 +635,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "myHealthArc.myHealthArc-new-frontend";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = myHealthArc;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

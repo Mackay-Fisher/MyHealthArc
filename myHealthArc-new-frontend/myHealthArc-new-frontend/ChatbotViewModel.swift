@@ -68,13 +68,12 @@ final class ChatbotViewModel: ObservableObject {
         saveRecipe(name: "Suggested Recipe", content: message)
     }
 
-    private func saveRecipe(name: String, content: String) {
+    func saveRecipe(name: String, content: String) {
         guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
             print("DEBUG - Failed to retrieve userHash from Keychain")
             return
         }
-        
-        let recipe = Recipe(name: name, content: content, userHash: userHash)
+        let recipe = Recipe(name: name, content: content, userHash: userHash, id: UUID())
         
         guard let url = URL(string: "http://localhost:8080/recipes") else {
             print("DEBUG - Invalid URL")
@@ -114,8 +113,10 @@ final class ChatbotViewModel: ObservableObject {
     }
 }
 
-struct Recipe: Codable {
+struct Recipe: Codable, Identifiable {
     var name: String
     var content: String
     var userHash: String
+    let id: UUID
+    
 }

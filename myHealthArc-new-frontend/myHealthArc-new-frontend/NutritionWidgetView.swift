@@ -99,7 +99,6 @@ struct NutritionWidgetView: View {
             .shadow(radius: 0.2)
         }
         .buttonStyle(PlainButtonStyle())
-        .padding()
     }
 
     private func fetchFoodInfo() {

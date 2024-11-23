@@ -34,11 +34,9 @@ struct ContentView: View {
                     // Widgets Area
                     ScrollView {
                         VStack(spacing: 20) {
-                            WidgetView(title: "Apple Health", detail: "Sleep: 8 hours")
-                            WidgetView(title: "Apple Fitness", detail: "Steps: 2,000")
-                            
+                            HealthWidget()
+                            FitnessWidgetView()
                             MedicationWidget()
-                            
                             NutritionWidgetView()
                         }
                         //.padding()

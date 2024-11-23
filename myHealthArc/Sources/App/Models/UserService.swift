@@ -10,26 +10,14 @@ final class UserService: Model, Content {
     @Parent(key: "user_id")
     var user: User
     
-    @Field(key: "apple_health_enabled")
-    var appleHealthEnabled: Bool
-    
-    @Field(key: "apple_fitness_enabled")
-    var appleFitnessEnabled: Bool
-    
-    @Field(key: "prescriptions_enabled")
-    var prescriptionsEnabled: Bool
-    
-    @Field(key: "nutrition_enabled")
-    var nutritionEnabled: Bool
+    @Field(key: "selected_services")
+    var selectedServices: [String: Bool]
     
     init() { }
     
-    init(id: UUID? = nil, userID: UUID, appleHealthEnabled: Bool, appleFitnessEnabled: Bool, prescriptionsEnabled: Bool, nutritionEnabled: Bool) {
+    init(id: UUID? = nil, userID: UUID, selectedServices: [String: Bool]) {
         self.id = id
         self.$user.id = userID
-        self.appleHealthEnabled = appleHealthEnabled
-        self.appleFitnessEnabled = appleFitnessEnabled
-        self.prescriptionsEnabled = prescriptionsEnabled
-        self.nutritionEnabled = nutritionEnabled
+        self.selectedServices = selectedServices
     }
 }

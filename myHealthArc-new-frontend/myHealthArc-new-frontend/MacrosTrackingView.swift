@@ -8,17 +8,28 @@
 import SwiftUI
 import SwiftKeychainWrapper
 
+struct BodyDataModel: Codable {
+    let userHash: String
+    let height: Double
+    let weight: Double
+    let age: Int
+    let gender: String
+    let bmi: Double?
+}
+
 struct MacrosTrackingView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var protein_left: Double = 0
     @State private var carbs_left: Double = 0
     @State private var fats_left: Double = 0
+    @State private var calories_left: Double = 0
     @State private var protein_progress_left: Double = 0
     @State private var carbs_progress_left: Double = 0
     @State private var fats_progress_left: Double = 0
+    @State private var calories_progress_left: Double = 0
     @State private var showSheet = false
 
-    private let dailyCaloricGoal: Double = 2000
+    @State private var dailyCaloricGoal: Double = 2000
     private let proteinPercentage: Double = 0.30
     private let fatsPercentage: Double = 0.25
     private let carbsPercentage: Double = 0.45
@@ -70,7 +81,7 @@ struct MacrosTrackingView: View {
                     
                     HStack(spacing: 20) {
                         MacroProgressView(macroName: "Fats", value: fats_left, unit: "g", color: .red, progress: fats_progress_left)
-                        MacroProgressView(macroName: "Calories", value: carbs_left, unit: "kcal", color: .green, progress: carbs_progress_left)
+                        MacroProgressView(macroName: "Calories", value: calories_left, unit: "kcal", color: .green, progress: calories_progress_left)
                     }
                 }
                 .padding()
@@ -104,9 +115,84 @@ struct MacrosTrackingView: View {
             .background(Color(.systemBackground))
             .navigationBarHidden(true)
             .onAppear {
-                calculateMacros()
+                fetchBodyData()
             }
         }
+    }
+
+    private func fetchBodyData() {
+        guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
+            print("DEBUG - Failed to retrieve userHash from Keychain")
+            return
+        }
+
+        let baseURL = "http://localhost:8080/bodyData/load"
+        guard var urlComponents = URLComponents(string: baseURL) else {
+            print("DEBUG - Failed to create URL components")
+            return
+        }
+        urlComponents.queryItems = [URLQueryItem(name: "userHash", value: userHash)]
+
+        guard let url = urlComponents.url else {
+            print("DEBUG - Failed to create URL from components")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("DEBUG - Error fetching body data: \(error.localizedDescription)")
+                return
+            }
+
+            guard let data = data else {
+                print("DEBUG - No data received")
+                return
+            }
+
+            do {
+                let bodyData = try JSONDecoder().decode(BodyDataModel.self, from: data)
+                let bmi = bodyData.bmi ?? 0.0
+                let height = bodyData.height
+                let weight = bodyData.weight
+                let age = bodyData.age
+                let gender = bodyData.gender
+                DispatchQueue.main.async {
+                    self.dailyCaloricGoal = calculateDailyCaloricGoal(bmi: bmi, height: height, weight: weight, age: age, gender: gender)
+                    self.calculateMacros()
+                }
+            } catch {
+                print("DEBUG - Decoding error: \(error)")
+            }
+        }.resume()
+    }
+
+    private func calculateDailyCaloricGoal(bmi: Double, height: Double, weight: Double, age: Int, gender: String) -> Double {
+        let bmr: Double
+        let baseBmr: Double
+        let weightFactor: Double
+        let heightFactor: Double
+        let ageFactor: Double
+        let ageAsDouble = Double(age)
+        print("Calculating daily caloric goal with BMI: \(bmi)")
+
+        if gender.lowercased() == "male" {
+            baseBmr = 88.362
+            weightFactor = 13.397 * weight
+            heightFactor = 4.799 * height
+            ageFactor = 5.677 * ageAsDouble
+        } else {
+            baseBmr = 447.593
+            weightFactor = 9.247 * weight
+            heightFactor = 3.098 * height
+            ageFactor = 4.330 * ageAsDouble
+        }
+
+        bmr = baseBmr + weightFactor + heightFactor - ageFactor
+        let activityFactor = 1.55
+        return bmr * activityFactor
     }
 
     private func calculateMacros() {
@@ -144,9 +230,11 @@ struct MacrosTrackingView: View {
                 protein_left = remainingProtein
                 fats_left = remainingFats
                 carbs_left = remainingCarbs
+                calories_left = remainingCalories
                 protein_progress_left = totalProtein / expectedProtein
                 fats_progress_left = totalFats / expectedFats
                 carbs_progress_left = totalCarbs / expectedCarbs
+                calories_progress_left = totalCalories / dailyCaloricGoal
             }
         }
     }

@@ -45,6 +45,26 @@ struct SettingsView: View {
                     .cornerRadius(20)
                     .padding(.bottom, 20)
                 }
+
+                Divider()
+                    .overlay(colorScheme == .dark ? Color.white : Color.gray)
+
+                Text("Manage Account")
+                    .font(.title2)
+                    .padding()
+
+                Spacer().frame(height: 20)
+
+                Button("Logout") {
+                    hasSignedUp = false
+                    isLoggedIn = false
+                }
+                .fontWeight(.bold)
+                .foregroundColor(.red)
+                .frame(width: 200, height: 50)
+                .padding()
+                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
+                .cornerRadius(20)
             }
             .padding()
         }
@@ -108,7 +128,7 @@ struct SettingsView: View {
         let body = ServiceRequest(
             userHash: userHash,
             selectedServices: selectedServices,
-            isFaceIDEnabled: false // FaceID is no longer relevant
+            isFaceIDEnabled: false // No FaceID in this version
         )
 
         do {

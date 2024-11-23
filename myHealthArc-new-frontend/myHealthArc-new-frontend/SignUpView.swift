@@ -7,6 +7,7 @@
 //TODO: need to add checks to ensure the information being entered is of correct input type
 //TODO: figure out how to store info
 import SwiftUI
+import SwiftKeychainWrapper
 
 struct UserDTO: Codable {
     var fullName: String
@@ -145,6 +146,8 @@ struct SignUpView: View {
                     DispatchQueue.main.async {
                         //isLoggedIn = true
                         navigateToServicesView = true
+                        KeychainWrapper.standard.set(user.userHash, forKey: "userHash")
+                        print("KEYCHAIN DEBUG - userHash saved: \(user.userHash)")
                     }
                 }
             }

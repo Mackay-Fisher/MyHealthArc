@@ -7,7 +7,7 @@ struct SettingsView: View {
     @State private var appleFitness: Bool = false
     @State private var prescription: Bool = false
     @State private var nutrition: Bool = false
-    @AppStorage("isFaceIDEnabled") private var isFaceIDEnabled: Bool = false
+    //@AppStorage("isFaceIDEnabled") private var isFaceIDEnabled: Bool = false
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
     @Environment(\.colorScheme) var colorScheme
@@ -104,7 +104,7 @@ struct SettingsView: View {
                 .cornerRadius(20)
                 
                 Spacer().frame(height: 20)
-
+                /*
                 Section {
                     Toggle("Enable FaceID", isOn: $isFaceIDEnabled)
                         .onChange(of: isFaceIDEnabled) { value in
@@ -124,10 +124,11 @@ struct SettingsView: View {
                 .cornerRadius(20)
 
                 Spacer().frame(height: 20)
-
+                */
                 Button("Logout") {
                     hasSignedUp = false
                     isLoggedIn = false
+                    KeychainWrapper.standard.removeObject(forKey: "userHash")
                 }
                 .fontWeight(.bold)
                 .foregroundColor(.red)
@@ -152,7 +153,7 @@ struct SettingsView: View {
             }
         }
     }
-
+    /*
     private func enableFaceID() {
         let context = LAContext()
         var error: NSError?
@@ -192,6 +193,7 @@ struct SettingsView: View {
         KeychainWrapper.standard.removeObject(forKey: "isFaceIDEnabled")
         isFaceIDEnabled = false
     }
+    */
 }
 
 enum HealthKitService {

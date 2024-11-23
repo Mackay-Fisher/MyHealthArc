@@ -12,7 +12,7 @@ struct ServicesView: View {
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
     
-    @AppStorage("isFaceIDEnabled") private var isFaceIDEnabled: Bool = false
+    //@AppStorage("isFaceIDEnabled") private var isFaceIDEnabled: Bool = false
     @AppStorage("hasShownAlert") var hasShownAlert = false
     @Binding var showAlert: Bool
 
@@ -82,6 +82,7 @@ struct ServicesView: View {
                     hasShownAlert = true
                 }
             }
+            /*
             .alert("Do you want to enable Face ID?", isPresented: $showAlert) {
                 Button("Yes") {
                     enableFaceID()
@@ -92,6 +93,7 @@ struct ServicesView: View {
                     showAlert = false
                 }
             }
+            */
             .background(colorScheme == .dark ? Color.black : Color.white)
             .navigationBarHidden(true)
             .overlay(
@@ -111,7 +113,7 @@ struct ServicesView: View {
             selectedServices.insert(service)
         }
     }
-
+    /*
     private func enableFaceID() {
         let context = LAContext()
         var error: NSError?
@@ -151,6 +153,7 @@ struct ServicesView: View {
         KeychainWrapper.standard.removeObject(forKey: "isFaceIDEnabled")
         isFaceIDEnabled = false
     }
+    */
 }
 
 struct ServiceButton: View {

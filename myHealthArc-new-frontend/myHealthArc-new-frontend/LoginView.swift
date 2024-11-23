@@ -74,11 +74,13 @@ struct LoginView: View {
                 .padding(.top)
                 .disabled(username.isEmpty || password.isEmpty)
             }
+            /*
             .onAppear {
                 if KeychainWrapper.standard.bool(forKey: "isFaceIDEnabled") == true {
                     authenticateWithFaceID()
                 }
             }
+            */
             
             /*.navigationDestination(isPresented: $isLoggedIn) {
                     View() // Destination view
@@ -100,6 +102,7 @@ struct LoginView: View {
                     DispatchQueue.main.async {
                         isLoggedIn = true
                         KeychainWrapper.standard.set(user.userHash, forKey: "userHash")
+                        print("KEYCHAIN DEBUG - userHash saved: \(user.userHash)")
                     }
                 } else {
                     DispatchQueue.main.async {
@@ -110,6 +113,7 @@ struct LoginView: View {
         }.resume()
     }
 
+    /*
     private func checkFaceID() {
         if KeychainWrapper.standard.bool(forKey: "isFaceIDEnabled") == true {
             authenticateWithFaceID()
@@ -153,6 +157,7 @@ struct LoginView: View {
             isLoggedIn = false
         }
     }
+    */
 
     private func fetchUserDetails(userHash: String) async throws -> User {
         guard let url = URL(string: "http://localhost:8080/users/\(userHash)") else {

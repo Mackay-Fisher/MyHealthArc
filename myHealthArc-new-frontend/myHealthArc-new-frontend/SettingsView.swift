@@ -3,15 +3,16 @@ import LocalAuthentication
 import SwiftKeychainWrapper
 
 struct SettingsView: View {
-    @State private var appleHealth: Bool = false
-    @State private var appleFitness: Bool = false
-    @State private var prescription: Bool = false
-    @State private var nutrition: Bool = false
     //@AppStorage("isFaceIDEnabled") private var isFaceIDEnabled: Bool = false
+    @State private var availableServices: [String] = ["Apple Health", "Apple Fitness", "Prescriptions", "Nutrition"]
+    @State private var selectedServices: [String: Bool] = [:]
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
     @Environment(\.colorScheme) var colorScheme
-    
+
+    private let userHash = "exampleUserHash" // Replace this with dynamic userHash later
+    private let baseURL = "https://185a-198-217-29-75.ngrok-free.app"
+
     var body: some View {
         ScrollView {
             VStack {
@@ -19,72 +20,33 @@ struct SettingsView: View {
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding()
-                
+
                 Divider()
                     .overlay(colorScheme == .dark ? Color.white : Color.gray)
 
                 Text("Toggle Services")
                     .font(.title2)
                     .padding()
-                
-                Section {
-                    Toggle("Apple Health", isOn: $appleHealth)
+
+                ForEach(availableServices, id: \.self) { service in
+                    Section {
+                        Toggle(service, isOn: Binding(
+                            get: { selectedServices[service] ?? false },
+                            set: { isEnabled in
+                                selectedServices[service] = isEnabled
+                            }
+                        ))
                         .font(.system(size: 18))
                         .toggleStyle(.switch)
                         .tint(Color.mhaGreen)
                         .padding()
                         .frame(width: 300)
-                        .onChange(of: appleHealth) { isEnabled in
-                            handleToggleChange(for: .health, isEnabled: isEnabled)
-                        }
+                    }
+                    .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
+                    .cornerRadius(20)
+                    .padding(.bottom, 20)
                 }
-                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
-                .cornerRadius(20)
-                
-                Spacer().frame(height: 20)
-                
-                Section {
-                    Toggle("Apple Fitness", isOn: $appleFitness)
-                        .font(.system(size: 18))
-                        .toggleStyle(.switch)
-                        .tint(Color.mhaGreen)
-                        .padding()
-                        .frame(width: 300)
-                        .onChange(of: appleFitness) { isEnabled in
-                            handleToggleChange(for: .fitness, isEnabled: isEnabled)
-                        }
-                }
-                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
-                .cornerRadius(20)
-                
-                Spacer().frame(height: 20)
-                
-                Section {
-                    Toggle("Prescriptions", isOn: $prescription)
-                        .font(.system(size: 18))
-                        .toggleStyle(.switch)
-                        .tint(Color.mhaGreen)
-                        .padding()
-                        .frame(width: 300)
-                }
-                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
-                .cornerRadius(20)
-                
-                Spacer().frame(height: 20)
-                
-                Section {
-                    Toggle("Nutrition", isOn: $nutrition)
-                        .font(.system(size: 18))
-                        .toggleStyle(.switch)
-                        .tint(Color.mhaGreen)
-                        .padding()
-                        .frame(width: 300)
-                }
-                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
-                .cornerRadius(20)
-                
-                Spacer().frame(height: 20)
-                
+
                 Divider()
                     .overlay(colorScheme == .dark ? Color.white : Color.gray)
 
@@ -133,72 +95,100 @@ struct SettingsView: View {
                 .fontWeight(.bold)
                 .foregroundColor(.red)
                 .frame(width: 200, height: 50)
+                .padding()
+                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
+                .cornerRadius(20)
             }
             .padding()
         }
         .background(colorScheme == .dark ? Color.black : Color.lightbackground)
-    }
-    
-    private func handleToggleChange(for service: HealthKitService, isEnabled: Bool) {
-        switch service {
-        case .health:
-            if isEnabled {
-                print("Apple Health enabled. Scheduling background sync.")
-                HealthKitBackgroundManager.shared.scheduleBackgroundMasterSync()
-            }
-        case .fitness:
-            if isEnabled {
-                print("Apple Fitness enabled. Scheduling background sync.")
-                HealthKitBackgroundManager.shared.scheduleBackgroundMasterSync()
+        .onAppear(perform: fetchServices)
+        .onDisappear {
+            Task {
+                await updateAllServicesAsync()
             }
         }
     }
-    /*
-    private func enableFaceID() {
-        let context = LAContext()
-        var error: NSError?
-        print("Attempting to enable FaceID")
 
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            print("Biometrics are available")
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Enable FaceID") { success, authenticationError in
-                DispatchQueue.main.async {
-                    if success {
-                        isFaceIDEnabled = true
-                        print("FaceID enabled successfully")
-                        KeychainWrapper.standard.set(true, forKey: "isFaceIDEnabled")
-                        if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
-                            KeychainWrapper.standard.set(userHash, forKey: "userHash")
-                            print("KeychainWrapper: userHash saved")
-                        } else {
-                            print("KeychainWrapper: Failed to retrieve userHash")
-                        }
-                    } else {
-                        if let error = authenticationError {
-                            print("Authentication failed: \(error.localizedDescription)")
-                        }
-                        isFaceIDEnabled = false
-                    }
-                }
-            }
-        } else {
+    // MARK: Fetch User Services
+    private func fetchServices() {
+        guard let url = URL(string: "\(baseURL)/user-services/fetch?userHash=\(userHash)") else {
+            print("Invalid URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("Biometrics not available: \(error.localizedDescription)")
+                print("Failed to fetch services: \(error.localizedDescription)")
+                return
             }
-            isFaceIDEnabled = false
-        }
+
+            guard let data = data else {
+                print("No data received")
+                return
+            }
+
+            do {
+                let response = try JSONDecoder().decode(ServiceResponse.self, from: data)
+                DispatchQueue.main.async {
+                    self.selectedServices = response.selectedServices
+                }
+            } catch {
+                print("Failed to decode services: \(error.localizedDescription)")
+            }
+        }.resume()
     }
 
-    private func disableFaceID() {
-        KeychainWrapper.standard.removeObject(forKey: "isFaceIDEnabled")
-        isFaceIDEnabled = false
+    // MARK: Update All Services (Async)
+    private func updateAllServicesAsync() async {
+        guard !selectedServices.isEmpty else {
+            print("No services selected. Skipping update.")
+            return
+        }
+
+        guard let url = URL(string: "\(baseURL)/user-services/update") else {
+            print("Invalid URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body = ServiceRequest(
+            userHash: userHash,
+            selectedServices: selectedServices,
+            isFaceIDEnabled: false // No FaceID in this version
+        )
+
+        do {
+            request.httpBody = try JSONEncoder().encode(body)
+
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                print("Services updated successfully")
+            } else {
+                print("Failed to update services: \(response)")
+            }
+        } catch {
+            print("Failed to update services: \(error.localizedDescription)")
+        }
     }
-    */
 }
 
-enum HealthKitService {
-    case health
-    case fitness
+// MARK: - Request and Response Models
+struct ServiceRequest: Codable {
+    var userHash: String
+    var selectedServices: [String: Bool]
+    var isFaceIDEnabled: Bool
+}
+
+struct ServiceResponse: Codable {
+    var selectedServices: [String: Bool]
+    var isFaceIDEnabled: Bool
 }
 
 struct SettingsView_Previews: PreviewProvider {

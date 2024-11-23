@@ -1,10 +1,28 @@
 {
-  "originHash" : "2e643107205478e85dda039870fa99ee40745c800deb0f49e6df3ad8dcb4dd7c",
+  "originHash" : "d8dfd825af690d31ab717473f756d394eecab82f7a08cbd6b78a272c0b991716",
   "pins" : [
+    {
+      "identity" : "openai",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MacPaw/OpenAI",
+      "state" : {
+        "revision" : "843e087929aa806adb611dbca93f9a4a7f28be04",
+        "version" : "0.3.0"
+      }
+    },
+    {
+      "identity" : "openaiswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/adamrushy/OpenAISwift",
+      "state" : {
+        "revision" : "ca66fb720d6ebb657601db5a0852b830ae310a4c",
+        "version" : "1.4.1"
+      }
+    },
     {
       "identity" : "swiftkeychainwrapper",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/jrendel/SwiftKeychainWrapper.git",
+      "location" : "https://github.com/jrendel/SwiftKeychainWrapper",
       "state" : {
         "revision" : "185a3165346a03767101c4f62e9a545a0fe0530f",
         "version" : "4.0.1"

@@ -73,7 +73,7 @@ struct SignUpView: View {
                         
                         // Show DatePicker conditionally
                         if showDatePicker {
-                            DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
+                            DatePicker("", selection: $dob, displayedComponents: .date)
                                 .datePickerStyle(.wheel)
                         }
                         

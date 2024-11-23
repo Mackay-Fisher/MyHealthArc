@@ -27,29 +27,47 @@ extension Color {
     static let mhaPurple = Color(hex: "#C197D2")
     static let mhaGreen = Color(hex: "#5EB229")
     static let mhaGray = Color(hex: "#292828")
+    static let mhaBlue = Color(hex: "#41B8D5")
+    static let mhaOrange = Color(hex: "#F2A25C")
+    static let mhaSalmon = Color(hex: "#FF7D79")
     static let lightbackground = Color(hex: "#f2f2f2")
     
 }
 
 @main
 struct myHealthArc_new_frontendApp: App {
-    @State private var isLoggedIn = false
+    @AppStorage("isLoggedIn") var isLoggedIn = false
     @State private var hasSignedUp = false
     @State private var showAlert = true
-        
+//    init() {
+//            // Register background tasks on app initialization
+//            HealthKitBackgroundManager.shared.registerBackgroundTasks()
+//            Task {
+//                    if await HealthKitBackgroundManager.shared.requestHealthKitAuthorization() {
+//                        HealthKitBackgroundManager.shared.syncMasterData { success in
+//                            print("Initial sync completed: \(success ? "Success" : "Failure")")
+//                        }
+//                    } else {
+//                        print("HealthKit authorization not granted.")
+//                    }
+//                }
+//        }
         var body: some Scene {
             WindowGroup {
-                if isLoggedIn {
-                    Tabs(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
-                }
-                else if hasSignedUp {
-                    ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp, showAlert: $showAlert)
-                }
-                else {
-                    //LoginView(isLoggedIn: $isLoggedIn)
-                    AppOpenScreen(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
-                }
-            }
+                AppleHealthHomeView()
+                    }
+//            WindowGroup {
+//                if isLoggedIn {
+//                    Tabs(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
+//                }
+//                else if hasSignedUp {
+//                    ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
+//                }
+//                else {
+//                    //LoginView(isLoggedIn: $isLoggedIn)
+//                    AppOpenScreen(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
+//                }
+//            }
         }
 
     private func authenticateWithFaceID() {

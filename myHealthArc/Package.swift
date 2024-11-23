@@ -52,6 +52,18 @@ let package = Package(
                 "CreateHealthKitsTest.swift",
                 "FaceIDBackendTest.swift"
             ]
+        ),
+        .testTarget(
+            name: "NutritionTests",
+            dependencies: [
+                .target(name: "App"),
+                .product(name: "XCTVapor", package: "vapor"),
+            ],
+            path: "Tests/NutritionTests",
+            sources: [
+                "NutritionValidationTest.swift",
+                "NutritionEntryTest.swift"
+            ]
         )
     ]
 )

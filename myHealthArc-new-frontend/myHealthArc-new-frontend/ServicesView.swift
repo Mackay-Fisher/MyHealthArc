@@ -5,11 +5,17 @@
 //  Created by Anjali Hole on 10/17/24.
 //
 import SwiftUI
+import LocalAuthentication
+import SwiftKeychainWrapper
 
 struct ServicesView: View {
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
     
+    @AppStorage("isFaceIDEnabled") private var isFaceIDEnabled: Bool = false
+    @AppStorage("hasShownAlert") var hasShownAlert = false
+    @Binding var showAlert: Bool
+
     @State private var selectedServices: Set<String> = []
     @Environment(\.colorScheme) var colorScheme
     @State private var userName: String = "User Name" // Placeholder for user name
@@ -70,6 +76,22 @@ struct ServicesView: View {
                 }
                 .padding(.bottom, 30)
             }
+            .onAppear {
+                if !hasShownAlert {
+                    showAlert = true
+                    hasShownAlert = true
+                }
+            }
+            .alert("Do you want to enable Face ID?", isPresented: $showAlert) {
+                Button("Yes") {
+                    enableFaceID()
+                    showAlert = false
+                }
+                Button("No", role: .cancel) {
+                    disableFaceID()
+                    showAlert = false
+                }
+            }
             .background(colorScheme == .dark ? Color.black : Color.white)
             .navigationBarHidden(true)
             .overlay(
@@ -88,6 +110,46 @@ struct ServicesView: View {
         } else {
             selectedServices.insert(service)
         }
+    }
+
+    private func enableFaceID() {
+        let context = LAContext()
+        var error: NSError?
+        print("Attempting to enable FaceID")
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            print("Biometrics are available")
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Enable FaceID") { success, authenticationError in
+                DispatchQueue.main.async {
+                    if success {
+                        isFaceIDEnabled = true
+                        print("FaceID enabled successfully")
+                        KeychainWrapper.standard.set(true, forKey: "isFaceIDEnabled")
+                        if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
+                            KeychainWrapper.standard.set(userHash, forKey: "userHash")
+                            print("KeychainWrapper: userHash saved")
+                        } else {
+                            print("KeychainWrapper: Failed to retrieve userHash")
+                        }
+                    } else {
+                        if let error = authenticationError {
+                            print("Authentication failed: \(error.localizedDescription)")
+                        }
+                        isFaceIDEnabled = false
+                    }
+                }
+            }
+        } else {
+            if let error = error {
+                print("Biometrics not available: \(error.localizedDescription)")
+            }
+            isFaceIDEnabled = false
+        }
+    }
+
+    private func disableFaceID() {
+        KeychainWrapper.standard.removeObject(forKey: "isFaceIDEnabled")
+        isFaceIDEnabled = false
     }
 }
 
@@ -139,6 +201,7 @@ struct ServicesView_Previews: PreviewProvider {
     static var previews: some View {
         @State var isLoggedIn: Bool = false
         @State var hasSignedUp: Bool = false
-        ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
+        @State var showAlert: Bool = true
+        ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp, showAlert: $showAlert)
     }
 }

@@ -29,6 +29,11 @@ struct Tabs: View {
                     Image(systemName: "books.vertical")
                     Text("Recipes")
                 }
+            GoalsView()
+                .tabItem {
+                    Image(systemName: "target")
+                    Text("Goals")
+                }
 //            SettingsView(isLoggedIn: $isLoggedIn,hasSignedUp: $hasSignedUp)
 //                .tabItem {
 //                    Image(systemName: "gear")

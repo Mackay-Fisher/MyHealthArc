@@ -68,7 +68,7 @@ final class ChatbotViewModel: ObservableObject {
         saveRecipe(name: "Suggested Recipe", content: message)
     }
 
-    private func saveRecipe(name: String, content: String) {
+    func saveRecipe(name: String, content: String) {
         guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
             print("DEBUG - Failed to retrieve userHash from Keychain")
             return

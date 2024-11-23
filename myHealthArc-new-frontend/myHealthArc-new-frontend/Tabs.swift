@@ -18,41 +18,22 @@ struct Tabs: View {
                     Image(systemName: "house")
                     Text("Home")
             }
-            SettingsView(isLoggedIn: $isLoggedIn,hasSignedUp: $hasSignedUp)
-                .tabItem {
-                    Image(systemName: "gear")
-                    Text("Settings")
-                }
-            //filler atm cuz 2 tabs looks dumb
-            EditProfilePage()
-                .tabItem {
-                    //TODO: figure out why this is filled in
-                    Image(systemName: "rectangle.portrait.and.arrow.right")
-                    Text("Profile")
-            }
-            // Temporary Placement
-            /*MacrosTrackingView()
+            
+            MacrosTrackingView()
                 .tabItem {
                     Image(systemName: "chart.pie")
                     Text("Macros")
-                }*/
-            /*MedicationsView()
-                .tabItem {
-                    Image(systemName: "pills")
-                    Text("Medications")
-            }
-            NutritionView()
-                .tabItem {
-                    Image(systemName: "carrot")
-                    Text("Nutrition")
-            }*/
-            
-            /*ServicesView(isLoggedIn: $isLoggedIn)
-                .tabItem {
-                    Image(systemName: "heart")
-                    Text("Services")
                 }
-            */
+            RecipesView()
+                .tabItem {
+                    Image(systemName: "books.vertical")
+                    Text("Recipes")
+                }
+//            SettingsView(isLoggedIn: $isLoggedIn,hasSignedUp: $hasSignedUp)
+//                .tabItem {
+//                    Image(systemName: "gear")
+//                    Text("Settings")
+//                }
             
         }
     }

@@ -5,7 +5,6 @@
 //  Created by Anjali Hole on 11/22/24.
 //
 
-
 import SwiftUI
 
 struct HealthWidget: View {
@@ -32,7 +31,7 @@ struct HealthWidget: View {
             Button(action: {
                 showFullHealthView = true
             }) {
-                VStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 20) {
                     // Title Section
                     HStack {
                         Spacer()
@@ -43,13 +42,9 @@ struct HealthWidget: View {
                                 .frame(width: 25)
                                 .foregroundColor(.pink)
                             
-                            Spacer()
-                                .frame(width: 15)
-                            
                             Text("Apple Health")
                                 .font(.headline)
                                 .padding(.top)
-                                .frame(alignment: .leading)
                         }
                         
                         Spacer()
@@ -58,19 +53,19 @@ struct HealthWidget: View {
                             .padding(.top)
                             .foregroundColor(colorScheme == .dark ? Color.lightbackground : Color.gray)
                     }
+                    
                     Divider()
                     
-                    
                     // Streaks Section
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 10) {
                         Text("Streaks")
                             .font(.headline)
                         
                         // Sleep Goals Pill
                         HStack {
-                            Image(systemName: "triangle.fill")
+                            Image(systemName: "pin.fill")
                                 .rotationEffect(.degrees(180))
-                                .foregroundColor(.green)
+                                .foregroundColor(.blue)
                             Text("Sleep Goals")
                                 .font(.subheadline)
                         }
@@ -78,17 +73,22 @@ struct HealthWidget: View {
                         .padding(.vertical, 6)
                         .background(Color.gray.opacity(0.2))
                         .cornerRadius(20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        
                         
                         // Streak Information
-                        HStack {
+                        HStack(alignment: .center) {
                             Image(systemName: "flame.fill")
                                 .foregroundColor(.orange)
+                            
                             Text("\(sleepStreak) days")
                                 .foregroundColor(.green)
                                 .fontWeight(.bold)
                             + Text(" of meeting\nyour sleep goal!")
                                 .fontWeight(.regular)
+
                         }
+                        .frame(maxWidth: .infinity, alignment: .center)
                     }
                     
                     // Sleep Data Section
@@ -98,32 +98,9 @@ struct HealthWidget: View {
                         
                         // Sleep Ring
                         HStack {
-                            ZStack {
-                                Circle()
-                                    .stroke(Color.gray.opacity(0.2), lineWidth: 8)
-                                    .frame(width: 80, height: 80)
+                            CircularSleepChart(hoursSlept: sleepHours)
+                                .frame(width: 80, height: 80)
                                 
-                                Circle()
-                                    .trim(from: 0, to: 0.7)
-                                    .stroke(
-                                        AngularGradient(
-                                            colors: sleepStages.map { $0.1 },
-                                            center: .center
-                                        ),
-                                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                                    )
-                                    .frame(width: 80, height: 80)
-                                    .rotationEffect(.degrees(-90))
-                                
-                                VStack {
-                                    Text("\(Int(sleepHours))")
-                                        .font(.title2)
-                                        .fontWeight(.bold)
-                                    Text("hrs")
-                                        .font(.caption)
-                                }
-                            }
-                            
                             // Legend
                             VStack(alignment: .leading, spacing: 4) {
                                 ForEach(sleepStages, id: \.0) { stage in
@@ -138,6 +115,7 @@ struct HealthWidget: View {
                             }
                             .padding(.leading)
                         }
+                        .frame(maxWidth: .infinity, alignment: .center)
                     }
                 }
                 .padding()

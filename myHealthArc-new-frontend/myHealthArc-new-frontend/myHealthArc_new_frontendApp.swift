@@ -52,23 +52,21 @@ struct myHealthArc_new_frontendApp: App {
 //                    }
 //                }
 //        }
-        var body: some Scene {
-            WindowGroup {
-                AppleHealthHomeView()
-                    }
-//            WindowGroup {
-//                if isLoggedIn {
-//                    Tabs(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
-//                }
-//                else if hasSignedUp {
-//                    ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
-//                }
-//                else {
-//                    //LoginView(isLoggedIn: $isLoggedIn)
-//                    AppOpenScreen(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
-//                }
-//            }
+    var body: some Scene {
+
+        WindowGroup {
+            if isLoggedIn {
+                Tabs(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp)
+            }
+            else if hasSignedUp {
+                ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp, showAlert: $showAlert)
+            }
+            else {
+                //LoginView(isLoggedIn: $isLoggedIn)
+                AppOpenScreen(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
+            }
         }
+    }
 
     private func authenticateWithFaceID() {
         let context = LAContext()

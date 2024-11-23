@@ -43,6 +43,12 @@ struct SignUpView: View {
     @State private var heightInches: String = ""
     @State private var weight: String = ""
     
+    // Constants for validation
+    private let minHeightFeet = 3 // 3 feet
+    private let maxHeightFeet = 8 // 8 feet
+    private let minWeight = 70.0 // 70 pounds
+    private let maxWeight = 700.0 // 700 pounds
+    
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
     
@@ -58,6 +64,50 @@ struct SignUpView: View {
     
     private var passwordsMatch: Bool {
         return password == password2 && !password.isEmpty
+    }
+    
+    private var heightIsValid: Bool {
+        let feet = Int(heightFeet) ?? 0
+        let inches = Int(heightInches) ?? 0
+        return feet >= minHeightFeet &&
+               feet <= maxHeightFeet &&
+               inches >= 0 &&
+               inches < 12
+    }
+    
+    private var weightIsValid: Bool {
+        let weightValue = Double(weight) ?? 0
+        return weightValue >= minWeight && weightValue <= maxWeight
+    }
+    
+    private var heightErrorMessage: String {
+        if heightFeet.isEmpty || heightInches.isEmpty {
+            return "Height is required"
+        }
+        let feet = Int(heightFeet) ?? 0
+        let inches = Int(heightInches) ?? 0
+        
+        if feet < minHeightFeet || feet > maxHeightFeet {
+            return "Height must be between \(minHeightFeet) and \(maxHeightFeet) feet"
+        }
+        if inches < 0 || inches >= 12 {
+            return "Inches must be between 0 and 11"
+        }
+        return ""
+    }
+    
+    private var weightErrorMessage: String {
+        if weight.isEmpty {
+            return "Weight is required"
+        }
+        let weightValue = Double(weight) ?? 0
+        if weightValue < minWeight {
+            return "Weight must be at least \(Int(minWeight)) pounds"
+        }
+        if weightValue > maxWeight {
+            return "Weight must be less than \(Int(maxWeight)) pounds"
+        }
+        return ""
     }
     
     var body: some View {
@@ -84,17 +134,15 @@ struct SignUpView: View {
                         VStack(alignment: .leading) {
                             SecureField("Password", text: $password)
                                 .textContentType(.newPassword)
-                        }
-                        VStack(alignment: .leading) {
                             SecureField("Re-Enter Password", text: $password2)
                                 .textContentType(.newPassword)
+                            
+                            if !password.isEmpty && !password2.isEmpty && !passwordsMatch {
+                                Text("Passwords do not match")
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                            }
                         }
-                        if !password.isEmpty && !password2.isEmpty && !passwordsMatch {
-                            Text("Passwords do not match")
-                                .font(.caption)
-                                .foregroundColor(.red)
-                        }
-                        
                         
                         TextField("Age", text: $age)
                             .keyboardType(.numberPad)
@@ -106,23 +154,39 @@ struct SignUpView: View {
                             }
                         }
                         
-                        // Height Input
-                        HStack {
-                            TextField("Feet", text: $heightFeet)
-                                .keyboardType(.numberPad)
-                                .frame(width: 50)
-                            Text("ft")
-                            TextField("Inches", text: $heightInches)
-                                .keyboardType(.numberPad)
-                                .frame(width: 50)
-                            Text("in")
+                        // Height Input with Validation
+                        VStack(alignment: .leading) {
+                            HStack {
+                                TextField("Feet", text: $heightFeet)
+                                    .keyboardType(.numberPad)
+                                    .frame(width: 50)
+                                Text("ft")
+                                TextField("Inches", text: $heightInches)
+                                    .keyboardType(.numberPad)
+                                    .frame(width: 50)
+                                Text("in")
+                            }
+                            
+                            if !heightFeet.isEmpty && !heightInches.isEmpty && !heightIsValid {
+                                Text(heightErrorMessage)
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                            }
                         }
                         
-                        // Weight Input
-                        HStack {
-                            TextField("Weight", text: $weight)
-                                .keyboardType(.decimalPad)
-                            Text("lbs")
+                        // Weight Input with Validation
+                        VStack(alignment: .leading) {
+                            HStack {
+                                TextField("Weight", text: $weight)
+                                    .keyboardType(.decimalPad)
+                                Text("lbs")
+                            }
+                            
+                            if !weight.isEmpty && !weightIsValid {
+                                Text(weightErrorMessage)
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                            }
                         }
                             
                         Button(action: {
@@ -217,9 +281,6 @@ struct SignUpView: View {
     }
     
     private var formIsValid: Bool {
-        let heightFeetValid = Int(heightFeet) ?? 0 > 0
-        let heightInchesValid = (Int(heightInches) ?? 0) >= 0 && (Int(heightInches) ?? 0) < 12
-        let weightValid = Double(weight) ?? 0 > 0
         let emailValid = isValidEmail(email)
         
         return !name.isEmpty &&
@@ -230,9 +291,8 @@ struct SignUpView: View {
                !age.isEmpty &&
                acceptedTerms &&
                ageVerified &&
-               heightFeetValid &&
-               heightInchesValid &&
-               weightValid
+               heightIsValid &&
+               weightIsValid
     }
 }
 

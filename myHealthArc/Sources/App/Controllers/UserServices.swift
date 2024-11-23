@@ -4,54 +4,68 @@ import Vapor
 struct UserServiceController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let userServices = routes.grouped("user-services")
-        userServices.post(use: self.updateUserServices) // POST /user-services
-        userServices.get(":userID", use: self.getUserServices) // GET /user-services/:userID
+        userServices.get("fetch", use: fetchUserServices)
+        userServices.post("update", use: updateUserServices)
     }
-    
-    // Update (or create) user services
-    func updateUserServices(req: Request) async throws -> UserService {
-        let serviceDTO = try req.content.decode(UserServiceDTO.self)
-        
-        guard let user = try await User.find(serviceDTO.userID, on: req.db) else {
+
+    // MARK: - Fetch User Services
+    func fetchUserServices(req: Request) async throws -> ServiceResponse {
+        guard let userId = try? req.query.get(String.self, at: "userId") else {
+            throw Abort(.badRequest, reason: "'userId' must be provided as a query parameter.")
+        }
+
+        guard let userUUID = UUID(uuidString: userId) else {
+            throw Abort(.badRequest, reason: "Invalid userId format. Must be a valid UUID.")
+        }
+
+        guard let userService = try await UserService.query(on: req.db)
+            .filter(\.$user.$id == userUUID)
+            .first() else {
+            throw Abort(.notFound, reason: "User services not found for the provided userId.")
+        }
+
+        return ServiceResponse(
+            selectedServices: userService.selectedServices,
+            isFaceIDEnabled: userService.isFaceIDEnabled
+        )
+    }
+
+    // MARK: - Update User Services
+    func updateUserServices(req: Request) async throws -> HTTPStatus {
+        let requestBody = try req.content.decode(ServiceRequest.self)
+
+        guard let userUUID = UUID(uuidString: requestBody.userId) else {
+            throw Abort(.badRequest, reason: "Invalid userId format. Must be a valid UUID.")
+        }
+
+        guard let user = try await User.find(userUUID, on: req.db) else {
             throw Abort(.notFound, reason: "User not found.")
         }
-        
-        // Find existing user services or create a new one
+
         let userService = try await UserService.query(on: req.db)
-            .filter(\.$user.$id == serviceDTO.userID)
+            .filter(\.$user.$id == user.requireID())
             .first() ?? UserService(
                 userID: try user.requireID(),
-                selectedServices: serviceDTO.selectedServices
+                selectedServices: requestBody.selectedServices,
+                isFaceIDEnabled: requestBody.isFaceIDEnabled
             )
-        
-        // Update selected services
-        userService.selectedServices = serviceDTO.selectedServices
-        
+
+        userService.selectedServices = requestBody.selectedServices
+        userService.isFaceIDEnabled = requestBody.isFaceIDEnabled
+
         try await userService.save(on: req.db)
-        return userService
-    }
-    
-    // Get user services
-    func getUserServices(req: Request) async throws -> UserServiceDTO {
-        guard let userID = req.parameters.get("userID", as: UUID.self) else {
-            throw Abort(.badRequest, reason: "Invalid userID.")
-        }
-        
-        guard let userService = try await UserService.query(on: req.db)
-            .filter(\.$user.$id == userID)
-            .first() else {
-            throw Abort(.notFound, reason: "User services not found.")
-        }
-        
-        return UserServiceDTO(
-            userID: userService.$user.id,
-            selectedServices: userService.selectedServices
-        )
+        return .ok
     }
 }
 
-// DTO for user services
-struct UserServiceDTO: Content {
-    var userID: UUID
+// MARK: - Request and Response Models
+struct ServiceRequest: Content {
+    var userId: String
     var selectedServices: [String: Bool]
+    var isFaceIDEnabled: Bool
+}
+
+struct ServiceResponse: Content {
+    var selectedServices: [String: Bool]
+    var isFaceIDEnabled: Bool
 }

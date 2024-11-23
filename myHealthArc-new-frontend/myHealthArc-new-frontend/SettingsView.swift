@@ -3,14 +3,14 @@ import LocalAuthentication
 import SwiftKeychainWrapper
 
 struct SettingsView: View {
-    @State private var availableServices: [String] = ["Apple Health", "Apple Fitness", "Prescriptions", "Nutrition"] // Add all possible services here
+    @State private var availableServices: [String] = ["Apple Health", "Apple Fitness", "Prescriptions", "Nutrition"]
     @State private var selectedServices: [String: Bool] = [:]
     @AppStorage("isFaceIDEnabled") private var isFaceIDEnabled: Bool = false
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
     @Environment(\.colorScheme) var colorScheme
 
-    private let userHash = "exampleUserHash" // Replace this with dynamic userHash later
+    private let userId = "exampleUserId" // Replace this with dynamic userId later
     private let baseURL = "https://7e81-198-217-29-75.ngrok-free.app"
 
     var body: some View {
@@ -68,19 +68,18 @@ struct SettingsView: View {
                 Spacer().frame(height: 20)
 
                 Section {
-                    Toggle("Enable FaceID", isOn: $isFaceIDEnabled)
-                        .onChange(of: isFaceIDEnabled) { value in
-                            if value {
-                                enableFaceID()
-                            } else {
-                                disableFaceID()
-                            }
+                    Toggle("Enable FaceID", isOn: Binding(
+                        get: { isFaceIDEnabled },
+                        set: { value in
+                            isFaceIDEnabled = value
+                            updateFaceID(value)
                         }
-                        .font(.system(size: 18))
-                        .toggleStyle(.switch)
-                        .tint(Color.mhaGreen)
-                        .padding()
-                        .frame(width: 300)
+                    ))
+                    .font(.system(size: 18))
+                    .toggleStyle(.switch)
+                    .tint(Color.mhaGreen)
+                    .padding()
+                    .frame(width: 300)
                 }
                 .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
                 .cornerRadius(20)
@@ -103,7 +102,7 @@ struct SettingsView: View {
     }
 
     private func fetchServices() {
-        guard let url = URL(string: "\(baseURL)/user-services/\(userHash)") else {
+        guard let url = URL(string: "\(baseURL)/user-services/fetch?userId=\(userId)") else {
             print("Invalid URL")
             return
         }
@@ -123,9 +122,10 @@ struct SettingsView: View {
             }
 
             do {
-                let services = try JSONDecoder().decode([String: Bool].self, from: data)
+                let response = try JSONDecoder().decode(ServiceResponse.self, from: data)
                 DispatchQueue.main.async {
-                    self.selectedServices = services
+                    self.selectedServices = response.selectedServices
+                    self.isFaceIDEnabled = response.isFaceIDEnabled
                 }
             } catch {
                 print("Failed to decode services: \(error.localizedDescription)")
@@ -134,17 +134,27 @@ struct SettingsView: View {
     }
 
     private func updateAllServices() {
-        guard let url = URL(string: "\(baseURL)/user-services/\(userHash)") else {
+        guard let url = URL(string: "\(baseURL)/user-services/update") else {
             print("Invalid URL")
             return
         }
 
         var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
+        request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        let body: [String: Any] = ["selectedServices": selectedServices]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        let body = ServiceRequest(
+            userId: userId,
+            selectedServices: selectedServices,
+            isFaceIDEnabled: isFaceIDEnabled
+        )
+
+        do {
+            request.httpBody = try JSONEncoder().encode(body)
+        } catch {
+            print("Failed to encode update data: \(error.localizedDescription)")
+            return
+        }
 
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
@@ -156,45 +166,22 @@ struct SettingsView: View {
         }.resume()
     }
 
-    private func enableFaceID() {
-        let context = LAContext()
-        var error: NSError?
-        print("Attempting to enable FaceID")
-
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            print("Biometrics are available")
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Enable FaceID") { success, authenticationError in
-                DispatchQueue.main.async {
-                    if success {
-                        isFaceIDEnabled = true
-                        print("FaceID enabled successfully")
-                        KeychainWrapper.standard.set(true, forKey: "isFaceIDEnabled")
-                        if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
-                            KeychainWrapper.standard.set(userHash, forKey: "userHash")
-                            print("KeychainWrapper: userHash saved")
-                        } else {
-                            print("KeychainWrapper: Failed to retrieve userHash")
-                        }
-                    } else {
-                        if let error = authenticationError {
-                            print("Authentication failed: \(error.localizedDescription)")
-                        }
-                        isFaceIDEnabled = false
-                    }
-                }
-            }
-        } else {
-            if let error = error {
-                print("Biometrics not available: \(error.localizedDescription)")
-            }
-            isFaceIDEnabled = false
-        }
+    private func updateFaceID(_ value: Bool) {
+        isFaceIDEnabled = value
+        updateAllServices()
     }
+}
 
-    private func disableFaceID() {
-        KeychainWrapper.standard.removeObject(forKey: "isFaceIDEnabled")
-        isFaceIDEnabled = false
-    }
+// MARK: - Request and Response Models
+struct ServiceRequest: Codable {
+    var userId: String
+    var selectedServices: [String: Bool]
+    var isFaceIDEnabled: Bool
+}
+
+struct ServiceResponse: Codable {
+    var selectedServices: [String: Bool]
+    var isFaceIDEnabled: Bool
 }
 
 struct SettingsView_Previews: PreviewProvider {

@@ -160,7 +160,7 @@ struct MedicationCheckerController: RouteCollection {
     }
 
 
-    private func saveNewInteractions(medications: [String], interactions: FormattedInteractionResponse, db: Database) async throws {
+    public func saveNewInteractions(medications: [String], interactions: FormattedInteractionResponse, db: Database) async throws {
         // Prepare conflicts with severity
         let formattedConflicts = interactions.interactionsBySeverity.flatMap { (severity, reactions) in
             reactions.map { "\(severity): \($0.description)" }
@@ -208,7 +208,7 @@ struct MedicationCheckerController: RouteCollection {
 
 
     // Fetch RxNorm IDs
-    private func getRxNormIds(for drugs: [String], client: Client) async throws -> [String] {
+    public func getRxNormIds(for drugs: [String], client: Client) async throws -> [String] {
         var ids: [String] = []
         for drug in drugs {
             let url = "https://www.medscape.com/api/quickreflookup/LookupService.ashx?q=\(drug)&sz=500&type=10417&metadata=has-interactions&format=json&jsonp=MDICshowResults"
@@ -238,7 +238,7 @@ struct MedicationCheckerController: RouteCollection {
     }
 
     // // Parse and fetch interaction data
-    private func getInteractionData(_ ids: [String], client: Client) async throws -> FormattedInteractionResponse {
+    public func getInteractionData(_ ids: [String], client: Client) async throws -> FormattedInteractionResponse {
         let query = ids.joined(separator: ",")
         let url = "https://reference.medscape.com/druginteraction.do?action=getMultiInteraction&ids=\(query)"
         let response = try await client.get(URI(string: url))
@@ -254,7 +254,7 @@ struct MedicationCheckerController: RouteCollection {
         return formatInteractions(interactionData)
     }
 
-    private func formatInteractions(_ interactionData: InteractionResponse) -> FormattedInteractionResponse {
+    public func formatInteractions(_ interactionData: InteractionResponse) -> FormattedInteractionResponse {
         var interactionsBySeverity: [String: [FormattedInteraction]] = [:]
         
         if interactionData.errorCode == 1, let interactions = interactionData.multiInteractions {

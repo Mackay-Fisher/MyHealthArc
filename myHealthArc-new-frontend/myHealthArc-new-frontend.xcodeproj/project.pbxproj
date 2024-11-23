@@ -22,6 +22,7 @@
 		254013EC2CF11C9200004E36 /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 254013EB2CF11C9200004E36 /* OpenAI */; };
 		254013EE2CF11C9400004E36 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 254013ED2CF11C9400004E36 /* SwiftKeychainWrapper */; };
 		254013F02CF18D4700004E36 /* HealthWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254013EF2CF18D4700004E36 /* HealthWidget.swift */; };
+		254013F42CF1954700004E36 /* FitnessWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254013F32CF1954700004E36 /* FitnessWidgetView.swift */; };
 		2562C0812CCA10CC009E4284 /* MedicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2562C0802CCA10CC009E4284 /* MedicationWidget.swift */; };
 		25D6E3B92CC9CBD2004A2B1A /* EditProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */; };
 		5A02A49F2CEBCE9200E83C60 /* FitnessDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */; };
@@ -78,6 +79,7 @@
 		2528D6352CC9FB86000D5852 /* NutritionWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionWidgetView.swift; sourceTree = "<group>"; };
 		254013E62CF1193700004E36 /* VitalInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VitalInfoView.swift; sourceTree = "<group>"; };
 		254013EF2CF18D4700004E36 /* HealthWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthWidget.swift; sourceTree = "<group>"; };
+		254013F32CF1954700004E36 /* FitnessWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessWidgetView.swift; sourceTree = "<group>"; };
 		2562C0802CCA10CC009E4284 /* MedicationWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationWidget.swift; sourceTree = "<group>"; };
 		25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfilePage.swift; sourceTree = "<group>"; };
 		5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessDataView.swift; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 				F47367BF2CE4026400D58353 /* ChatbotView.swift */,
 				F47367C42CE4057C00D58353 /* ChatbotViewModel.swift */,
 				F4ED25562CEC057600A3E53A /* MacrosTrackingView.swift */,
+				254013F32CF1954700004E36 /* FitnessWidgetView.swift */,
 				250FC2322CC1F9CF0023AE43 /* LoginView.swift */,
 				250FC23A2CC201430023AE43 /* Tabs.swift */,
 				250FC23C2CC202C90023AE43 /* SignUpView.swift */,
@@ -390,6 +393,7 @@
 				5A02A4A12CEBF01000E83C60 /* HealthKitManager.swift in Sources */,
 				250FC2372CC200D10023AE43 /* ServicesView.swift in Sources */,
 				5AB0CE2C2CEB0FBA003FC857 /* ActivityManager.swift in Sources */,
+				254013F42CF1954700004E36 /* FitnessWidgetView.swift in Sources */,
 				250FC2332CC1F9CF0023AE43 /* LoginView.swift in Sources */,
 				250FC23D2CC202D10023AE43 /* SignUpView.swift in Sources */,
 				5A2504BD2CED99B60092C149 /* HealthSyncPreviewView.swift in Sources */,

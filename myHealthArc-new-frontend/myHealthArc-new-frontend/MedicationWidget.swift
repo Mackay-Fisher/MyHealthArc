@@ -109,7 +109,6 @@ struct MedicationWidget: View {
             .shadow(radius: 0.2)
         }
         .buttonStyle(PlainButtonStyle())
-        //.padding()
     }
     private func clearSearch() {
             firstMedication = ""

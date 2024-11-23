@@ -35,10 +35,8 @@ struct ContentView: View {
                     ScrollView {
                         VStack(spacing: 20) {
                             HealthWidget()
-                            WidgetView(title: "Apple Fitness", detail: "Steps: 2,000")
-                            
+                            FitnessWidgetView()
                             MedicationWidget()
-                            
                             NutritionWidgetView()
                         }
                         //.padding()

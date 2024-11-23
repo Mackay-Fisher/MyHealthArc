@@ -16,67 +16,62 @@ struct RecipesView: View {
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        NavigationView {
-            VStack {
-                // Header
-                HStack {
-                    Image(systemName: "book.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .padding(-2)
-                        .frame(width: 30)
-                        .foregroundColor(.pink)
+        VStack {
+            // Header
+            HStack {
+                Image(systemName: "book.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(-2)
+                    .frame(width: 30)
+                    .foregroundColor(.pink)
+                
+                Text("Recipes")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .padding()
+            }
+            
+            Divider()
+                .overlay(colorScheme == .dark ? Color.white : Color.gray)
+            
+            // Content
+            if isLoading {
+                ProgressView()
+                    .padding()
+            } else if recipes.isEmpty {
+                VStack(spacing: 20) {
+                    Image(systemName: "bookmark.slash")
+                        .font(.system(size: 50))
+                        .foregroundColor(.gray)
                     
-                    Text("Recipes")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding()
-                }
-                
-                Divider()
-                    .overlay(colorScheme == .dark ? Color.white : Color.gray)
-                
-                // Content
-                if isLoading {
-                    Text("Retrieving Data from Server...")
+                    Text("No Recipes Saved")
                         .font(.title2)
                         .fontWeight(.semibold)
-                } else if recipes.isEmpty {
-                    VStack(spacing: 20) {
-                        Image(systemName: "bookmark.slash")
-                            .font(.system(size: 50))
-                            .foregroundColor(.gray)
-                        
-                        Text("No Recipes Saved")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                        
-                        Text("Your saved recipes will appear here.\nUse the Recipe Assistant to generate and save recipes!")
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.gray)
-                            .padding(.horizontal)
-                    }
-                    .frame(maxHeight: .infinity)
-                } else {
-                    // Recipes List
-                    ScrollView {
-                        VStack(spacing: 15) {
-                            ForEach(recipes) { recipe in
-                                Button(action: {
-                                    selectedRecipe = recipe
-                                    showRecipeDetail = true
-                                }) {
-                                    RecipeRowView(recipe: recipe)
-                                }
+                    
+                    Text("Your saved recipes will appear here.\nUse the Recipe Assistant to generate and save recipes!")
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.gray)
+                        .padding(.horizontal)
+                }
+                .frame(maxHeight: .infinity)
+            } else {
+                // Recipes List
+                ScrollView {
+                    VStack(spacing: 15) {
+                        ForEach(recipes) { recipe in
+                            Button(action: {
+                                selectedRecipe = recipe
+                                showRecipeDetail = true
+                            }) {
+                                RecipeRowView(recipe: recipe)
                             }
                         }
-                        .padding()
                     }
-                    .sheet(isPresented: $showRecipeDetail) {
-                        if let recipe = selectedRecipe {
-                            RecipeDetailView(recipe: recipe)
-                        }
-                    }
+                    .padding()
+                }
+                .sheet(item: $selectedRecipe) { recipe in
+                    RecipeDetailView(recipe: recipe)
                 }
             }
         }
@@ -121,6 +116,9 @@ struct RecipesView: View {
                     self.recipes = fetchedRecipes
                 } catch {
                     print("DEBUG - Decoding error: \(error.localizedDescription)")
+                    if let dataString = String(data: data, encoding: .utf8) {
+                        print("DEBUG - Received data: \(dataString)")
+                    }
                 }
             }
         }.resume()
@@ -182,11 +180,6 @@ struct RecipeDetailView: View {
             })
         }
     }
-}
-
-// Update Recipe model to conform to Identifiable
-extension Recipe: Identifiable {
-    var id: String { name }
 }
 
 struct RecipesView_Previews: PreviewProvider {

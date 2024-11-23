@@ -3,15 +3,16 @@ import LocalAuthentication
 import SwiftKeychainWrapper
 
 struct SettingsView: View {
-    @State private var appleHealth: Bool = false
-    @State private var appleFitness: Bool = false
-    @State private var prescription: Bool = false
-    @State private var nutrition: Bool = false
+    @State private var availableServices: [String] = ["Apple Health", "Apple Fitness", "Prescriptions", "Nutrition"] // Add all possible services here
+    @State private var selectedServices: [String: Bool] = [:]
     @AppStorage("isFaceIDEnabled") private var isFaceIDEnabled: Bool = false
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
     @Environment(\.colorScheme) var colorScheme
-    
+
+    private let userHash = "exampleUserHash" // Replace this with dynamic userHash later
+    private let baseURL = "https://7e81-198-217-29-75.ngrok-free.app"
+
     var body: some View {
         ScrollView {
             VStack {
@@ -19,72 +20,33 @@ struct SettingsView: View {
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding()
-                
+
                 Divider()
                     .overlay(colorScheme == .dark ? Color.white : Color.gray)
 
                 Text("Toggle Services")
                     .font(.title2)
                     .padding()
-                
-                Section {
-                    Toggle("Apple Health", isOn: $appleHealth)
+
+                ForEach(availableServices, id: \.self) { service in
+                    Section {
+                        Toggle(service, isOn: Binding(
+                            get: { selectedServices[service] ?? false },
+                            set: { isEnabled in
+                                selectedServices[service] = isEnabled
+                            }
+                        ))
                         .font(.system(size: 18))
                         .toggleStyle(.switch)
                         .tint(Color.mhaGreen)
                         .padding()
                         .frame(width: 300)
-                        .onChange(of: appleHealth) { isEnabled in
-                            handleToggleChange(for: .health, isEnabled: isEnabled)
-                        }
+                    }
+                    .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
+                    .cornerRadius(20)
+                    .padding(.bottom, 20)
                 }
-                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
-                .cornerRadius(20)
-                
-                Spacer().frame(height: 20)
-                
-                Section {
-                    Toggle("Apple Fitness", isOn: $appleFitness)
-                        .font(.system(size: 18))
-                        .toggleStyle(.switch)
-                        .tint(Color.mhaGreen)
-                        .padding()
-                        .frame(width: 300)
-                        .onChange(of: appleFitness) { isEnabled in
-                            handleToggleChange(for: .fitness, isEnabled: isEnabled)
-                        }
-                }
-                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
-                .cornerRadius(20)
-                
-                Spacer().frame(height: 20)
-                
-                Section {
-                    Toggle("Prescriptions", isOn: $prescription)
-                        .font(.system(size: 18))
-                        .toggleStyle(.switch)
-                        .tint(Color.mhaGreen)
-                        .padding()
-                        .frame(width: 300)
-                }
-                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
-                .cornerRadius(20)
-                
-                Spacer().frame(height: 20)
-                
-                Section {
-                    Toggle("Nutrition", isOn: $nutrition)
-                        .font(.system(size: 18))
-                        .toggleStyle(.switch)
-                        .tint(Color.mhaGreen)
-                        .padding()
-                        .frame(width: 300)
-                }
-                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
-                .cornerRadius(20)
-                
-                Spacer().frame(height: 20)
-                
+
                 Divider()
                     .overlay(colorScheme == .dark ? Color.white : Color.gray)
 
@@ -102,7 +64,7 @@ struct SettingsView: View {
                 .frame(width: 300, height: 50)
                 .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
                 .cornerRadius(20)
-                
+
                 Spacer().frame(height: 20)
 
                 Section {
@@ -136,21 +98,62 @@ struct SettingsView: View {
             .padding()
         }
         .background(colorScheme == .dark ? Color.black : Color.lightbackground)
+        .onAppear(perform: fetchServices)
+        .onDisappear(perform: updateAllServices)
     }
-    
-    private func handleToggleChange(for service: HealthKitService, isEnabled: Bool) {
-        switch service {
-        case .health:
-            if isEnabled {
-                print("Apple Health enabled. Scheduling background sync.")
-                HealthKitBackgroundManager.shared.scheduleBackgroundMasterSync()
-            }
-        case .fitness:
-            if isEnabled {
-                print("Apple Fitness enabled. Scheduling background sync.")
-                HealthKitBackgroundManager.shared.scheduleBackgroundMasterSync()
-            }
+
+    private func fetchServices() {
+        guard let url = URL(string: "\(baseURL)/user-services/\(userHash)") else {
+            print("Invalid URL")
+            return
         }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Failed to fetch services: \(error.localizedDescription)")
+                return
+            }
+
+            guard let data = data else {
+                print("No data received")
+                return
+            }
+
+            do {
+                let services = try JSONDecoder().decode([String: Bool].self, from: data)
+                DispatchQueue.main.async {
+                    self.selectedServices = services
+                }
+            } catch {
+                print("Failed to decode services: \(error.localizedDescription)")
+            }
+        }.resume()
+    }
+
+    private func updateAllServices() {
+        guard let url = URL(string: "\(baseURL)/user-services/\(userHash)") else {
+            print("Invalid URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = ["selectedServices": selectedServices]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Failed to update services: \(error.localizedDescription)")
+                return
+            }
+
+            print("All services updated successfully")
+        }.resume()
     }
 
     private func enableFaceID() {
@@ -192,11 +195,6 @@ struct SettingsView: View {
         KeychainWrapper.standard.removeObject(forKey: "isFaceIDEnabled")
         isFaceIDEnabled = false
     }
-}
-
-enum HealthKitService {
-    case health
-    case fitness
 }
 
 struct SettingsView_Previews: PreviewProvider {

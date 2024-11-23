@@ -24,6 +24,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateUserGoals())  // Add fitness goals migration
     app.migrations.add(CreateUserStreaks()) // Add fitness streaks migration
     app.migrations.add(CreateRecipe())
+    app.migrations.add(CreateUserService())
 
     // Use Leaf for rendering
     app.views.use(.leaf)

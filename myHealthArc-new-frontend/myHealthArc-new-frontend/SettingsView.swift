@@ -10,8 +10,8 @@ struct SettingsView: View {
     @Binding var hasSignedUp: Bool
     @Environment(\.colorScheme) var colorScheme
 
-    private let userId = "exampleUserId" // Replace this with dynamic userId later
-    private let baseURL = "https://7e81-198-217-29-75.ngrok-free.app"
+    private let userHash = "exampleUserHash" // Replace this with dynamic userHash later
+    private let baseURL = "https://185a-198-217-29-75.ngrok-free.app"
 
     var body: some View {
         ScrollView {
@@ -98,11 +98,16 @@ struct SettingsView: View {
         }
         .background(colorScheme == .dark ? Color.black : Color.lightbackground)
         .onAppear(perform: fetchServices)
-        .onDisappear(perform: updateAllServices)
+        .onDisappear {
+            Task {
+                await updateAllServicesAsync()
+            }
+        }
     }
 
+    // MARK: Fetch User Services
     private func fetchServices() {
-        guard let url = URL(string: "\(baseURL)/user-services/fetch?userId=\(userId)") else {
+        guard let url = URL(string: "\(baseURL)/user-services/fetch?userHash=\(userHash)") else {
             print("Invalid URL")
             return
         }
@@ -133,7 +138,14 @@ struct SettingsView: View {
         }.resume()
     }
 
-    private func updateAllServices() {
+
+    // MARK: Update All Services (Async)
+    private func updateAllServicesAsync() async {
+        guard !selectedServices.isEmpty else {
+            print("No services selected. Skipping update.")
+            return
+        }
+
         guard let url = URL(string: "\(baseURL)/user-services/update") else {
             print("Invalid URL")
             return
@@ -144,37 +156,37 @@ struct SettingsView: View {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let body = ServiceRequest(
-            userId: userId,
+            userHash: userHash,
             selectedServices: selectedServices,
             isFaceIDEnabled: isFaceIDEnabled
         )
 
         do {
             request.httpBody = try JSONEncoder().encode(body)
-        } catch {
-            print("Failed to encode update data: \(error.localizedDescription)")
-            return
-        }
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Failed to update services: \(error.localizedDescription)")
-                return
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                print("Services updated successfully")
+            } else {
+                print("Failed to update services: \(response)")
             }
-
-            print("All services updated successfully")
-        }.resume()
+        } catch {
+            print("Failed to update services: \(error.localizedDescription)")
+        }
     }
 
+
+    // MARK: Update FaceID (Synchronous Trigger)
     private func updateFaceID(_ value: Bool) {
-        isFaceIDEnabled = value
-        updateAllServices()
+        Task {
+            await updateAllServicesAsync()
+        }
     }
 }
 
 // MARK: - Request and Response Models
 struct ServiceRequest: Codable {
-    var userId: String
+    var userHash: String
     var selectedServices: [String: Bool]
     var isFaceIDEnabled: Bool
 }

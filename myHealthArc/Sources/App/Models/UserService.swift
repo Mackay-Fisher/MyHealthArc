@@ -7,8 +7,8 @@ final class UserService: Model, Content {
     @ID(key: .id)
     var id: UUID?
 
-    @Parent(key: "user_id")
-    var user: User
+    @Field(key: "user_hash")
+    var userHash: String
 
     @Field(key: "selected_services")
     var selectedServices: [String: Bool]
@@ -18,10 +18,16 @@ final class UserService: Model, Content {
 
     init() { }
 
-    init(id: UUID? = nil, userID: UUID, selectedServices: [String: Bool], isFaceIDEnabled: Bool = false) {
+    init(
+        id: UUID? = nil,
+        userHash: String,
+        selectedServices: [String: Bool] = [:], // Default to empty dictionary
+        isFaceIDEnabled: Bool = false // Default to false
+    ) {
         self.id = id
-        self.$user.id = userID
+        self.userHash = userHash
         self.selectedServices = selectedServices
         self.isFaceIDEnabled = isFaceIDEnabled
     }
 }
+

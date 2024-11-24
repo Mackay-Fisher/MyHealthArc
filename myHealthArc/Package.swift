@@ -44,15 +44,9 @@ let package = Package(
             ],
             path: "Tests/AppTests",
             sources: [
-                //"MongoTest.swift",
-                //"SchemaTests.swift",
-                //"InsertUsersTest.swift",
-                //"CreateMedicationsTest.swift",
-                //"CreateNutritionsTest.swift",
-                //"CreateHealthKitsTest.swift",
-                //"FaceIDBackendTest.swift",
                 "NutritionValidationTest.swift",
                 "NutritionEntryTest.swift",
+                "BodyDataTest.swift",
             ]
         )
     ]

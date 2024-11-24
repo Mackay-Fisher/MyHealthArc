@@ -12,9 +12,5 @@
 	<true/>
 	<key>com.apple.developer.healthkit.recalibrate-estimates</key>
 	<true/>
-	<key>com.apple.developer.biometric</key>
-    <array>
-        <string>FaceID</string>
-    </array>
 </dict>
 </plist>

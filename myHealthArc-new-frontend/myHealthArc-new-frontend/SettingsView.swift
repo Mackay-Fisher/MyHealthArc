@@ -3,6 +3,7 @@ import LocalAuthentication
 import SwiftKeychainWrapper
 
 struct SettingsView: View {
+    //@AppStorage("isFaceIDEnabled") private var isFaceIDEnabled: Bool = false
     @State private var availableServices: [String] = ["Apple Health", "Apple Fitness", "Prescriptions", "Nutrition"]
     @State private var selectedServices: [String: Bool] = [:]
     @Binding var isLoggedIn: Bool
@@ -53,11 +54,43 @@ struct SettingsView: View {
                     .font(.title2)
                     .padding()
 
+                Section {
+                    NavigationLink(destination: EditProfilePage()) {
+                        Text("Edit Profile")
+                    }
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                }
+                .padding()
+                .frame(width: 300, height: 50)
+                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
+                .cornerRadius(20)
+                
                 Spacer().frame(height: 20)
+                /*
+                Section {
+                    Toggle("Enable FaceID", isOn: $isFaceIDEnabled)
+                        .onChange(of: isFaceIDEnabled) { value in
+                            if value {
+                                enableFaceID()
+                            } else {
+                                disableFaceID()
+                            }
+                        }
+                        .font(.system(size: 18))
+                        .toggleStyle(.switch)
+                        .tint(Color.mhaGreen)
+                        .padding()
+                        .frame(width: 300)
+                }
+                .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
+                .cornerRadius(20)
 
+                Spacer().frame(height: 20)
+                */
                 Button("Logout") {
                     hasSignedUp = false
                     isLoggedIn = false
+                    KeychainWrapper.standard.removeObject(forKey: "userHash")
                 }
                 .fontWeight(.bold)
                 .foregroundColor(.red)

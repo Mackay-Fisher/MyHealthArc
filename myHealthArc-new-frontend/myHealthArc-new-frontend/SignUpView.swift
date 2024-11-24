@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftKeychainWrapper
 
 struct UserDTO: Codable {
     var fullName: String
@@ -274,6 +275,8 @@ struct SignUpView: View {
                 if let user = try? JSONDecoder().decode(User.self, from: data) {
                     DispatchQueue.main.async {
                         navigateToServicesView = true
+                        KeychainWrapper.standard.set(user.userHash, forKey: "userHash")
+                        print("KEYCHAIN DEBUG - userHash saved: \(user.userHash)")
                     }
                 }
             }

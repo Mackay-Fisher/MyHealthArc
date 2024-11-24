@@ -17,6 +17,8 @@ struct SleepDataView: View {
     @State private var wakeUpTime: Date? = nil
     @State private var sleepHoursByDay: [Date: Double] = [:] // For graph data
     @State private var noDataAvailable: Bool = false // Flag for no data
+    
+    @Environment(\.colorScheme) var colorScheme
 
     private let healthStore = HKHealthStore()
 

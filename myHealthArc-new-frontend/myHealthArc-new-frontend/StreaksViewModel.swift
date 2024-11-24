@@ -4,6 +4,10 @@
 //
 //  Created by Mackay Fisher on 11/21/24.
 //
+
+import Foundation
+import SwiftUI
+
 struct FitnessGoal: Identifiable {
     let id = UUID()
     let name: String
@@ -25,6 +29,7 @@ struct GoalColors {
 
 struct StreakFlameView: View {
     let streak: FitnessGoal
+    @Environment(\.colorScheme) var colorScheme
 
     private var flameSize: CGFloat {
         // Adjust size based on streak value
@@ -80,10 +85,7 @@ struct StreakFlameView: View {
 }
 
 
-import SwiftUI
 
-import Foundation
-import SwiftUI
 
 class StreaksViewModel: ObservableObject {
     @Published var streaks: [FitnessGoal] = []

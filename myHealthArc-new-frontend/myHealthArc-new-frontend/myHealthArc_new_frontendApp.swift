@@ -4,6 +4,7 @@
 //
 //  Created by Vancura, Christiana Elaine on 10/17/24.
 //
+
 //This file is just navigating between the initial files, so login, or the view where navigation options are present (tabs)
 import SwiftUI
 import LocalAuthentication
@@ -55,6 +56,7 @@ struct myHealthArc_new_frontendApp: App {
         }
     }
 
+    //Note: Not working b/c Apple is dumb
     private func authenticateWithFaceID() {
         let context = LAContext()
         var error: NSError?

@@ -122,7 +122,7 @@ struct TermsAndConditionsView: View {
                     
                     Text("8. Contact Information")
                         .font(.headline)
-                    Text("If you have any questions about these Terms and Conditions, please contact us at anjali_hole@tamu.edu.")
+                    Text("If you have any questions about these Terms and Conditions, please contact us at myHealthArc@gmail.com.")
                 }
                 
                 Text("By using the myHealthArc app, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.")

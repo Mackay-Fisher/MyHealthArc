@@ -15,6 +15,7 @@ struct FitnessDataView: View {
     @State private var exerciseTime: Int? // in minutes
     @State private var flightsClimbed: Int? // in flights
     @State private var moveMinutes: Int? // Move minutes
+    @Environment(\.colorScheme) var colorScheme
 
     private let healthStore = HKHealthStore()
 

@@ -34,6 +34,11 @@ struct Tabs: View {
                     Image(systemName: "target")
                     Text("Goals")
                 }
+            StreaksView()
+                .tabItem {
+                    Image(systemName: "flame")
+                    Text("Streaks")
+                }
 //            SettingsView(isLoggedIn: $isLoggedIn,hasSignedUp: $hasSignedUp)
 //                .tabItem {
 //                    Image(systemName: "gear")

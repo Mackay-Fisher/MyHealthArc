@@ -34,6 +34,7 @@ struct MacrosTrackingView: View {
     private let fatsPercentage: Double = 0.25
     private let carbsPercentage: Double = 0.45
     
+    
     var body: some View {
         
         NavigationView {

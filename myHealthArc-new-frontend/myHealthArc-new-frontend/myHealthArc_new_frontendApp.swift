@@ -57,7 +57,7 @@ struct myHealthArc_new_frontendApp: App {
     }
 
     //Note: Not working b/c Apple is dumb
-    /*private func authenticateWithFaceID() {
+    private func authenticateWithFaceID() {
         let context = LAContext()
         var error: NSError?
 
@@ -80,7 +80,7 @@ struct myHealthArc_new_frontendApp: App {
             }
         } else {
         }
-    }*/
+    }
 
     private func fetchUserDetails(userHash: String) async throws -> User {
         guard let url = URL(string: "http://localhost:8080/users/\(userHash)") else {

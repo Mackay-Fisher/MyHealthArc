@@ -320,8 +320,6 @@ struct BodyDataPayload: Codable {
     let bmi: Double?
 }
 
-// BodyInfoView and other related views...
-
 
 // MARK: - Preview
 struct BodyInfoView_Previews: PreviewProvider {

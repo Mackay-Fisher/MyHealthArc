@@ -38,6 +38,7 @@ struct ContentView: View {
                             FitnessWidgetView()
                             MedicationWidget()
                             NutritionWidgetView()
+                            WaterWidget()
                         }
                         //.padding()
                         
@@ -82,7 +83,7 @@ struct ContentView: View {
 }
 
 // Widget View for displaying health data - can delete this function later
-struct WidgetView: View {
+/*struct WidgetView: View {
     var title: String
     var detail: String
     @Environment(\.colorScheme) var colorScheme
@@ -105,7 +106,7 @@ struct WidgetView: View {
         .cornerRadius(25)
     }
         
-}
+}*/
 // User Profile View
 struct UserProfileView: View {
     @Binding var isLoggedIn: Bool

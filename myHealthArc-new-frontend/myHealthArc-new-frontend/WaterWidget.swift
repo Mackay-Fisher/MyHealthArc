@@ -25,7 +25,7 @@ struct WaterWidget: View {
                         Text("Water Intake")
                             .font(.headline)
                     }
-                    .padding()
+                    //.padding()
 
                     Divider()
                     
@@ -37,7 +37,7 @@ struct WaterWidget: View {
                                 }
                         }
                     }
-                    .padding()
+                    //.padding()
 
                     Text("\(cupsFilled) / \(waterGoal) glasses")
                         .font(.subheadline)
@@ -100,7 +100,7 @@ struct CupView: View {
     let isFilled: Bool
 
     var body: some View {
-        Image(systemName: "cup.and.saucer.fill")
+        Image(systemName: isFilled ? "drop.fill" : "drop")
             .resizable()
             .aspectRatio(contentMode: .fit)
             .frame(width: 40, height: 40)

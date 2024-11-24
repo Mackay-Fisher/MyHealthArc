@@ -39,19 +39,7 @@ struct myHealthArc_new_frontendApp: App {
     @AppStorage("isLoggedIn") var isLoggedIn = false
     @State private var hasSignedUp = false
     @State private var showAlert = true
-//    init() {
-//            // Register background tasks on app initialization
-//            HealthKitBackgroundManager.shared.registerBackgroundTasks()
-//            Task {
-//                    if await HealthKitBackgroundManager.shared.requestHealthKitAuthorization() {
-//                        HealthKitBackgroundManager.shared.syncMasterData { success in
-//                            print("Initial sync completed: \(success ? "Success" : "Failure")")
-//                        }
-//                    } else {
-//                        print("HealthKit authorization not granted.")
-//                    }
-//                }
-//        }
+    
     var body: some Scene {
 
         WindowGroup {
@@ -62,7 +50,6 @@ struct myHealthArc_new_frontendApp: App {
                 ServicesView(isLoggedIn: $isLoggedIn , hasSignedUp: $hasSignedUp, showAlert: $showAlert)
             }
             else {
-                //LoginView(isLoggedIn: $isLoggedIn)
                 AppOpenScreen(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
             }
         }

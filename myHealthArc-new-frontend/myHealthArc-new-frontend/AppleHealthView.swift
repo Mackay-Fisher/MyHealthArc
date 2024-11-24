@@ -11,6 +11,7 @@ struct AppleHealthHomeView: View {
     @State private var height: Double = 63
     @State private var weight: Double = 115
     @State private var age: Int = 22
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         GeometryReader { geometry in
@@ -71,7 +72,7 @@ struct AppleHealthHomeView: View {
                 Spacer()
             }
             .padding()
-            .background(Color.black.edgesIgnoringSafeArea(.all))
+            .background(colorScheme == .dark ? Color.black.edgesIgnoringSafeArea(.all) : Color.white.edgesIgnoringSafeArea(.all))
         }
     }
 

@@ -17,6 +17,7 @@ struct VitalInfoView: View {
     @State private var heartRateData: [(String, Double)] = []
     @State private var respiratoryData: [(String, Double)] = []
     @State private var noDataAvailable: Bool = false // No data flag
+    @Environment(\.colorScheme) var colorScheme
 
     private let healthStore = HKHealthStore()
 
@@ -88,7 +89,7 @@ struct VitalInfoView: View {
                 }
             }
             .padding()
-            .background(Color.black.edgesIgnoringSafeArea(.all))
+            .background(colorScheme == .dark ? Color.black.edgesIgnoringSafeArea(.all) : Color.white.edgesIgnoringSafeArea(.all))
             .onAppear {
                 fetchVitalData()
             }

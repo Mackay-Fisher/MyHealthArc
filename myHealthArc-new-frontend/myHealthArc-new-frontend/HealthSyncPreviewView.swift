@@ -6,6 +6,7 @@ struct HealthSyncPreviewView: View {
     @State private var healthData: [String] = []
     @State private var fitnessData: [String] = []
     private let healthStore = HKHealthStore()
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationView {

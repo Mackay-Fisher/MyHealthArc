@@ -10,6 +10,7 @@ struct BodyInfoView: View {
     @State private var showPopup: Bool = false // Control popup visibility
     @State private var userHash: String = "sampleUserHash" // Replace with actual user identifier
     @State private var isLoading: Bool = false // Track loading state
+    @Environment(\.colorScheme) var colorScheme
 
     enum Gender: String, Codable {
         case male, female

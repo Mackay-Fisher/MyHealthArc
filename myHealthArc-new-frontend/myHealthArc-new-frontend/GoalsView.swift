@@ -21,6 +21,7 @@ struct GoalsView: View {
     @State private var distanceTraveled = 0 // New goal for distance in miles
 
     @State private var isLoading = true
+    @Environment(\.colorScheme) var colorScheme
 
     private let baseURL = "https://e0dc-198-217-29-75.ngrok-free.app/goals"
     private let userId = "dummy_user_id"

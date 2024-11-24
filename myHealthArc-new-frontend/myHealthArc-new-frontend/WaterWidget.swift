@@ -21,8 +21,8 @@ struct WaterWidget: View {
                 VStack {
                     HStack(spacing: 8) {
                         Image(systemName: "drop.fill")
-                            .foregroundColor(.blue)
-                        Text("Water Intake")
+                            .foregroundColor(.mhaBlue)
+                        Text("Log Water Intake")
                             .font(.headline)
                     }
                     //.padding()
@@ -103,8 +103,8 @@ struct CupView: View {
         Image(systemName: isFilled ? "drop.fill" : "drop")
             .resizable()
             .aspectRatio(contentMode: .fit)
-            .frame(width: 40, height: 40)
-            .foregroundColor(isFilled ? .blue : .gray)
+            .frame(width: 30, height: 30)
+            .foregroundColor(.mhaBlue)
             .padding(4)
     }
 }

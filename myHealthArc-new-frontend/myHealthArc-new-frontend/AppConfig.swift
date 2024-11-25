@@ -10,5 +10,5 @@ import Foundation
 import SwiftKeychainWrapper
 
 struct AppConfig {
-    static let baseURL = "http://3.149.228.158:8081"
+    static let baseURL = "http://209.38.153.40:8080"
 }

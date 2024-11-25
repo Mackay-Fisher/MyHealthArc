@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftKeychainWrapper
 
 struct BodyInfoView: View {
 
@@ -8,7 +9,7 @@ struct BodyInfoView: View {
     @State private var gender: Gender = .male // Default gender
     @State private var bmi: Double?           // BMI value (calculated)
     @State private var showPopup: Bool = false // Control popup visibility
-    @State private var userHash: String = "sampleUserHash" // Replace with actual user identifier
+    @State private var userHash: String? = KeychainWrapper.standard.string(forKey: "userHash") // Replace with actual user identifier
     @State private var isLoading: Bool = false // Track loading state
     @Environment(\.colorScheme) var colorScheme
 
@@ -312,7 +313,7 @@ struct PopupOverlay: View {
 
 // BodyDataPayload struct
 struct BodyDataPayload: Codable {
-    let userHash: String
+    let userHash: String?
     let height: Double
     let weight: Double
     let age: Int

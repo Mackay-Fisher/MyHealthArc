@@ -116,7 +116,7 @@ final class ChatbotViewModel: ObservableObject {
 struct Recipe: Codable, Identifiable {
     var name: String
     var content: String
-    var userHash: String
+    var userHash: String?
     let id: UUID
     
 }

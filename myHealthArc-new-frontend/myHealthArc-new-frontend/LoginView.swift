@@ -90,7 +90,7 @@ struct LoginView: View {
     }
 
     private func login() {
-        var request = URLRequest(url: URL(string: "http://localhost:8080/users/login")!)
+        var request = URLRequest(url: URL(string: "\(AppConfig.baseURL)/users/login")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         let loginDTO = LoginDTO(email: username, password: password)

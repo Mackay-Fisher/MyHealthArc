@@ -28,11 +28,11 @@ struct VitalInfoView: View {
                         Text("No Vital Data Available")
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                         
                         Text("This page is designed for wearable devices such as Apple Watches. To use this feature, please sync your vital data with the Apple Health app.")
                             .font(.body)
-                            .foregroundColor(.gray)
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                             .multilineTextAlignment(.center)
                             .padding()
                     }
@@ -41,16 +41,16 @@ struct VitalInfoView: View {
                         VStack(spacing: 10) {
                             Text("Blood Pressure")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             HStack {
                                 Text("Systolic: \(systolic) mmHg")
                                     .font(.subheadline)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                                 Spacer()
                                 Text("Diastolic: \(diastolic) mmHg")
                                     .font(.subheadline)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                             }
                         }
                         .padding()
@@ -77,10 +77,10 @@ struct VitalInfoView: View {
                             value: "\(respiratoryRate) breaths/min",
                             timestamp: Date(),
                             icon: "lungs.fill",
-                            iconColor: .blue,
+                            iconColor: .mhaBlue,
                             data: respiratoryData,
-                            lineColor: .blue,
-                            fillColor: Color.blue.opacity(0.2)
+                            lineColor: .mhaBlue,
+                            fillColor: Color.mhaBlue.opacity(0.2)
                         )
                     }
                 }
@@ -169,13 +169,14 @@ struct VitalSection: View {
     let data: [(String, Double)]
     let lineColor: Color
     let fillColor: Color
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack {
             HStack {
                 Text(title)
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 Spacer()
                 Text(timestamp, style: .time) // Use timestamp
                     .font(.subheadline)
@@ -192,7 +193,7 @@ struct VitalSection: View {
                 Text(value)
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundColor(.white)
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
             }
             .padding(.bottom, 10)
             

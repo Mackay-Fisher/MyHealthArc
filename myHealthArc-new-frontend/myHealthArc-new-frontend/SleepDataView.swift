@@ -137,7 +137,7 @@ struct SleepDataView: View {
                 }
             }
             .padding()
-            .background(Color.black.edgesIgnoringSafeArea(.all))
+            .background(colorScheme == .dark ? Color.black.edgesIgnoringSafeArea(.all) : Color.white.edgesIgnoringSafeArea(.all))
             .onAppear {
                 requestAuthorization()
                 fetchSleepData()

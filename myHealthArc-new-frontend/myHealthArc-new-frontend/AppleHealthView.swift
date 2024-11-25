@@ -20,7 +20,7 @@ struct AppleHealthHomeView: View {
                 Text("❤️ Apple Health Data")
                     .font(.title)
                     .fontWeight(.bold)
-                    .foregroundColor(.white)
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
 
                 // Horizontal Selector
                 HStack(spacing: 30) {
@@ -100,7 +100,7 @@ enum HealthSection {
 
     var imageName: String {
         switch self {
-        case .bmi: return "bmi_icon" // Replace with your actual image names
+        case .bmi: return "bmi_icon" 
         case .sleep: return "sleep_icon"
         case .vitals: return "vital_icon"
         }
@@ -130,8 +130,8 @@ struct SectionButton: View {
             Image(section.imageName)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 50, height: 50)
-                .padding()
+                .frame(width: 70, height: 70)
+                .padding(10)
                 .background(isSelected ? Color.pink : Color.gray.opacity(0.2))
                 .clipShape(Circle())
                 .shadow(radius: isSelected ? 5 : 0)

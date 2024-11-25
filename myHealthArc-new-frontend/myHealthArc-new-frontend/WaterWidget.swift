@@ -10,11 +10,10 @@ import SwiftKeychainWrapper
 struct WaterWidget: View {
     @AppStorage("cupsFilled") private var cupsFilled: Int = 0
     @AppStorage("lastUpdatedDate") private var lastUpdatedDate: String = ""
-    @AppStorage("waterGoal") private var waterGoal: Int = 8
+    @State private var waterGoal: Int = 8 // Default goal
 
     @State private var isLoading = true
-    private let baseURL = "\(AppConfig.baseURL)/goals"
-    private let userId = KeychainWrapper.standard.string(forKey: "userHash")
+    @StateObject private var goalsManager = GoalsManager()
 
     @Environment(\.colorScheme) var colorScheme
 
@@ -66,7 +65,7 @@ struct WaterWidget: View {
                                 cupsFilled += 1
                             }
                         }) {
-                            Text("Add Water")
+                            Text("Add Cup")
                                 .font(.subheadline)
                                 .padding()
                                 .frame(maxWidth: .infinity)
@@ -80,7 +79,7 @@ struct WaterWidget: View {
                                 cupsFilled -= 1
                             }
                         }) {
-                            Text("Remove Water")
+                            Text("Remove Cup")
                                 .font(.subheadline)
                                 .padding()
                                 .frame(maxWidth: .infinity)
@@ -100,7 +99,7 @@ struct WaterWidget: View {
         }
         .onAppear {
             checkForNewDay()
-            fetchGoalsFromAPI()
+            fetchWaterGoal()
         }
     }
 
@@ -122,30 +121,25 @@ struct WaterWidget: View {
         return formatter.string(from: date)
     }
 
-    private func fetchGoalsFromAPI() {
+    private func fetchWaterGoal() {
         isLoading = true
-        guard let url = URL(string: "\(baseURL)/fetch?userId=\(userId)") else {
-            print("Invalid URL")
-            isLoading = false
-            return
-        }
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            defer { isLoading = false }
-            guard let data = data, error == nil else {
-                print("Error fetching goals: \(error?.localizedDescription ?? "Unknown error")")
-                return
-            }
+        let userId = KeychainWrapper.standard.string(forKey: "userHash") ?? ""
+
+        Task {
             do {
-                if let goals = try JSONSerialization.jsonObject(with: data) as? [String: Int] {
-                    DispatchQueue.main.async {
-                        waterGoal = goals["water-intake"] ?? 8
-                    }
+                if goalsManager.goals["water-intake"] == nil {
+                    try await goalsManager.fetchGoals(from: "\(AppConfig.baseURL)/goals", userHash: userId)
                 }
+                self.waterGoal = goalsManager.goals["water-intake"] ?? 8 // Default to 8 if not set
             } catch {
-                print("Error parsing goals JSON: \(error)")
+                print("Error fetching goals: \(error)")
             }
-        }.resume()
+            self.isLoading = false
+        }
     }
+
+
+
 }
 
 struct WaterWidget_Previews: PreviewProvider {

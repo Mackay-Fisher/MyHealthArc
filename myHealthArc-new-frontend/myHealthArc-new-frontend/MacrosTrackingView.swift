@@ -127,7 +127,7 @@ struct MacrosTrackingView: View {
             return
         }
 
-        let baseURL = "http://localhost:8080/bodyData/load"
+        let baseURL = "\(AppConfig.baseURL)/bodyData/load"
         guard var urlComponents = URLComponents(string: baseURL) else {
             print("DEBUG - Failed to create URL components")
             return
@@ -241,7 +241,7 @@ struct MacrosTrackingView: View {
     }
     
     private func fetchMealsForDay(completion: @escaping ([Meal]) -> Void) {
-        let baseURL = "http://localhost:8080/nutrition/meals"
+        let baseURL = "\(AppConfig.baseURL)/nutrition/meals"
         let dateString = ISO8601DateFormatter().string(from: Date())
         
         guard let userHash = KeychainWrapper.standard.string(forKey: "userHash"),

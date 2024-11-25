@@ -407,7 +407,7 @@ struct NutritionView: View {
         }()
         
     private func fetchMealsForDay(date: Date) {
-        let baseURL = "http://localhost:8080/nutrition/meals"
+        let baseURL = "\(AppConfig.baseURL)/nutrition/meals"
         let dateString = ISO8601DateFormatter().string(from: date)
         
         guard let userHash = KeychainWrapper.standard.string(forKey: "userHash"),
@@ -495,7 +495,7 @@ struct NutritionView: View {
         private func fetchNutritionInfo(for foodItems: [String], mealName: String) {
             guard !foodItems.isEmpty else { return }
 
-            let baseURL = "http://localhost:8080/nutrition/info"
+            let baseURL = "\(AppConfig.baseURL)/nutrition/info"
             let query = foodItems.joined(separator: ",").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
             guard let url = URL(string: "\(baseURL)?query=\(query)") else {
                 print("Invalid URL")
@@ -578,7 +578,7 @@ struct NutritionView: View {
     private func createNutritionObject(mealName: String, proteinMin: Double, proteinMax: Double,
                                          carbsMin: Double, carbsMax: Double, fatsMin: Double, fatsMax: Double,
                                          caloriesMin: Int, caloriesMax: Int) {
-            let baseURL = "http://localhost:8080/nutrition/create"
+            let baseURL = "\(AppConfig.baseURL)/nutrition/create"
             guard let url = URL(string: baseURL) else {
                 print("Invalid URL")
                 return
@@ -645,7 +645,7 @@ struct NutritionView: View {
         private func fetchFoodInfo() {
             guard !foodSearch.isEmpty else { return }
 
-            let baseURL = "http://localhost:8080/nutrition/info"
+            let baseURL = "\(AppConfig.baseURL)/nutrition/info"
             let query = foodSearch.lowercased().addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
             guard let url = URL(string: "\(baseURL)?query=\(query)") else {
                 print("Invalid URL")
@@ -944,7 +944,7 @@ struct EditMeal: View {
             return
         }
         
-        let baseURL = "http://localhost:8080/nutrition/macroRanges"
+        let baseURL = "\(AppConfig.baseURL)/nutrition/macroRanges"
         guard let url = URL(string: "\(baseURL)/\(mealId)") else {
             print("DEBUG - Invalid URL")
             return
@@ -991,7 +991,7 @@ struct EditMeal: View {
         
         print("DEBUG - Updating meal with ID: \(mealId)")
         
-        let baseURL = "http://localhost:8080/nutrition/update"
+        let baseURL = "\(AppConfig.baseURL)/nutrition/update"
         guard let url = URL(string: "\(baseURL)/\(mealId)") else {
             print("DEBUG - Invalid URL")
             return

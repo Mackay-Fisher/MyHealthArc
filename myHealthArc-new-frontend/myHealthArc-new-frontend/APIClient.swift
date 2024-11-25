@@ -7,7 +7,7 @@
 import Foundation
 
 class APIClient {
-    private let baseURL = "https://1199-198-217-29-75.ngrok-free.app"
+    private let baseURL = "\(AppConfig.baseURL)"
 
     func fetchGoals(userHash: String, completion: @escaping (Result<[String: Int], Error>) -> Void) {
         guard let url = URL(string: "\(baseURL)/goals/\(userHash)") else {

@@ -11,7 +11,7 @@ struct SettingsView: View {
     @Environment(\.colorScheme) var colorScheme
 
     private let userHash = "exampleUserHash" // Replace this with dynamic userHash later
-    private let baseURL = "https://185a-198-217-29-75.ngrok-free.app"
+    private let baseURL = "\(AppConfig.baseURL)"
 
     var body: some View {
         ScrollView {

@@ -87,7 +87,7 @@ struct RecipesView: View {
             return
         }
         
-        let baseURL = "http://localhost:8080/recipes"
+        let baseURL = "\(AppConfig.baseURL)/recipes"
         guard let url = URL(string: "\(baseURL)?userHash=\(userHash)") else {
             print("DEBUG - Invalid URL")
             isLoading = false

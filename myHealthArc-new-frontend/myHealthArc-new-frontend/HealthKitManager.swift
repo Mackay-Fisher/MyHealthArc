@@ -181,7 +181,7 @@ extension HealthKitBackgroundManager {
         print("Data being sent to dummyPath:", dataToSync)
         
         // Replace the placeholder with your actual ngrok URL
-        let ngrokUrl = "https://bbc6-198-217-29-75.ngrok-free.app" // Update with your active ngrok URL
+        let ngrokUrl = "\(AppConfig.baseURL)" // Update with your active ngrok URL
         guard let url = URL(string: "\(ngrokUrl)/healthFitness/dummyPath") else {
             print("Invalid URL for dummyPath")
             return

@@ -12,7 +12,7 @@ struct WaterWidget: View {
     @AppStorage("waterGoal") private var waterGoal: Int = 8
 
     @State private var isLoading = true
-    private let baseURL = "https://e0dc-198-217-29-75.ngrok-free.app/goals"
+    private let baseURL = "\(AppConfig.baseURL)/goals"
     private let userId = "dummy_user_id"
 
     @Environment(\.colorScheme) var colorScheme

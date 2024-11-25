@@ -75,7 +75,7 @@ final class ChatbotViewModel: ObservableObject {
         }
         let recipe = Recipe(name: name, content: content, userHash: userHash, id: UUID())
         
-        guard let url = URL(string: "http://localhost:8080/recipes") else {
+        guard let url = URL(string: "\(AppConfig.baseURL)/recipes") else {
             print("DEBUG - Invalid URL")
             return
         }

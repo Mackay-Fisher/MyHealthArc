@@ -93,7 +93,7 @@ struct BodyInfoView: View {
 
     // MARK: - Load Body Data
     private func loadBodyData() async {
-        guard let url = URL(string: "http://3.149.228.158:8080/bodyData/load?userHash=\(userHash)") else { return }
+        guard let url = URL(string: "\(AppConfig.baseURL)/bodyData/load?userHash=\(userHash)") else { return }
 
         isLoading = true
         defer { isLoading = false }
@@ -116,7 +116,7 @@ struct BodyInfoView: View {
     // MARK: - Update Body Data
     // Function to update body data
     private func updateBodyData() {
-        guard let url = URL(string: "http://3.149.228.158:8080/bodyData/update") else {
+        guard let url = URL(string: "\(AppConfig.baseURL)/bodyData/update") else {
             print("Invalid URL")
             return
         }

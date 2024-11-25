@@ -29,6 +29,7 @@
 		5A02A49F2CEBCE9200E83C60 /* FitnessDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */; };
 		5A02A4A12CEBF01000E83C60 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02A4A02CEBF00F00E83C60 /* HealthKitManager.swift */; };
 		5A25041B2CF4042500F65B44 /* WaterWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A25041A2CF4042500F65B44 /* WaterWidget.swift */; };
+		5A25041D2CF4080100F65B44 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A25041C2CF4080100F65B44 /* AppConfig.swift */; };
 		5A2504BD2CED99B60092C149 /* HealthSyncPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2504BC2CED99B60092C149 /* HealthSyncPreviewView.swift */; };
 		5A9615F52CEF0F500004F56E /* GoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9615F42CEF0F500004F56E /* GoalsView.swift */; };
 		5A9615FD2CF02D400004F56E /* StreaksViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9615FC2CF02D400004F56E /* StreaksViewModel.swift */; };
@@ -88,6 +89,7 @@
 		5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessDataView.swift; sourceTree = "<group>"; };
 		5A02A4A02CEBF00F00E83C60 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		5A25041A2CF4042500F65B44 /* WaterWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterWidget.swift; sourceTree = "<group>"; };
+		5A25041C2CF4080100F65B44 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		5A2504BC2CED99B60092C149 /* HealthSyncPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthSyncPreviewView.swift; sourceTree = "<group>"; };
 		5A9615F42CEF0F500004F56E /* GoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsView.swift; sourceTree = "<group>"; };
 		5A9615FC2CF02D400004F56E /* StreaksViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreaksViewModel.swift; sourceTree = "<group>"; };
@@ -200,6 +202,7 @@
 				254013EF2CF18D4700004E36 /* HealthWidget.swift */,
 				5AB0CE2B2CEB0FBA003FC857 /* ActivityManager.swift */,
 				F47367BF2CE4026400D58353 /* ChatbotView.swift */,
+				5A25041C2CF4080100F65B44 /* AppConfig.swift */,
 				F47367C42CE4057C00D58353 /* ChatbotViewModel.swift */,
 				F4ED25562CEC057600A3E53A /* MacrosTrackingView.swift */,
 				254013F32CF1954700004E36 /* FitnessWidgetView.swift */,
@@ -417,6 +420,7 @@
 				254013E72CF1193700004E36 /* VitalInfoView.swift in Sources */,
 				F4ED25572CEC057600A3E53A /* MacrosTrackingView.swift in Sources */,
 				F47367C02CE4026400D58353 /* ChatbotView.swift in Sources */,
+				5A25041D2CF4080100F65B44 /* AppConfig.swift in Sources */,
 				8F161C2D2CC1B36200E726E7 /* myHealthArc_new_frontendApp.swift in Sources */,
 				254013F62CF19A5300004E36 /* RecipesView.swift in Sources */,
 				5AAA9B482CEDB6030051134F /* APIClient.swift in Sources */,

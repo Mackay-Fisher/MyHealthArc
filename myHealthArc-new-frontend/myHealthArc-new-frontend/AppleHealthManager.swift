@@ -79,6 +79,44 @@ class AppleHealthManager {
         let respiratoryRate = try await fetchMostRecentQuantitySample(for: .respiratoryRate, unit: .count().unitDivided(by: .minute()), typeName: "respiratoryRate")
         return [heartRate, systolic, diastolic, respiratoryRate].compactMap { $0 }
     }
+    func fetchHistoricalData(
+        for identifier: HKQuantityTypeIdentifier,
+        unit: HKUnit,
+        from startDate: Date,
+        to endDate: Date
+    ) async throws -> [(String, Double)] {
+        guard let quantityType = HKQuantityType.quantityType(forIdentifier: identifier) else {
+            return []
+        }
+        
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(
+                sampleType: quantityType,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: true)]
+            ) { _, samples, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                
+                let data = samples?.compactMap { sample -> (String, Double)? in
+                    guard let sample = sample as? HKQuantitySample else { return nil }
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "HH:mm"
+                    let timeString = formatter.string(from: sample.endDate)
+                    return (timeString, sample.quantity.doubleValue(for: unit))
+                } ?? []
+                
+                continuation.resume(returning: data)
+            }
+            
+            healthStore.execute(query)
+        }
+    }
 
     // Helper to fetch the most recent quantity sample
     private func fetchMostRecentQuantitySample(for identifier: HKQuantityTypeIdentifier, unit: HKUnit, typeName: String) async throws -> HealthData? {

@@ -83,7 +83,7 @@ struct myHealthArc_new_frontendApp: App {
     }
 
     private func fetchUserDetails(userHash: String) async throws -> User {
-        guard let url = URL(string: "http://localhost:8080/users/\(userHash)") else {
+        guard let url = URL(string: "\(AppConfig.baseURL)/users/\(userHash)") else {
             throw URLError(.badURL)
         }
         var request = URLRequest(url: url)

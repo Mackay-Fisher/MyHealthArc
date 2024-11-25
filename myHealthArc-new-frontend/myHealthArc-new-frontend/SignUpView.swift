@@ -261,7 +261,7 @@ struct SignUpView: View {
     }
     
     private func signUp() {
-        var request = URLRequest(url: URL(string: "http://localhost:8080/users/signup")!)
+        var request = URLRequest(url: URL(string: "\(AppConfig.baseURL)/users/signup")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 

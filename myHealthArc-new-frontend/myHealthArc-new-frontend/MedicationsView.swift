@@ -224,7 +224,7 @@ struct MedicationsView: View {
         }
 
         // Prepare the URL with query parameters
-        let baseURL = "http://localhost:8080/medicationChecker/demoCheck"
+        let baseURL = "\(AppConfig.baseURL)/medicationChecker/demoCheck"
         let medicationsQuery = selectedMedications.joined(separator: ",")
         guard let url = URL(string: "\(baseURL)?medications=\(medicationsQuery)") else { return }
 

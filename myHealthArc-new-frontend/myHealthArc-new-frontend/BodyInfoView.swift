@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftKeychainWrapper
 
 struct BodyInfoView: View {
 
@@ -8,7 +9,7 @@ struct BodyInfoView: View {
     @State private var gender: Gender = .male // Default gender
     @State private var bmi: Double?           // BMI value (calculated)
     @State private var showPopup: Bool = false // Control popup visibility
-    @State private var userHash: String = "sampleUserHash" // Replace with actual user identifier
+    @State private var userHash: String? = KeychainWrapper.standard.string(forKey: "userHash") // Replace with actual user identifier
     @State private var isLoading: Bool = false // Track loading state
     @Environment(\.colorScheme) var colorScheme
 
@@ -93,7 +94,7 @@ struct BodyInfoView: View {
 
     // MARK: - Load Body Data
     private func loadBodyData() async {
-        guard let url = URL(string: "http://3.149.228.158:8080/bodyData/load?userHash=\(userHash)") else { return }
+        guard let url = URL(string: "\(AppConfig.baseURL)/bodyData/load?userHash=\(userHash)") else { return }
 
         isLoading = true
         defer { isLoading = false }
@@ -116,7 +117,7 @@ struct BodyInfoView: View {
     // MARK: - Update Body Data
     // Function to update body data
     private func updateBodyData() {
-        guard let url = URL(string: "http://3.149.228.158:8080/bodyData/update") else {
+        guard let url = URL(string: "\(AppConfig.baseURL)/bodyData/update") else {
             print("Invalid URL")
             return
         }
@@ -312,7 +313,7 @@ struct PopupOverlay: View {
 
 // BodyDataPayload struct
 struct BodyDataPayload: Codable {
-    let userHash: String
+    let userHash: String?
     let height: Double
     let weight: Double
     let age: Int

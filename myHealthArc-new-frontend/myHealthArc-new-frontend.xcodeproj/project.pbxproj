@@ -28,6 +28,7 @@
 		25D6E3B92CC9CBD2004A2B1A /* EditProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */; };
 		5A02A49F2CEBCE9200E83C60 /* FitnessDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */; };
 		5A02A4A12CEBF01000E83C60 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02A4A02CEBF00F00E83C60 /* HealthKitManager.swift */; };
+		5A25041B2CF4042500F65B44 /* WaterWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A25041A2CF4042500F65B44 /* WaterWidget.swift */; };
 		5A2504BD2CED99B60092C149 /* HealthSyncPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2504BC2CED99B60092C149 /* HealthSyncPreviewView.swift */; };
 		5A9615F52CEF0F500004F56E /* GoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9615F42CEF0F500004F56E /* GoalsView.swift */; };
 		5A9615FD2CF02D400004F56E /* StreaksViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9615FC2CF02D400004F56E /* StreaksViewModel.swift */; };
@@ -86,6 +87,7 @@
 		25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfilePage.swift; sourceTree = "<group>"; };
 		5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessDataView.swift; sourceTree = "<group>"; };
 		5A02A4A02CEBF00F00E83C60 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
+		5A25041A2CF4042500F65B44 /* WaterWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterWidget.swift; sourceTree = "<group>"; };
 		5A2504BC2CED99B60092C149 /* HealthSyncPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthSyncPreviewView.swift; sourceTree = "<group>"; };
 		5A9615F42CEF0F500004F56E /* GoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsView.swift; sourceTree = "<group>"; };
 		5A9615FC2CF02D400004F56E /* StreaksViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreaksViewModel.swift; sourceTree = "<group>"; };
@@ -203,6 +205,7 @@
 				254013F32CF1954700004E36 /* FitnessWidgetView.swift */,
 				250FC2322CC1F9CF0023AE43 /* LoginView.swift */,
 				254013F52CF19A5300004E36 /* RecipesView.swift */,
+				5A25041A2CF4042500F65B44 /* WaterWidget.swift */,
 				250FC23A2CC201430023AE43 /* Tabs.swift */,
 				250FC23C2CC202C90023AE43 /* SignUpView.swift */,
 				250FC2382CC200DF0023AE43 /* SettingsView.swift */,
@@ -390,6 +393,7 @@
 				250FC23B2CC201460023AE43 /* Tabs.swift in Sources */,
 				250FC23F2CC205900023AE43 /* AppOpenScreen.swift in Sources */,
 				2528D6282CC9DA8E000D5852 /* MedicationsView.swift in Sources */,
+				5A25041B2CF4042500F65B44 /* WaterWidget.swift in Sources */,
 				5A9615F52CEF0F500004F56E /* GoalsView.swift in Sources */,
 				250FC2412CC208C80023AE43 /* TermsAndConditionsView.swift in Sources */,
 				5AB0CE2A2CEB0F9E003FC857 /* AppleHealthManager.swift in Sources */,

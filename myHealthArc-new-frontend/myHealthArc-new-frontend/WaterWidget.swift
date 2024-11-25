@@ -1,3 +1,9 @@
+//
+//  WaterWidget.swift
+//  myHealthArc-new-frontend
+//
+//  Created by Sharir on 11/24/24.
+//
 import SwiftUI
 
 struct WaterWidget: View {
@@ -8,10 +14,8 @@ struct WaterWidget: View {
     @State private var isLoading = true
     private let baseURL = "https://e0dc-198-217-29-75.ngrok-free.app/goals"
     private let userId = "dummy_user_id"
-    
-    @Environment(\.colorScheme) var colorScheme
 
-    let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 4)
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         VStack {
@@ -22,26 +26,69 @@ struct WaterWidget: View {
                     HStack(spacing: 8) {
                         Image(systemName: "drop.fill")
                             .foregroundColor(.mhaBlue)
-                        Text("Log Water Intake")
+                        Text("Water Intake")
                             .font(.headline)
                     }
-                    //.padding()
 
                     Divider()
-                    
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(0..<waterGoal, id: \.self) { index in
-                            CupView(isFilled: index < cupsFilled)
-                                .onTapGesture {
-                                    cupsFilled = index + 1 
-                                }
+
+                    ZStack {
+                        Circle()
+                            .stroke(lineWidth: 10)
+                            .foregroundColor(.mhaGray.opacity(0.3))
+                            .frame(width: 150, height: 150)
+
+                        Circle()
+                            .trim(from: 0.0, to: progress)
+                            .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                            .foregroundColor(.mhaBlue)
+                            .frame(width: 150, height: 150)
+                            .rotationEffect(.degrees(-90))
+
+                        VStack {
+                            Image(systemName: "drop.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 50, height: 50)
+                                .foregroundColor(.mhaBlue)
+
+                            Text("\(cupsFilled) / \(waterGoal)")
+                                .font(.headline)
+                                .padding(.top, 4)
                         }
                     }
-                    //.padding()
+                    .padding()
 
-                    Text("\(cupsFilled) / \(waterGoal) glasses")
-                        .font(.subheadline)
-                        .padding(.top)
+                    HStack {
+                        Button(action: {
+                            if cupsFilled < waterGoal {
+                                cupsFilled += 1
+                            }
+                        }) {
+                            Text("Add Water")
+                                .font(.subheadline)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.mhaBlue)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+
+                        Button(action: {
+                            if cupsFilled > 0 {
+                                cupsFilled -= 1
+                            }
+                        }) {
+                            Text("Remove Water")
+                                .font(.subheadline)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.red.opacity(0.8))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                    }
+                    .padding()
                 }
                 .frame(maxWidth: 320)
                 .padding()
@@ -54,6 +101,10 @@ struct WaterWidget: View {
             checkForNewDay()
             fetchGoalsFromAPI()
         }
+    }
+
+    private var progress: CGFloat {
+        return CGFloat(cupsFilled) / CGFloat(waterGoal)
     }
 
     private func checkForNewDay() {
@@ -96,22 +147,8 @@ struct WaterWidget: View {
     }
 }
 
-struct CupView: View {
-    let isFilled: Bool
-
-    var body: some View {
-        Image(systemName: isFilled ? "drop.fill" : "drop")
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .frame(width: 30, height: 30)
-            .foregroundColor(.mhaBlue)
-            .padding(4)
-    }
-}
-
 struct WaterWidget_Previews: PreviewProvider {
     static var previews: some View {
         WaterWidget()
     }
 }
-

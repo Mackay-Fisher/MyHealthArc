@@ -93,7 +93,7 @@ class StreaksViewModel: ObservableObject {
 
     private let apiClient = APIClient()
     private let baseURL = "\(AppConfig.baseURL)/goals"
-    private let userId = "dummy_user_id"
+    private let userId = KeychainWrapper.standard.string(forKey: "userHash")
 
     func fetchStreaks() {
         isLoading = true
@@ -136,6 +136,7 @@ class StreaksViewModel: ObservableObject {
 }
 
 import SwiftUI
+import SwiftKeychainWrapper
 
 struct StreaksView: View {
     @StateObject private var viewModel = StreaksViewModel()

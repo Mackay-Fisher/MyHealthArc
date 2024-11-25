@@ -5,6 +5,7 @@
 //  Created by Sharir on 11/24/24.
 //
 import SwiftUI
+import SwiftKeychainWrapper
 
 struct WaterWidget: View {
     @AppStorage("cupsFilled") private var cupsFilled: Int = 0
@@ -13,7 +14,7 @@ struct WaterWidget: View {
 
     @State private var isLoading = true
     private let baseURL = "\(AppConfig.baseURL)/goals"
-    private let userId = "dummy_user_id"
+    private let userId = KeychainWrapper.standard.string(forKey: "userHash")
 
     @Environment(\.colorScheme) var colorScheme
 

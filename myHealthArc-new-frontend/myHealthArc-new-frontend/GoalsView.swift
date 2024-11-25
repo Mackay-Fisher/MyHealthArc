@@ -5,6 +5,7 @@
 //  Created by Mackay Fisher on 11/21/24.
 //
 import SwiftUI
+import SwiftKeychainWrapper
 
 struct GoalsView: View {
     @State private var stepCount = 0
@@ -24,8 +25,7 @@ struct GoalsView: View {
     @Environment(\.colorScheme) var colorScheme
 
     private let baseURL = "\(AppConfig.baseURL)/goals"
-    private let userId = "dummy_user_id"
-
+    private let userId = KeychainWrapper.standard.string(forKey: "userHash")
     var body: some View {
         NavigationView {
             VStack {

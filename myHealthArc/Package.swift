@@ -47,6 +47,7 @@ let package = Package(
                 "NutritionValidationTest.swift",
                 "NutritionEntryTest.swift",
                 "BodyDataTest.swift",
+                "MedicationCheckerTest.swift",
             ]
         )
     ]

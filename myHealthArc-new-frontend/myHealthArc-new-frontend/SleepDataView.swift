@@ -325,6 +325,7 @@ struct SleepGraphView: View {
 struct CircularSleepChart: View {
     let hoursSlept: Double
     let stages: [String: Double]
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ZStack {
@@ -333,25 +334,25 @@ struct CircularSleepChart: View {
             
             Circle()
                 .trim(from: 0, to: CGFloat(stages["AWAKE"]! / hoursSlept))
-                .stroke(Color.yellow, lineWidth: 8)
+                .stroke(Color.mhaYellow, lineWidth: 8)
                 .rotationEffect(.degrees(-90))
             
             Circle()
                 .trim(from: CGFloat(stages["AWAKE"]! / hoursSlept),
                       to: CGFloat((stages["AWAKE"]! + stages["REM"]!) / hoursSlept))
-                .stroke(Color.purple, lineWidth: 8)
+                .stroke(Color.mhaPurple, lineWidth: 8)
                 .rotationEffect(.degrees(-90))
             
             Circle()
                 .trim(from: CGFloat((stages["AWAKE"]! + stages["REM"]!) / hoursSlept),
                       to: CGFloat((stages["AWAKE"]! + stages["REM"]! + stages["CORE"]!) / hoursSlept))
-                .stroke(Color.blue, lineWidth: 8)
+                .stroke(Color.mhaGreen, lineWidth: 8)
                 .rotationEffect(.degrees(-90))
             
             Circle()
                 .trim(from: CGFloat((stages["AWAKE"]! + stages["REM"]! + stages["CORE"]!) / hoursSlept),
                       to: CGFloat((stages["AWAKE"]! + stages["REM"]! + stages["CORE"]! + stages["DEEP"]!) / hoursSlept))
-                .stroke(Color.green, lineWidth: 8)
+                .stroke(Color.mhaBlue, lineWidth: 8)
                 .rotationEffect(.degrees(-90))
             
             VStack {
@@ -360,7 +361,7 @@ struct CircularSleepChart: View {
                Text("\(Int((hoursSlept.truncatingRemainder(dividingBy: 1) * 60))) min")
                    .font(.caption)
             }
-            .foregroundColor(.white)
+            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
         }
     }
 }

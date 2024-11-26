@@ -39,13 +39,8 @@ struct Tabs: View {
                     Image(systemName: "flame")
                     Text("Streaks")
                 }
-//            SettingsView(isLoggedIn: $isLoggedIn,hasSignedUp: $hasSignedUp)
-//                .tabItem {
-//                    Image(systemName: "gear")
-//                    Text("Settings")
-//                }
             
-        }
+        }.accentColor(.mhaPurple)
     }
 }
 

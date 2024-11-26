@@ -99,6 +99,7 @@ struct HealthSyncPreviewView: View {
             HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!,
             HKObjectType.quantityType(forIdentifier: .distanceCycling)!,
             HKObjectType.quantityType(forIdentifier: .flightsClimbed)!,
+            HKObjectType.quantityType(forIdentifier: .appleStandTime)!,
 
             // Body measurements
             HKObjectType.quantityType(forIdentifier: .bodyMass)!,

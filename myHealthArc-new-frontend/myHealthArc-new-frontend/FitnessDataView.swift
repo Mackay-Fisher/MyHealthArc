@@ -120,9 +120,29 @@ struct FitnessDataView: View {
         }
         .background(Color.black.edgesIgnoringSafeArea(.all))
         .onAppear {
-            fetchFitnessData()
+            requestAuthorization()
         }
     }
+    // MARK: - Authorization
+        private func requestAuthorization() {
+            // Define the types we want to read
+            let typesToRead: Set<HKObjectType> = [
+                HKObjectType.quantityType(forIdentifier: .stepCount)!,
+                HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
+                HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!,
+                HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
+                HKObjectType.quantityType(forIdentifier: .flightsClimbed)!,
+                HKObjectType.quantityType(forIdentifier: .appleStandTime)!
+            ]
+            
+            healthStore.requestAuthorization(toShare: nil, read: typesToRead) { success, error in
+                if success {
+                    fetchFitnessData()
+                } else if let error = error {
+                    print("Authorization failed: \(error.localizedDescription)")
+                }
+            }
+        }
 
     // MARK: - Fetch Fitness Data
     private func fetchFitnessData() {

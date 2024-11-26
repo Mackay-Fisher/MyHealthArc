@@ -266,14 +266,21 @@ struct MedicationsView: View {
             return
         }
 
-        // Create array of medications and join them with comma
+        // Create an array of medications and join them with commas
         let medicationsQuery = selectedMedications.joined(separator: ",")
 
-        // Prepare the URL with query parameters including user hash
+        // Ensure proper encoding of the medications and userHash query parameters
+        guard let encodedMedications = medicationsQuery.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let encodedUserHash = userHash.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            errorMessage = "Error encoding request parameters."
+            showInteraction = true
+            return
+        }
+
+        // Prepare the URL with encoded query parameters
         let baseURL = "\(AppConfig.baseURL)/medicationChecker/check"
-        guard let encodedQuery = medicationsQuery.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: "\(baseURL)?medications=\(encodedQuery)&userHash=\(userHash)") else {
-            errorMessage = "Error creating request."
+        guard let url = URL(string: "\(baseURL)?medications=\(encodedMedications)&userHash=\(encodedUserHash)") else {
+            errorMessage = "Error creating request URL."
             showInteraction = true
             return
         }
@@ -303,15 +310,12 @@ struct MedicationsView: View {
                     
                     // Handle response based on content
                     if let reason = decodedResponse.reason, reason.contains("Data corrupted") {
-                        // This seems to be the response when no interactions are found
                         errorMessage = "No known interactions found between the selected medications."
                         interactionResults = [:]
                     } else if let interactions = decodedResponse.interactionsBySeverity {
-                        // We have found interactions
                         interactionResults = interactions
                         errorMessage = ""
                     } else if let isError = decodedResponse.error, isError {
-                        // Handle other errors
                         errorMessage = decodedResponse.reason ?? "Unknown error occurred"
                         interactionResults = [:]
                     }

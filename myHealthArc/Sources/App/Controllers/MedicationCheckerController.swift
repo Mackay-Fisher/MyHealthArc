@@ -15,7 +15,7 @@ struct MedicationCheckerController: RouteCollection {
         // Get medications from the query and convert to lowercase
         let medicationsParam = try req.query.get(String.self, at: "medications")
         let medications = medicationsParam.split(separator: ",").map { $0.lowercased() }
-
+        print(medications)
         // Ensure at least two medications are provided
         guard medications.count >= 2 else {
             throw Abort(.badRequest, reason: "At least two medications are required for interaction checking.")

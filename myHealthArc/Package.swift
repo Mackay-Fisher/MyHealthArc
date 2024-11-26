@@ -48,6 +48,10 @@ let package = Package(
                 "NutritionEntryTest.swift",
                 "BodyDataTest.swift",
                 "MedicationCheckerTest.swift",
+                "RecipeTest.swift",
+                "UserTest.swift",
+                "UserServicesTest.swift",
+                "HealthKitTest.swift",
             ]
         )
     ]

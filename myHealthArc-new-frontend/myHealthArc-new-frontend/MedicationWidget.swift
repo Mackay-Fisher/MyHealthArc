@@ -179,15 +179,22 @@ struct MedicationWidget: View {
             return
         }
 
-        // Create array of medications and join them with comma
+        // Create an array of medications and join them with a comma
         let medications = [firstMedication, secondMedication]
         let medicationsQuery = medications.joined(separator: ",")
 
-        // Prepare the URL with query parameters including user hash
+        // Ensure proper encoding of query parameters
+        guard let encodedMedications = medicationsQuery.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let encodedUserHash = userHash.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            errorMessage = "Error encoding request parameters."
+            showInteraction = true
+            return
+        }
+
+        // Construct the URL with encoded query parameters
         let baseURL = "\(AppConfig.baseURL)/medicationChecker/check"
-        guard let encodedQuery = medicationsQuery.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: "\(baseURL)?medications=\(encodedQuery)&userHash=\(userHash)") else {
-            errorMessage = "Error creating request."
+        guard let url = URL(string: "\(baseURL)?medications=\(encodedMedications)&userHash=\(encodedUserHash)") else {
+            errorMessage = "Error creating request URL."
             showInteraction = true
             return
         }
@@ -217,11 +224,11 @@ struct MedicationWidget: View {
                     
                     // Handle response based on content
                     if let reason = decodedResponse.reason, reason.contains("Data corrupted") {
-                        // This seems to be the response when no interactions are found
+                        // No interactions found
                         errorMessage = "No known interactions found between \(firstMedication) and \(secondMedication)."
                         interactionResults = [:]
                     } else if let interactions = decodedResponse.interactionsBySeverity {
-                        // We have found interactions
+                        // Found interactions
                         interactionResults = interactions
                         errorMessage = ""
                     } else if let isError = decodedResponse.error, isError {

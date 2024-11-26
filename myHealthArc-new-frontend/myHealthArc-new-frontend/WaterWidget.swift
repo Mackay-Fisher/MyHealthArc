@@ -122,21 +122,34 @@ struct WaterWidget: View {
     }
 
     private func fetchWaterGoal() {
-        isLoading = true
         let userId = KeychainWrapper.standard.string(forKey: "userHash") ?? ""
+        isLoading = true
 
         Task {
             do {
-                if goalsManager.goals["water-intake"] == nil {
-                    try await goalsManager.fetchGoals(from: "\(AppConfig.baseURL)/goals", userHash: userId)
+                // Fetch goals asynchronously
+                try await goalsManager.fetchGoals(from: "\(AppConfig.baseURL)/goals", userHash: userId)
+                
+                // Log after fetching
+                print("Fetched goals: \(goalsManager.goals)")
+
+                // Update waterGoal after fetch
+                DispatchQueue.main.async {
+                    self.waterGoal = self.goalsManager.goals["water-intake"] ?? 8 // Default to 8 if not set
+                    self.isLoading = false
                 }
-                self.waterGoal = goalsManager.goals["water-intake"] ?? 8 // Default to 8 if not set
             } catch {
                 print("Error fetching goals: \(error)")
+
+                // Handle error and fallback to default water goal
+                DispatchQueue.main.async {
+                    self.waterGoal = 8
+                    self.isLoading = false
+                }
             }
-            self.isLoading = false
         }
     }
+
 
 
 

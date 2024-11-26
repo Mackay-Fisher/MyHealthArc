@@ -25,7 +25,6 @@
 		254013F42CF1954700004E36 /* FitnessWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254013F32CF1954700004E36 /* FitnessWidgetView.swift */; };
 		254013F62CF19A5300004E36 /* RecipesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254013F52CF19A5300004E36 /* RecipesView.swift */; };
 		2562C0812CCA10CC009E4284 /* MedicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2562C0802CCA10CC009E4284 /* MedicationWidget.swift */; };
-		25D6E3B92CC9CBD2004A2B1A /* EditProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D6E3B82CC9CBC8004A2B1A /* EditProfilePage.swift */; };
 		5A02A49F2CEBCE9200E83C60 /* FitnessDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02A49E2CEBCE9200E83C60 /* FitnessDataView.swift */; };
 		5A02A4A12CEBF01000E83C60 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02A4A02CEBF00F00E83C60 /* HealthKitManager.swift */; };
 		5A25041B2CF4042500F65B44 /* WaterWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A25041A2CF4042500F65B44 /* WaterWidget.swift */; };

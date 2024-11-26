@@ -185,7 +185,10 @@ struct GoalsView: View {
                 }
             }
             .onAppear {
-                goalsManager.fetchGoals(from: baseURL, userHash: userId)
+                Task{
+                    try await goalsManager.fetchGoals(from: baseURL, userHash: userId)
+                }
+                
             }
             .alert("Success!", isPresented: $showingSaveConfirmation) {
                 Button("OK", role: .cancel) { }

@@ -148,14 +148,14 @@ struct FitnessDataView: View {
             requestAuthorization()
             let userId = KeychainWrapper.standard.string(forKey: "userHash") ?? ""
             Task {
-                await fetchGoals(userId: userId)
+                try await fetchGoals(userId: userId)
                 isLoading = false
             }
         }
     }
 
-    private func fetchGoals(userId: String) async {
-        await goalsManager.fetchGoals(from: "\(AppConfig.baseURL)/goals", userHash: userId)
+    private func fetchGoals(userId: String) async throws{
+        try await goalsManager.fetchGoals(from: "\(AppConfig.baseURL)/goals", userHash: userId)
     }
     // MARK: - Authorization
         private func requestAuthorization() {

@@ -24,7 +24,7 @@ final class ChatbotViewModel: ObservableObject {
         if let apiKeyFromEnv = ProcessInfo.processInfo.environment["OPENAI_KEY"] {
             self.apiKey = apiKeyFromEnv
         } else {
-            self.apiKey = ""
+            self.apiKey = AppConfig.OPENAI_KEY
         }
     }
     

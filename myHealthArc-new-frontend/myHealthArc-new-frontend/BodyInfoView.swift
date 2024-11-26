@@ -9,7 +9,7 @@ struct BodyInfoView: View {
     @State private var gender: Gender = .male // Default gender
     @State private var bmi: Double?           // BMI value (calculated)
     @State private var showPopup: Bool = false // Control popup visibility
-    @State private var userHash: String? = KeychainWrapper.standard.string(forKey: "userHash") // Replace with actual user identifier
+    let userHash = KeychainWrapper.standard.string(forKey: "userHash")
     @State private var isLoading: Bool = false // Track loading state
     @Environment(\.colorScheme) var colorScheme
 
@@ -96,8 +96,17 @@ struct BodyInfoView: View {
 
     // MARK: - Load Body Data
     private func loadBodyData() async {
-        guard let url = URL(string: "\(AppConfig.baseURL)/bodyData/load?userHash=\(userHash)") else { return }
+        guard let userHash = userHash else {
+            print("User hash is nil.")
+            return
+        }
+        
+        guard let url = URL(string: "\(AppConfig.baseURL)/bodyData/load?userHash=\(userHash)") else {
+            print("Invalid URL")
+            return
+        }
 
+        print(url)
         isLoading = true
         defer { isLoading = false }
 
@@ -105,6 +114,7 @@ struct BodyInfoView: View {
             let (data, _) = try await URLSession.shared.data(from: url)
             let response = try JSONDecoder().decode(BodyDataPayload.self, from: data)
             DispatchQueue.main.async {
+                print(response)
                 self.height = response.height
                 self.weight = response.weight
                 self.age = response.age
@@ -116,9 +126,10 @@ struct BodyInfoView: View {
         }
     }
 
+
     // MARK: - Update Body Data
     // Function to update body data
-    private func updateBodyData() {
+    private func updateBodyData() async{
         guard let url = URL(string: "\(AppConfig.baseURL)/bodyData/update") else {
             print("Invalid URL")
             return

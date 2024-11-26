@@ -1,3 +1,10 @@
+
+//
+//  NutritionView.swift
+//  myHealthArc-new-frontend
+//
+//  Created by Anjali Hole on 10/23/24.
+
 import SwiftUI
 import SwiftKeychainWrapper
 import Foundation
@@ -51,7 +58,6 @@ struct MacroRangeResponse: Codable {
 
 // MARK: - Main View
 struct NutritionView: View {
-    
     @State private var mealInput: String = ""
     @State private var meals: [Meal] = []
     @State private var foodSearch: String = ""
@@ -64,130 +70,225 @@ struct NutritionView: View {
     @State private var selectedMeal: Meal?
     @State private var showForm: Bool = false
     
-    
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        VStack {
-            // Header
-            HStack {
-                Image("carrot")
-                    .resizable()
-                    .scaledToFit()
-                    .padding(-2)
-                    .frame(width: 30)
-                Text("Meal Tracking")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-            }
-            
-            Divider()
-                .overlay(colorScheme == .dark ? Color.white : Color.gray)
-            
-            Spacer().frame(height: 10)
-            
-            // Add Meal Button
-            ZStack(alignment: .topTrailing) {
+        ZStack {
+            // Main Content
+            VStack {
+                // Header
                 HStack {
-                    Spacer()
-                    Text("Your Meals")
-                        .font(.title2)
-                        .padding(.top)
-                    Spacer()
+                    Image("carrot")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(-2)
+                        .frame(width: 30)
+                    Text("Meal Tracking")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
                 }
-                .padding(.horizontal)
                 
-                Button(action: { showPopup = true }) {
-                    Image(systemName: "plus.circle")
-                        .font(.title)
-                        .padding(12)
-                        .foregroundColor(Color.mhaPurple)
-                }
-            }
-            
-            Spacer().frame(height: 2)
-            
-            // Calendar View
-            calendarView
-            
-            // Meals List
-            List(meals, id: \.id) { meal in
-                VStack(alignment: .leading) {
+                Divider()
+                    .overlay(colorScheme == .dark ? Color.white : Color.gray)
+                
+                Spacer().frame(height: 10)
+                
+                // Add Meal Button
+                ZStack(alignment: .topTrailing) {
                     HStack {
-                        Text(meal.name)
-                            .font(.headline)
                         Spacer()
-                        Button(action: {
-                            selectedMeal = meal
-                            globalSelectedMealId = meal.id
-                            showForm = true
-                        }) {
-                            Image("pencil")
-                                .resizable()
-                                .scaledToFit()
-                                .padding(6)
-                                .frame(width: 30)
-                        }
-                        .buttonStyle(PlainButtonStyle())
+                        Text("Your Meals")
+                            .font(.title2)
+                            .padding(.top)
+                        Spacer()
                     }
-                    .padding(.bottom, 2)
+                    .padding(.horizontal)
                     
-                    HStack(spacing: 10) {
-                        ForEach([meal.totalProtein, meal.totalCarbs, meal.totalFats, meal.totalCalories], id: \.name) { macro in
-                            VStack(spacing: 8) {
-                                Text(macro.name)
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(colorForMacro(macro.name))
-                                
-                                ZStack {
-                                    Circle()
-                                        .stroke(colorForMacro(macro.name), lineWidth: 2)
-                                        .frame(width: 60, height: 60)
-                                    
-                                    Text(macro.value)
-                                        .font(.footnote)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(colorForMacro(macro.name))
-                                }
-                                
-                                if(macro.name == "Calories:"){
-                                    Text("kcal")
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(Color.mhaGreen)
-                                }
-                                else{
-                                    Text("g")
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(colorForMacro(macro.name))
+                    Button(action: { showPopup = true }) {
+                        Image(systemName: "plus.circle")
+                            .font(.title)
+                            .padding(12)
+                            .foregroundColor(Color.mhaPurple)
+                    }
+                }
+                
+                Spacer().frame(height: 2)
+                
+                // Calendar View
+                calendarView
+                
+                // Meals List
+                List(meals, id: \.id) { meal in
+                    Button(action: {
+                        selectedMeal = meal
+                        globalSelectedMealId = meal.id
+                        showForm = true
+                    }) {
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text(meal.name)
+                                    .font(.headline)
+                                    .foregroundColor(colorScheme == .dark ? .white : .black)
+                                Spacer()
+                                Image("pencil")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(6)
+                                    .frame(width: 30)
+                            }
+                            .padding(.bottom, 2)
+                            
+                            HStack(spacing: 10) {
+                                ForEach([meal.totalProtein, meal.totalCarbs, meal.totalFats, meal.totalCalories], id: \.name) { macro in
+                                    VStack(spacing: 8) {
+                                        Text(macro.name)
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(colorForMacro(macro.name))
+                                        
+                                        ZStack {
+                                            Circle()
+                                                .stroke(colorForMacro(macro.name), lineWidth: 2)
+                                                .frame(width: 60, height: 60)
+                                            
+                                            Text(macro.value)
+                                                .font(.footnote)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(colorForMacro(macro.name))
+                                        }
+                                        
+                                        if(macro.name == "Calories:") {
+                                            Text("kcal")
+                                                .font(.caption)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(Color.mhaGreen)
+                                        }
+                                        else {
+                                            Text("g")
+                                                .font(.caption)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(colorForMacro(macro.name))
+                                        }
+                                    }
+                                    .frame(maxWidth: .infinity)
                                 }
                             }
-                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 5)
                         }
                     }
-                    .padding(.vertical,5)
                 }
+                .listStyle(PlainListStyle())
             }
-            .listStyle(PlainListStyle())
-
+            .blur(radius: showFoodInfo ? 8 : 0)
+            .overlay(
+                Rectangle()
+                    .fill(Color.black.opacity(showFoodInfo ? 0.3 : 0))
+                    .allowsHitTesting(showFoodInfo)
+            )
             
-            // Search Bar
-            searchBar
-            
+            // Search Bar and Results Overlay
+            VStack {
+                Spacer()
+                
+                // Search Bar
+                VStack {
+                    HStack {
+                        TextField("Search for food", text: $foodSearch)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .cornerRadius(20)
+                        Button(action: fetchFoodInfo) {
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(.white)
+                                .padding(5)
+                                .background(Color.mhaPurple)
+                                .clipShape(Circle())
+                        }
+                    }
+                    .padding()
+                    
+                    // Search Results
+                    if showFoodInfo {
+                        VStack(alignment: .leading, spacing: 15) {
+                            let items = foodInfo.split(separator: " - ", maxSplits: 1)
+                            if items.count == 2 {
+                                Text(String(items[0]).capitalized)
+                                    .font(.headline)
+                                    .padding(.bottom, 5)
+                                
+                                let nutrients = String(items[1]).components(separatedBy: ", ")
+                                ForEach(nutrients, id: \.self) { nutrient in
+                                    let parts = nutrient.split(separator: ":")
+                                    if parts.count == 2 {
+                                        let name = String(parts[0]) + ":"
+                                        let values = String(parts[1]).trimmingCharacters(in: .whitespaces)
+                                        
+                                        HStack(spacing: 10) {
+                                            Circle()
+                                                .fill(colorForMacro(name))
+                                                .frame(width: 8, height: 8)
+                                            
+                                            Text(name)
+                                                .font(.subheadline)
+                                                .fontWeight(.medium)
+                                                .frame(width: 80, alignment: .leading)
+                                            
+                                            Text(values)
+                                                .font(.subheadline)
+                                                .foregroundColor(.secondary)
+                                            
+                                            if name == "Calories:" {
+                                                Text("kcal")
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                            } else {
+                                                Text("g")
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                Button(action: {
+                                    foodSearch = ""
+                                    foodInfo = ""
+                                    showFoodInfo = false
+                                }) {
+                                    Text("Clear")
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 20)
+                                        .padding(.vertical, 8)
+                                        .background(Color.mhaSalmon)
+                                        .cornerRadius(20)
+                                }
+                                .padding(.top, 10)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                            }
+                        }
+                        .padding()
+                        .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                        .cornerRadius(12)
+                        //.shadow(radius: 5)
+                        .padding(.horizontal)
+                    }
+                }
+                .background(colorScheme == .dark ? Color.mhaGray: Color.white)
+                .cornerRadius(12)
+                //.shadow(radius: showFoodInfo ? 2 : 0)
+            }
         }
-        .padding()
         .sheet(item: $selectedMeal) { meal in
             EditMeal(meal: meal) {
                 fetchMealsForDay(date: selectedDate)
             }
-        }        .overlay(addMealPopup)
+        }
+        .overlay(addMealPopup)
         .onAppear {
             fetchMealsForDay(date: selectedDate)
         }
     }
     
+    // MARK: - Helper Functions
     private func colorForMacro(_ macroName: String) -> Color {
         switch macroName {
         case "Protein:":
@@ -202,39 +303,39 @@ struct NutritionView: View {
             return Color.gray.opacity(0.8)
         }
     }
-    //MARK: - Calendar view
+    
+    // MARK: - Calendar View
     private var calendarView: some View {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 5) {
-                    ForEach(getCurrentWeek(), id: \.self) { date in
-                        VStack {
-                            Text(date, formatter: DateFormatter.dayOfWeekFormatter)
-                                .font(.subheadline)
-                            Text(date, formatter: DateFormatter.dayFormatter)
-                                .font(.title3)
-                                .fontWeight(isSelectedDate(date) ? .bold : .regular)
-                                .foregroundColor(isSelectedDate(date) ? Color.mhaGreen : .primary)
-                        }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 40)
-                                .fill(isSelectedDate(date) ? Color.mhaPurple.opacity(0.2) : Color.clear)
-                        )
-                        .onTapGesture {
-                            selectedDate = Calendar.current.startOfDay(for: date)
-                            fetchMealsForDay(date: selectedDate)
-                        }
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 5) {
+                ForEach(getCurrentWeek(), id: \.self) { date in
+                    VStack {
+                        Text(date, formatter: DateFormatter.dayOfWeekFormatter)
+                            .font(.subheadline)
+                        Text(date, formatter: DateFormatter.dayFormatter)
+                            .font(.title3)
+                            .fontWeight(isSelectedDate(date) ? .bold : .regular)
+                            .foregroundColor(isSelectedDate(date) ? Color.mhaGreen : .primary)
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 40)
+                            .fill(isSelectedDate(date) ? Color.mhaPurple.opacity(0.2) : Color.clear)
+                    )
+                    .onTapGesture {
+                        selectedDate = Calendar.current.startOfDay(for: date)
+                        fetchMealsForDay(date: selectedDate)
                     }
                 }
-                .padding(.horizontal)
             }
+            .padding(.horizontal)
         }
+    }
     
     private func isSelectedDate(_ date: Date) -> Bool {
-            Calendar.current.isDate(date, inSameDayAs: selectedDate)
-        }
+        Calendar.current.isDate(date, inSameDayAs: selectedDate)
+    }
     
-    // Generate current week dates centered around today
     private func getCurrentWeek() -> [Date] {
         let calendar = Calendar.current
         let today = Date()
@@ -286,7 +387,7 @@ struct NutritionView: View {
                     .background(colorScheme == .dark ? Color.gray.opacity(0.9) : Color.white)
                     .cornerRadius(16)
                     .frame(width: 350)
-                    .shadow(radius: 20)
+                    .shadow(radius: 2)
                 }
             }
         }

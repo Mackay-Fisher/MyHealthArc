@@ -273,12 +273,14 @@ struct FitnessWidget: View {
         let currentValue = extractNumeric(from: value)
         let goalValue = extractNumeric(from: goal)
         let remaining = max(0, goalValue - currentValue)
-        
         // Handle different units based on the title
         if title == "Calories Burned" {
             return "\(Int(remaining)) kcal"
         } else if title == "Distance" {
-            return String(format: "%.2f mi", remaining)
+            let currentValue = extractNumeric(from: value)/100
+            let goalValue = extractNumeric(from: goal)
+            let remaining = max(0, goalValue - currentValue)
+            return String(format: "\(Float(remaining)) mi", remaining)
         } else if title.contains("Time") || title == "Move Minutes" {
             return "\(Int(remaining)) min"
         } else {

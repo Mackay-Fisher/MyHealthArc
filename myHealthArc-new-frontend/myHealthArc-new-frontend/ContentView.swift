@@ -1,12 +1,20 @@
 //this is the dashboard page
 import SwiftUI
 
+// Service View Model
+class ServicesViewModel: ObservableObject {
+    @Published var selectedServices: [String: Bool] = [:]
+    static let shared = ServicesViewModel()
+}
+
 struct ContentView: View {
-    @State private var showSettings: Bool = false // Toggle settings visibility
+    @State private var showSettings: Bool = false
     @Environment(\.colorScheme) var colorScheme
+    @StateObject private var servicesViewModel = ServicesViewModel.shared
     
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -19,7 +27,7 @@ struct ContentView: View {
                         Spacer()
                         Button(action: {
                             withAnimation(.easeInOut) {
-                                showSettings.toggle() // Toggle settings view
+                                showSettings.toggle()
                             }
                         }) {
                             Image(systemName: "person.circle.fill")
@@ -34,42 +42,49 @@ struct ContentView: View {
                     // Widgets Area
                     ScrollView {
                         VStack(spacing: 20) {
-                            HealthWidget()
-                            FitnessWidgetView()
-                            MedicationWidget()
-                            NutritionWidgetView()
-                            WaterWidget()
+                            if servicesViewModel.selectedServices["Apple Health"] ?? false {
+                                HealthWidget()
+                            }
+                            
+                            if servicesViewModel.selectedServices["Apple Fitness"] ?? false {
+                                FitnessWidgetView()
+                            }
+                            
+                            if servicesViewModel.selectedServices["Prescriptions"] ?? false {
+                                MedicationWidget()
+                            }
+                            
+                            if servicesViewModel.selectedServices["Nutrition"] ?? false {
+                                NutritionWidgetView()
+                                WaterWidget()
+                            }
                         }
-                        //.padding()
-                        
                         .shadow(radius: 0.5)
                     }
                 }
-                //.padding()
                 .background(colorScheme == .dark ? Color(.systemBackground) : Color.lightbackground)
                 .navigationBarHidden(true)
                 
-                
                 // Slide-out Settings View
                 if showSettings {
-                    Color.black.opacity(0.4) // Dimmed background when settings is open
+                    Color.black.opacity(0.4)
                         .ignoresSafeArea()
                         .onTapGesture {
                             withAnimation(.easeInOut) {
-                                showSettings = false // Close settings when clicking outside
+                                showSettings = false
                             }
                         }
                     
                     SettingsView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
-                        .frame(width: UIScreen.main.bounds.width * 0.8) // 80% of screen width
+                        .frame(width: UIScreen.main.bounds.width * 0.8, height: UIScreen.main.bounds.height * 0.7)
                         .background(colorScheme == .dark ? Color.mhaGray : Color.white)
                         .cornerRadius(20)
                         .shadow(radius: 10)
-                        .offset(x: showSettings ? 0 : UIScreen.main.bounds.width) // Slide-in effect
+                        .offset(x: showSettings ? 0 : UIScreen.main.bounds.width)
                         .animation(.easeInOut, value: showSettings)
                         .gesture(
                             DragGesture().onEnded { value in
-                                if value.translation.width > 100 { // Detect swipe to close
+                                if value.translation.width > 100 {
                                     withAnimation(.easeInOut) {
                                         showSettings = false
                                     }
@@ -82,31 +97,6 @@ struct ContentView: View {
     }
 }
 
-// Widget View for displaying health data - can delete this function later
-/*struct WidgetView: View {
-    var title: String
-    var detail: String
-    @Environment(\.colorScheme) var colorScheme
-
-    var body: some View {
-        VStack {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                .padding(.top)
-            Divider()
-                .frame(width: UIScreen.main.bounds.width * 0.8)
-            Text(detail)
-                .font(.subheadline)
-                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                .padding(.bottom)
-        }
-        .frame(maxWidth: 350)
-        .background(colorScheme == .dark ? Color.mhaGray : Color.white)
-        .cornerRadius(25)
-    }
-        
-}*/
 // User Profile View
 struct UserProfileView: View {
     @Binding var isLoggedIn: Bool
@@ -115,7 +105,6 @@ struct UserProfileView: View {
     var userEmail: String
     @Binding var showProfile: Bool
     @Environment(\.colorScheme) var colorScheme
-
     
     var body: some View {
         VStack {
@@ -125,7 +114,7 @@ struct UserProfileView: View {
                     .fontWeight(.bold)
                 Spacer()
                 Button(action: {
-                    showProfile = false // Close the profile view
+                    showProfile = false
                 }) {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(Color.mhaGreen)
@@ -142,20 +131,17 @@ struct UserProfileView: View {
             }
             .padding()
             Divider().padding(.horizontal)
-
-            // Settings View
+            
             SettingsView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
-
-
+            
             Spacer()
-
         }
         .frame(maxWidth: .infinity, maxHeight: 300)
         .background(colorScheme == .dark ? Color.mhaGray : Color.white)
         .cornerRadius(10)
         .shadow(radius: 10)
         .padding()
-        .transition(.move(edge: .top)) // Add transition for profile view
+        .transition(.move(edge: .top))
     }
 }
 
@@ -166,4 +152,3 @@ struct ContentView_Previews: PreviewProvider {
         ContentView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp)
     }
 }
-

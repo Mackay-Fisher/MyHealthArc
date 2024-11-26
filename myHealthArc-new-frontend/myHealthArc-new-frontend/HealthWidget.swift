@@ -17,7 +17,7 @@ struct HealthWidget: View {
     @State private var totalSleepHours: Double = 0
     private let healthStore = HKHealthStore()
     @State private var lastSleepHours: Double = 0
-    private let sleepStreak = 14
+    private let sleepStreak = 35
 @State private var sleepStages: [String: Double] = [
         "AWAKE": 0,
         "REM": 0,

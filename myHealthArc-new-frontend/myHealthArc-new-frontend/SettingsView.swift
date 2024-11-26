@@ -9,7 +9,8 @@ struct SettingsView: View {
     @Binding var hasSignedUp: Bool
     @Environment(\.colorScheme) var colorScheme
     
-    private let userHash = "exampleUserHash" // Replace this with dynamic userHash later
+
+    private let userHash = KeychainWrapper.standard.string(forKey: "userHash") ?? "exampleUserHash"
     private let baseURL = "\(AppConfig.baseURL)"
     
     var body: some View {

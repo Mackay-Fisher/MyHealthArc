@@ -1,5 +1,6 @@
 //this is the dashboard page
 import SwiftUI
+import SwiftKeychainWrapper
 
 // Service View Model
 class ServicesViewModel: ObservableObject {
@@ -93,8 +94,45 @@ struct ContentView: View {
                         )
                 }
             }
+        }.onAppear {
+            fetchInitialServices()
         }
     }
+    private func fetchInitialServices() {
+            guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
+                print("Invalid userHash")
+                return
+            }
+            
+            guard let url = URL(string: "\(AppConfig.baseURL)/user-services/fetch?userHash=\(userHash)") else {
+                print("Invalid URL")
+                return
+            }
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Failed to fetch services: \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let data = data else {
+                    print("No data received")
+                    return
+                }
+                
+                do {
+                    let response = try JSONDecoder().decode(ServiceResponse.self, from: data)
+                    DispatchQueue.main.async {
+                        self.servicesViewModel.selectedServices = response.selectedServices
+                    }
+                } catch {
+                    print("Failed to decode services: \(error.localizedDescription)")
+                }
+            }.resume()
+        }
 }
 
 // User Profile View

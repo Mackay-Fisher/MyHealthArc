@@ -52,6 +52,7 @@ let package = Package(
                 "UserTest.swift",
                 "UserServicesTest.swift",
                 "HealthKitTest.swift",
+                "GoalsTest.swift",
             ]
         )
     ]

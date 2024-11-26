@@ -36,6 +36,24 @@ final class RecipeTest: XCTestCase {
         try await deleteRecipe(userHash: "user2")
     }
 
+    func testCreateAndFetchRecipe1() async throws {
+        try await createRecipe(userHash: "user3", name: "Recipe 3", content: "Mix ingredients")
+        try await fetchRecipes(userHash: "user3")
+        try await deleteRecipe(userHash: "user3")
+    }
+
+    func testCreateAndFetchRecipe2() async throws {
+        try await createRecipe(userHash: "user4", name: "Recipe 4", content: "Mix ingredients")
+        try await fetchRecipes(userHash: "user4")
+        try await deleteRecipe(userHash: "user4")
+    }
+
+    func testCreateAndFetchRecipe3() async throws {
+        try await createRecipe(userHash: "user5", name: "Recipe 5", content: "Mix ingredients")
+        try await fetchRecipes(userHash: "user5")
+        try await deleteRecipe(userHash: "user5")
+    }
+
     private func createRecipe(userHash: String, name: String, content: String) async throws {
         let newRecipe = Recipe(
             name: name,

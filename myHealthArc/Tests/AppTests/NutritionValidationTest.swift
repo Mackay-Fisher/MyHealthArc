@@ -44,6 +44,18 @@ final class NutritionValidationTest: XCTestCase {
         try await validateNutritionItem(foodName: "salmon")
     }
 
+    func testValidateKimchi() async throws {
+        try await validateNutritionItem(foodName: "kimchi")
+    }
+
+    func testValidateSteak() async throws {
+        try await validateNutritionItem(foodName: "steak")
+    }
+
+    func testValidateWhiteRice() async throws {
+        try await validateNutritionItem(foodName: "whiterice")
+    }
+
     private func validateNutritionItem(foodName: String) async throws {
         let apiKey = Environment.get("FOOD_DATA_API_KEY") ?? "DEMO_KEY"
         let req = Request(application: app, on: app.eventLoopGroup.next())

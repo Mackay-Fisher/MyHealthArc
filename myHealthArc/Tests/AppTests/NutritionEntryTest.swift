@@ -26,7 +26,7 @@ final class NutritionEntryTest: XCTestCase {
     }
 
     func testInsertNutrition1() async throws {
-        try await insertNutrition(userHash: "user1", foodName: "Apple", proteinMinimum: 10.0, proteinMaximum: 20.0, carbohydratesMinimum: 10.0, carbohydratesMaximum: 20.0, fatsMinimum: 10.0, fatsMaximum: 20.0, caloriesMinimum: 10, caloriesMaximum: 20)
+        try await insertNutrition(userHash: "user1", foodName: "Apple", proteinMinimum: 10.0, proteinMaximum: 20.0, carbohydratesMinimum: 10.0, carbohydratesMaximum: 20.0, fatsMinimum: 10.0, fatsMaximum: 20.0, caloriesMinimum: 100, caloriesMaximum: 200)
     }
 
     func testInsertNutrition2() async throws {
@@ -45,7 +45,7 @@ final class NutritionEntryTest: XCTestCase {
         try await insertNutrition(userHash: "user5", foodName: "Mango", proteinMinimum: 50.0, proteinMaximum: 50.0, carbohydratesMinimum: 50.0, carbohydratesMaximum: 50.0, fatsMinimum: 50.0, fatsMaximum: 50.0, caloriesMinimum: 500, caloriesMaximum: 550)
     }
 
-    private func insertNutrition(userHash: String, foodName: String, proteinMinimum: Double, proteinMaximum: Double, carbohydratesMinimum: Double, carbohydratesMaximum: Double, fatsMinimum: Double, fatsMaximum: Double, caloriesMinimum: Int, caloriesMaximum: Int, modifiedProtein: Double? = nil, modifiedCarbohydrates: Double? = nil, modifiedFats: Double? = nil, modifiedCalories: Int? = nil) async throws {
+    private func insertNutrition(userHash: String, foodName: String, proteinMinimum: Double, proteinMaximum: Double, carbohydratesMinimum: Double, carbohydratesMaximum: Double, fatsMinimum: Double, fatsMaximum: Double, caloriesMinimum: Int, caloriesMaximum: Int) async throws {
         let newNutrition = Nutrition(
             userHash: userHash,
             foodName: foodName,
@@ -56,11 +56,7 @@ final class NutritionEntryTest: XCTestCase {
             fatsMinimum: fatsMinimum,
             fatsMaximum: fatsMaximum,
             caloriesMinimum: caloriesMinimum,
-            caloriesMaximum: caloriesMaximum,
-            modifiedProtein: modifiedProtein,
-            modifiedCarbohydrates: modifiedCarbohydrates,
-            modifiedFats: modifiedFats,
-            modifiedCalories: modifiedCalories
+            caloriesMaximum: caloriesMaximum
         )
 
         print("Sending POST request to create the nutrition object for \(userHash)")
@@ -86,10 +82,6 @@ final class NutritionEntryTest: XCTestCase {
         XCTAssertEqual(dbItem.fatsMaximum, newNutrition.fatsMaximum, "Fats maximum does not match")
         XCTAssertEqual(dbItem.caloriesMinimum, newNutrition.caloriesMinimum, "Calories minimum does not match")
         XCTAssertEqual(dbItem.caloriesMaximum, newNutrition.caloriesMaximum, "Calories maximum does not match")
-        XCTAssertEqual(dbItem.modifiedProtein, newNutrition.modifiedProtein, "Modified protein does not match")
-        XCTAssertEqual(dbItem.modifiedCarbohydrates, newNutrition.modifiedCarbohydrates, "Modified carbohydrates does not match")
-        XCTAssertEqual(dbItem.modifiedFats, newNutrition.modifiedFats, "Modified fats does not match")
-        XCTAssertEqual(dbItem.modifiedCalories, newNutrition.modifiedCalories, "Modified calories does not match")
         print("Nutrition object validation completed successfully for \(userHash)")
 
         _ = try await nutritionCollection.deleteOne(where: ["userHash": userHash]).get()

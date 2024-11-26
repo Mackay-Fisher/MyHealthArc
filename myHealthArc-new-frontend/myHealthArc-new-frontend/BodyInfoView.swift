@@ -57,7 +57,7 @@ struct BodyInfoView: View {
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(Color.mhaSalmon)
-                            .cornerRadius(15)
+                            .cornerRadius(20)
                     }
                     .padding()
                 }
@@ -257,11 +257,11 @@ struct SliderInput: View {
 struct PopupOverlay: View {
     let bmi: Double?
     let onClose: () -> Void
-
+    @Environment(\.colorScheme) var colorScheme
     var body: some View {
-        Color.black.opacity(0.5)
-            .edgesIgnoringSafeArea(.all)
-            .onTapGesture { onClose() }
+//        Color.black.opacity(0.12)
+//            .edgesIgnoringSafeArea(.all)
+//            .onTapGesture { onClose() }
 
         VStack(spacing: 15) {
             Text("Your BMI")
@@ -272,17 +272,23 @@ struct PopupOverlay: View {
                 Text(String(format: "%.2f kg/m²", calculatedBMI))
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundColor(calculatedBMI < 18.5 || calculatedBMI > 24.9 ? .red : .green)
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
+                    //.foregroundColor(calculatedBMI < 18.5 || calculatedBMI > 24.9 ? .red : .green)
 
                 Text(calculatedBMI < 18.5 ? "(Underweight)" :
                      calculatedBMI > 24.9 ? "(Overweight)" :
                      "(Normal)")
                     .font(.title3)
-                    .foregroundColor(.white)
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
+                    .padding(8)
+                    .background(
+                            calculatedBMI < 18.5 || calculatedBMI > 24.9 ? Color.red : Color.mhaGreen
+                        )
+                        .cornerRadius(10)
 
                 Text("A BMI of 18.5 - 24.9 indicates a healthy weight.")
                     .font(.subheadline)
-                    .foregroundColor(.white)
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
                     .multilineTextAlignment(.center)
                     .padding()
             } else {
@@ -298,7 +304,7 @@ struct PopupOverlay: View {
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background(Color.red)
-                    .cornerRadius(15)
+                    .cornerRadius(20)
             }
         }
         .padding()

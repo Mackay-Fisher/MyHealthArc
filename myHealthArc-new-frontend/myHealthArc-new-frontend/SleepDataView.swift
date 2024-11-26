@@ -33,7 +33,7 @@ struct SleepDataView: View {
                         Text("No Sleep Data Available")
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(colorScheme == .dark ? .white : .black)
                         
                         Text("This page is designed for wearable devices such as Apple Watches. To use this feature, please sync your sleep data with the Apple Health app.")
                             .font(.body)
@@ -45,7 +45,7 @@ struct SleepDataView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Goal Completion")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(colorScheme == .dark ? .white : .black)
                         
                         HStack {
                             ProgressBar(value: min(totalSleepHours / 56.0, 1.0))
@@ -53,20 +53,20 @@ struct SleepDataView: View {
                             
                             Text("\(String(format: "%.1f", totalSleepHours)) hrs")
                                 .font(.subheadline)
-                                .foregroundColor(.white)
+                                .foregroundColor(colorScheme == .dark ? .white : .black)
                                 .bold()
                         }
                         
                         HStack {
                             Text("\(String(format: "%.1f", totalSleepHours)) hrs this week")
                                 .font(.caption)
-                                .foregroundColor(.white)
+                                .foregroundColor(colorScheme == .dark ? .white : .black)
                             
                             Spacer()
                             
                             Text("56 hrs goal")
                                 .font(.caption)
-                                .foregroundColor(.white)
+                                .foregroundColor(colorScheme == .dark ? .white : .black)
                         }
                     }
                     .padding()
@@ -80,7 +80,7 @@ struct SleepDataView: View {
                             Spacer()
                             Text("Last Sleep")
                                 .font(.caption)
-                                .foregroundColor(.white)
+                                .foregroundColor(colorScheme == .dark ? .white : .black)
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -93,11 +93,11 @@ struct SleepDataView: View {
                                     .foregroundColor(.yellow)
                                 Text("Fall Asleep")
                                     .font(.subheadline)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(colorScheme == .dark ? .white : .black)
                             }
                             Text(fallAsleepTime != nil ? "\(fallAsleepTime!, formatter: timeFormatter)" : "N/A")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(colorScheme == .dark ? .white : .black)
                             
                             Divider()
                                 .background(Color.white)
@@ -107,11 +107,11 @@ struct SleepDataView: View {
                                     .foregroundColor(.orange)
                                 Text("Wake Up")
                                     .font(.subheadline)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(colorScheme == .dark ? .white : .black)
                             }
                             Text(wakeUpTime != nil ? "\(wakeUpTime!, formatter: timeFormatter)" : "N/A")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(colorScheme == .dark ? .white : .black)
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -122,7 +122,7 @@ struct SleepDataView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Sleep Graph (Last Week)")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(colorScheme == .dark ? .white : .black)
                         
                         ScrollView(.horizontal, showsIndicators: false) {
                             SleepGraphView(data: sleepHoursByDay)
@@ -255,6 +255,7 @@ struct SleepDataView: View {
 struct SleepGraphView: View {
    let data: [Date: Double]
    @State private var selectedDate: Date? = nil
+    @Environment(\.colorScheme) var colorScheme
    
    var body: some View {
        GeometryReader { geometry in
@@ -269,7 +270,7 @@ struct SleepGraphView: View {
                        VStack {
                            Spacer()
                            Rectangle()
-                               .fill(Color.green)
+                               .fill(Color.mhaGreen)
                                .frame(width: width * 0.8, height: height)
                                .contentShape(Rectangle())
                                .onTapGesture {
@@ -287,7 +288,7 @@ struct SleepGraphView: View {
                            }
                            .font(.caption2)
                        }
-                       .foregroundColor(.white)
+                       .foregroundColor(colorScheme == .dark ? .white : .black)
                    }
                }
                
@@ -300,9 +301,9 @@ struct SleepGraphView: View {
                            .bold()
                    }
                    .padding(8)
-                   .background(Color.black.opacity(0.8))
+                   .background(colorScheme == .dark ? Color.black.opacity(0.8) : Color.white.opacity(0.8))
                    .cornerRadius(8)
-                   .foregroundColor(.white)
+                   .foregroundColor(colorScheme == .dark ? .white : .black)
                    .offset(y: 20)
                }
            }
@@ -378,7 +379,7 @@ struct ProgressBar: View {
                 
                 Rectangle()
                     .frame(width: CGFloat(value) * geometry.size.width, height: geometry.size.height)
-                    .foregroundColor(.purple)
+                    .foregroundColor(.mhaPurple)
             }
             .cornerRadius(5)
         }

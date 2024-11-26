@@ -24,10 +24,19 @@ struct FitnessDataView: View {
             VStack(spacing: 20) {
                 // Header
                 VStack {
-                    Text("🏃‍♂️ Apple Fitness Data")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
+                    HStack {
+                        Image(systemName: "figure.run")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 25)
+                            .foregroundColor(.mhaGreen)
+                        
+                        Text("Apple Fitness")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                    }
+                    
 
                     Text("Summary")
                         .font(.headline)
@@ -35,17 +44,33 @@ struct FitnessDataView: View {
                 }
 
                 // Manage Goals Button
-                HStack {
-                    Text("Manage Goals")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .foregroundColor(.gray)
+//                HStack {
+//                    Text("Manage Goals")
+//                        .font(.headline)
+//                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+//                    Spacer()
+//                    Image(systemName: "chevron.right")
+//                        .foregroundColor(.gray)
+//                }
+//                .padding()
+//                .background(Color(.systemGray6))
+//                .cornerRadius(15)
+                NavigationLink(destination: GoalsView()) {
+                    HStack {
+                        Image(systemName: "target")
+                            .foregroundColor(.mhaGreen)
+                        Text("Manage Goals")
+                            .foregroundColor(.mhaGreen)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.gray)
+                    }
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
+                    .frame(maxWidth: .infinity)
                 }
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(15)
+                .padding(.horizontal)
 
                 // Data Widgets Grid
                 LazyVGrid(columns: [GridItem(.flexible(minimum: 150)), GridItem(.flexible(minimum: 150))], spacing: 20) {
@@ -56,7 +81,7 @@ struct FitnessDataView: View {
                             goal: "10,000",
                             progress: Double(stepCount) / 10000,
                             icon: "figure.walk",
-                            iconColor: .blue
+                            iconColor: .mhaBlue
                         )
                     }
 
@@ -67,7 +92,7 @@ struct FitnessDataView: View {
                             goal: "400 kcal",
                             progress: Double(caloriesBurned) / 400,
                             icon: "flame.fill",
-                            iconColor: .red
+                            iconColor: .mhaSalmon
                         )
                     }
 
@@ -78,7 +103,7 @@ struct FitnessDataView: View {
                             goal: "1.0 mi",
                             progress: distance / 1.0,
                             icon: "map.fill",
-                            iconColor: .green
+                            iconColor: .mhaGreen
                         )
                     }
 
@@ -89,7 +114,7 @@ struct FitnessDataView: View {
                             goal: "60 min",
                             progress: Double(exerciseTime) / 60,
                             icon: "dumbbell.fill",
-                            iconColor: .purple
+                            iconColor: .mhaPurple
                         )
                     }
 
@@ -100,7 +125,7 @@ struct FitnessDataView: View {
                             goal: "20",
                             progress: Double(flightsClimbed) / 20,
                             icon: "airplane.departure",
-                            iconColor: .orange
+                            iconColor: .mhaOrange
                         )
                     }
 
@@ -111,14 +136,14 @@ struct FitnessDataView: View {
                             goal: "30 min",
                             progress: Double(moveMinutes) / 30,
                             icon: "clock.fill",
-                            iconColor: .yellow
+                            iconColor: .mhaYellow
                         )
                     }
                 }
             }
             .padding()
         }
-        .background(Color.black.edgesIgnoringSafeArea(.all))
+        .background(colorScheme == .dark ? Color.black.edgesIgnoringSafeArea(.all) : Color.white.edgesIgnoringSafeArea(.all))
         .onAppear {
             requestAuthorization()
         }
@@ -258,11 +283,18 @@ struct FitnessWidget: View {
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
-
-            Text("To Go: \(goal)")
-                .font(.subheadline)
-                .foregroundColor(.gray)
-                .multilineTextAlignment(.center)
+            HStack{
+                Image(systemName: "checkmark.arrow.trianglehead.counterclockwise")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 25)
+                    .foregroundColor(.mhaGreen)
+                Text("To Go: \(goal)")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+            }
+            
         }
         .padding()
         .background(Color(.systemGray6))

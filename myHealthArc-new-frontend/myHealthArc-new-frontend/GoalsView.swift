@@ -169,9 +169,9 @@ struct GoalsView: View {
                             .bold()
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color.green)
+                            .background(Color.mhaGreen)
                             .foregroundColor(.white)
-                            .cornerRadius(10)
+                            .cornerRadius(20)
                     }
                     .padding()
                 }
@@ -205,6 +205,7 @@ struct GoalAdjusterView: View {
     @Binding var value: Int
     let unit: String
     let step: Int
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         VStack(spacing: 10) {
@@ -215,7 +216,7 @@ struct GoalAdjusterView: View {
                     if value > 0 { value -= step }
                 }) {
                     Image(systemName: "minus.circle.fill")
-                        .foregroundColor(.black)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                         .font(.title2)
                 }
 
@@ -227,7 +228,7 @@ struct GoalAdjusterView: View {
                     value += step
                 }) {
                     Image(systemName: "plus.circle.fill")
-                        .foregroundColor(.black)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                         .font(.title2)
                 }
             }

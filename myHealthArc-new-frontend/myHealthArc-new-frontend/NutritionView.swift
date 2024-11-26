@@ -89,7 +89,6 @@ struct NutritionView: View {
                 }
                 
                 Divider()
-                    .overlay(colorScheme == .dark ? Color.white : Color.gray)
                 
                 Spacer().frame(height: 10)
                 
@@ -266,13 +265,13 @@ struct NutritionView: View {
                             }
                         }
                         .padding()
-                        .background(colorScheme == .dark ? Color.mhaGray : Color.white)
+                        //.background(colorScheme == .dark ? Color.mhaGray : Color.white)
                         .cornerRadius(12)
                         //.shadow(radius: 5)
                         .padding(.horizontal)
                     }
                 }
-                .background(colorScheme == .dark ? Color.mhaGray: Color.white)
+                //.background(colorScheme == .dark ? Color.mhaGray: Color.white)
                 .cornerRadius(12)
                 //.shadow(radius: showFoodInfo ? 2 : 0)
             }

@@ -105,9 +105,7 @@ struct MedicationsView: View {
                 }
                 
                 Divider()
-                    .overlay(
-                        (colorScheme == .dark ? Color.white : Color.gray)
-                    )
+                    
                 Spacer()
                     .frame(height:20)
                 

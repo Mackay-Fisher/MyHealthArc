@@ -39,7 +39,7 @@ struct MacrosTrackingView: View {
         NavigationView {
             VStack(spacing: 20) {
                 HStack {
-                    Image("pills") // Change to macros image
+                    Image("macros") // Change to macros image
                         .resizable()
                         .scaledToFit()
                         .padding(-2)
@@ -50,15 +50,14 @@ struct MacrosTrackingView: View {
                         .padding()
                 }
                 Divider()
-                    .overlay((colorScheme == .dark ? Color.white : Color.gray))
 
                 // Manage Goals Button
-                NavigationLink(destination: NutritionView()) {
+                NavigationLink(destination: GoalsView()) {
                     HStack {
                         Image(systemName: "target")
-                            .foregroundColor(.green)
+                            .foregroundColor(.mhaGreen)
                         Text("Manage Goals")
-                            .foregroundColor(.green)
+                            .foregroundColor(.mhaGreen)
                         Spacer()
                         Image(systemName: "chevron.right")
                             .foregroundColor(.gray)
@@ -72,13 +71,13 @@ struct MacrosTrackingView: View {
                 // Progress Section
                 VStack(spacing: 20) {
                     HStack(spacing: 20) {
-                        MacroProgressView(macroName: "Protein", value: protein_left, unit: "g", color: .blue, progress: protein_progress_left)
-                        MacroProgressView(macroName: "Carbs", value: carbs_left, unit: "g", color: .orange, progress: carbs_progress_left)
+                        MacroProgressView(macroName: "Protein", value: protein_left, unit: "g", color: .mhaBlue, progress: protein_progress_left)
+                        MacroProgressView(macroName: "Carbs", value: carbs_left, unit: "g", color: .mhaOrange, progress: carbs_progress_left)
                     }
 
                     HStack(spacing: 20) {
-                        MacroProgressView(macroName: "Fats", value: fats_left, unit: "g", color: .red, progress: fats_progress_left)
-                        MacroProgressView(macroName: "Calories", value: calories_left, unit: "kcal", color: .green, progress: calories_progress_left)
+                        MacroProgressView(macroName: "Fats", value: fats_left, unit: "g", color: .mhaSalmon, progress: fats_progress_left)
+                        MacroProgressView(macroName: "Calories", value: calories_left, unit: "kcal", color: .mhaGreen, progress: calories_progress_left)
                     }
                 }
                 .padding()
@@ -89,21 +88,23 @@ struct MacrosTrackingView: View {
                 Button(action: { showSheet = true }) {
                     Spacer()
                     HStack {
-                        Image(systemName: "lightbulb.fill")
-                            .frame(width: 28, height: 28)
-                            .foregroundColor(.white)
-                        Text("Recipe Assistant")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
+                        Image("ai")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 55, height: 55)
+//                            .foregroundColor(.white)
+//                        Text("Recipe Assistant")
+//                            .font(.caption)
+//                            .fontWeight(.semibold)
+//                            .foregroundColor(.white)
                     }
-                    .padding(10)
-                    .background(Color.mhaPurple)
-                    .cornerRadius(12)
-                    .shadow(radius: 5)
-                    .padding(.leading, 20)
-                    .padding(.top, 20)
-                    .padding(.trailing, 20)
+                    .padding(20)
+//                    .background(Color.mhaPurple)
+//                    .cornerRadius(12)
+//                    .shadow(radius: 5)
+//                    .padding(.leading, 20)
+//                    .padding(.top, 20)
+//                    .padding(.trailing, 20)
                     .sheet(isPresented: $showSheet) {
                         ChatbotView(viewModel: ChatbotViewModel(proteinLeft: protein_left, carbsLeft: carbs_left, fatsLeft: fats_left))
                     }
@@ -225,10 +226,10 @@ struct MacroProgressView: View {
                 .padding(.bottom)
             ZStack {
                 Circle()
-                    .stroke(Color(.systemGray5), lineWidth: 17)
+                    .stroke(Color(.systemGray5), lineWidth: 8)
                 Circle()
                     .trim(from: 0, to: progress) // Adjust for progress
-                    .stroke(color, lineWidth: 17)
+                    .stroke(color, lineWidth: 8)
                     .rotationEffect(.degrees(-90))
                 
                 VStack {
@@ -240,13 +241,13 @@ struct MacroProgressView: View {
                         .foregroundColor(.gray)
                 }
             }
-            .frame(width: 80, height: 80)
+            .frame(width: 90, height: 90)
             .padding(.bottom)
         }
         .padding()
         .frame(width: 175, height: 175)
         .background(Color(.systemGray6))
-        .cornerRadius(10)
+        .cornerRadius(20)
     }
 }
 

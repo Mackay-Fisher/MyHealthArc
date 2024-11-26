@@ -24,12 +24,10 @@ struct ChatbotView: View {
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding()
-            }
+            }.accentColor(.mhaGreen)
             
             Divider()
-                .overlay(
-                    (colorScheme == .dark ? Color.white : Color.gray)
-                )
+
             VStack {
                 MessagesListView(messages: viewModel.messages, viewModel: viewModel)
                 
@@ -40,6 +38,7 @@ struct ChatbotView: View {
                             handleDietaryOption(option: option)
                         }) {
                             Text(option)
+                                .foregroundColor(.mhaPurple)
                                 .font(.body)
                                 .padding(8)
                                 .cornerRadius(10)
@@ -47,6 +46,7 @@ struct ChatbotView: View {
                         .buttonStyle(PlainButtonStyle())
                         .padding(2)
                         .cornerRadius(12)
+                        .foregroundColor(.mhaPurple)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color.gray, lineWidth: 0.5)
@@ -129,8 +129,8 @@ struct MessageRow: View {
                             }
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .foregroundColor(.purple)
-                            .background(Color.purple.opacity(0.1))
+                            .foregroundColor(.mhaPurple)
+                            .background(Color.mhaPurple.opacity(0.1))
                             .cornerRadius(12)
                         }
                         .padding(.leading, 12)

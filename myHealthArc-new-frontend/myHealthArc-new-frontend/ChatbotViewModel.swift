@@ -26,7 +26,6 @@ final class ChatbotViewModel: ObservableObject {
         } else {
             self.apiKey = ""
         }
-
     }
     
     func sendDefaultMessage() {
@@ -42,32 +41,32 @@ final class ChatbotViewModel: ObservableObject {
         
         let query = ChatQuery(
             messages: [.init(role: .user, content: message)!],
-                    model: .gpt3_5Turbo
-                )
-                
-                openAI.chats(query: query) { result in
-                    switch result {
-                    case .success(let success):
-                        guard let choice = success.choices.first else {
-                            return
-                        }
-                        guard let message = choice.message.content?.string else { return }
-                        DispatchQueue.main.async {
-                            self.receiveChatbotMessage(message)
-                        }
-                    case .failure(let failure):
-                        self.receiveChatbotMessage("Chatbot is not working. Please try again later.")
-                        print(failure)
-                    }
+            model: .gpt3_5Turbo
+        )
+        
+        openAI.chats(query: query) { result in
+            switch result {
+            case .success(let success):
+                guard let choice = success.choices.first else {
+                    return
                 }
+                guard let message = choice.message.content?.string else { return }
+                DispatchQueue.main.async {
+                    self.receiveChatbotMessage(message)
+                }
+            case .failure(let failure):
+                self.receiveChatbotMessage("Chatbot is not working. Please try again later.")
+                print(failure)
+            }
+        }
     }
-
+    
     private func receiveChatbotMessage(_ message: String) {
         let receivedMessage = ChatMessage(message: message, isUser: false)
         messages.append(receivedMessage)
-        saveRecipe(name: "Suggested Recipe", content: message)
+        // Removed the automatic saveRecipe call
     }
-
+    
     func saveRecipe(name: String, content: String) {
         guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
             print("DEBUG - Failed to retrieve userHash from Keychain")

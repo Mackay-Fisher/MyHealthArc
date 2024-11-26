@@ -38,17 +38,17 @@ struct FitnessWidgetView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 25)
-                                .foregroundColor(.green)
+                                .foregroundColor(.mhaGreen)
                             
                             Text("Apple Fitness")
                                 .font(.headline)
-                                .padding(.top)
+                                //.padding(.top)
                         }
                         
                         Spacer()
                         
                         Image(systemName: "chevron.right")
-                            .padding(.top)
+                            //.padding(.top)
                             .foregroundColor(colorScheme == .dark ? Color.lightbackground : Color.gray)
                     }
                     
@@ -64,17 +64,20 @@ struct FitnessWidgetView: View {
                                 Text("\(caloriesBurned ?? 0)")
                                     .font(.title)
                                     .fontWeight(.semibold)
+                                    .fontWeight(.semibold)
                                 Text("cal")
                                     .font(.caption)
                                     .foregroundColor(.gray)
                                     .padding(.bottom, 2)
                             }
                         }
-                        
+                        Divider() // Vertical divider
+                               .frame(height: 40)
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Exercise")
-                                .foregroundColor(.green)
+                                .foregroundColor(.mhaGreen)
                                 .font(.subheadline)
+                                .fontWeight(.semibold)
                             HStack(alignment: .bottom, spacing: 4) {
                                 Text("\(exerciseTime ?? 0)")
                                     .font(.title)
@@ -85,11 +88,13 @@ struct FitnessWidgetView: View {
                                     .padding(.bottom, 2)
                             }
                         }
-                        
+                        Divider() // Vertical divider
+                               .frame(height: 40)
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Stand")
-                                .foregroundColor(.blue)
+                                .foregroundColor(.mhaBlue)
                                 .font(.subheadline)
+                                .fontWeight(.semibold)
                             HStack(alignment: .bottom, spacing: 4) {
                                 Text("\(standHours ?? 0)")
                                     .font(.title)

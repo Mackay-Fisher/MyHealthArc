@@ -17,13 +17,13 @@ struct FitnessGoal: Identifiable {
 }
 
 struct GoalColors {
-    static let steps = Color.blue
-    static let exercise = Color.purple
+    static let steps = Color.mhaBlue
+    static let exercise = Color.mhaPurple
     static let calories = Color.pink
     static let sleep = Color.teal
-    static let water = Color.blue
-    static let workouts = Color.green
-    static let nutrition = Color.orange
+    static let water = Color.mhaBlue
+    static let workouts = Color.mhaGreen
+    static let nutrition = Color.mhaOrange
     static let elevation = Color.gray
     static let distance = Color.cyan
 }
@@ -34,7 +34,7 @@ struct StreakFlameView: View {
 
     private var flameSize: CGFloat {
         // Adjust size based on streak value
-        let baseSize: CGFloat = 30
+        let baseSize: CGFloat = 40
         let maxIncrease: CGFloat = 15
         let increase = min(CGFloat(streak.value) / 30.0, 1.0) * maxIncrease
         return baseSize + increase
@@ -103,7 +103,7 @@ class StreaksViewModel: ObservableObject {
         
         // Define example streaks
         let exampleStreaks = [
-            FitnessGoal(name: "Sleep", value: 35, color: GoalColors.sleep),
+            FitnessGoal(name: "Sleep", value: 35, color: .mhaOrange),
         ]
         
         guard let userId = KeychainWrapper.standard.string(forKey: "userHash") else {
@@ -193,7 +193,7 @@ class StreaksViewModel: ObservableObject {
         case "exercise": return GoalColors.exercise
         case "caloriesburned": return GoalColors.calories
         case "sleep": return GoalColors.sleep
-        case "water": return GoalColors.water
+        case "water intake": return GoalColors.water
         case "workouts": return GoalColors.workouts
         case "elevation": return GoalColors.elevation
         case "distance": return GoalColors.distance
@@ -211,11 +211,12 @@ struct StreaksView: View {
             VStack {
                 // Header
                 HStack {
-                    Image("goals")
+                    Image(systemName: "flame.fill")
                         .resizable()
                         .scaledToFit()
                         .padding(-2)
                         .frame(width: 30)
+                        .foregroundColor(.mhaOrange)
                     Text("Streaks")
                         .font(.largeTitle)
                         .fontWeight(.bold)

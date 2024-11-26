@@ -29,7 +29,7 @@ struct NutritionWidgetView: View {
                         Spacer()
                             .frame(width: 15)
                         
-                        Text("Nutrition Search")
+                        Text("Meal Tracking")
                             .font(.headline)
                             .padding(.top)
                             .frame(alignment: .leading)

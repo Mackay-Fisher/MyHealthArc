@@ -24,7 +24,7 @@ struct RecipesView: View {
                     .scaledToFit()
                     .padding(-2)
                     .frame(width: 30)
-                    .foregroundColor(.pink)
+                    .foregroundColor(.mhaSalmon)
                 
                 Text("Recipes")
                     .font(.largeTitle)
@@ -133,7 +133,7 @@ struct RecipeRowView: View {
     var body: some View {
         HStack {
             Image(systemName: "bookmark.fill")
-                .foregroundColor(.purple)
+                .foregroundColor(.mhaPurple)
                 .padding(.leading)
             
             Text(recipe.name)

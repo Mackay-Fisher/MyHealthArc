@@ -135,14 +135,17 @@ struct SignUpView: View {
                         VStack(alignment: .leading) {
                             SecureField("Password", text: $password)
                                 .textContentType(.newPassword)
+                        }
+                        VStack(alignment: .leading) {
                             SecureField("Re-Enter Password", text: $password2)
                                 .textContentType(.newPassword)
                             
-                            if !password.isEmpty && !password2.isEmpty && !passwordsMatch {
-                                Text("Passwords do not match")
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                            }
+                            
+                        }
+                        if !password.isEmpty && !password2.isEmpty && !passwordsMatch {
+                            Text("Passwords do not match")
+                                .font(.caption)
+                                .foregroundColor(.red)
                         }
                         
                         TextField("Age", text: $age)

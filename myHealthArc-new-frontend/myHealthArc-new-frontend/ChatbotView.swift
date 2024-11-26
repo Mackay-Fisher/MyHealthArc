@@ -76,12 +76,36 @@ struct ChatbotView: View {
 struct MessagesListView: View {
     var messages: [ChatMessage]
     var viewModel: ChatbotViewModel
+    @State private var scrollTarget: UUID?
     
     var body: some View {
-        List(messages) { message in
-            MessageRow(message: message, viewModel: viewModel)
-                .padding(.vertical, 5)
-                .listRowSeparator(.hidden)
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack {
+                    ForEach(messages) { message in
+                        MessageRow(message: message, viewModel: viewModel)
+                            .padding(.vertical, 5)
+                            .id(message.id)
+                    }
+                    // Invisible anchor view at the bottom
+                    Color.clear
+                        .frame(height: 1)
+                        .id("bottom")
+                }
+            }
+            .onChange(of: messages.count) { _ in
+                withAnimation {
+                    proxy.scrollTo("bottom", anchor: .bottom)
+                }
+            }
+            // Watch for changes in the messages array
+            .onReceive(viewModel.$messages) { _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    withAnimation {
+                        proxy.scrollTo("bottom", anchor: .bottom)
+                    }
+                }
+            }
         }
         .listStyle(PlainListStyle())
         .cornerRadius(10)
@@ -108,6 +132,7 @@ struct MessageRow: View {
                         .cornerRadius(20)
                         .shadow(radius: 5)
                         .multilineTextAlignment(.leading)
+                        .frame(maxWidth: UIScreen.main.bounds.width * 0.8, alignment: .trailing)
                 } else {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(message.message)
@@ -117,6 +142,7 @@ struct MessageRow: View {
                             .cornerRadius(20)
                             .shadow(radius: 5)
                             .multilineTextAlignment(.leading)
+                            .frame(maxWidth: UIScreen.main.bounds.width * 0.8, alignment: .leading)
                         
                         // Save Recipe Button
                         Button(action: {

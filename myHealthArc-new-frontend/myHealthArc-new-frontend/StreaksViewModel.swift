@@ -97,7 +97,7 @@ class StreaksViewModel: ObservableObject {
 
     func fetchStreaks() {
         isLoading = true
-        guard let streaksURL = URL(string: "\(baseURL)/streaks?userId=\(userId)") else { return }
+        guard let streaksURL = URL(string: "\(baseURL)/streaks?userId=\(String(describing: userId))") else { return }
 
         URLSession.shared.dataTask(with: streaksURL) { [weak self] data, response, error in
             if let data = data, let fetchedStreaks = try? JSONDecoder().decode([String: Int].self, from: data) {

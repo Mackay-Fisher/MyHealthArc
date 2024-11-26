@@ -33,7 +33,6 @@ struct RecipesView: View {
             }
             
             Divider()
-                .overlay(colorScheme == .dark ? Color.white : Color.gray)
             
             // Content
             if isLoading {

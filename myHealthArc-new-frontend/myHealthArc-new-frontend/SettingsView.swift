@@ -22,7 +22,6 @@ struct SettingsView: View {
                     .padding()
                 
                 Divider()
-                    .overlay(colorScheme == .dark ? Color.white : Color.gray)
                 
                 Text("Toggle Services")
                     .font(.title2)

@@ -148,7 +148,7 @@ struct NutritionView: View {
                                         ZStack {
                                             Circle()
                                                 .stroke(colorForMacro(macro.name), lineWidth: 2)
-                                                .frame(width: 60, height: 60)
+                                                .frame(width: 65, height: 65)
                                             
                                             Text(macro.value)
                                                 .font(.footnote)
@@ -383,7 +383,7 @@ struct NutritionView: View {
                         }
                     }
                     .padding()
-                    .background(colorScheme == .dark ? Color.gray.opacity(0.9) : Color.white)
+                    .background(colorScheme == .dark ? Color.darkGray : Color.white)
                     .cornerRadius(16)
                     .frame(width: 350)
                     .shadow(radius: 2)

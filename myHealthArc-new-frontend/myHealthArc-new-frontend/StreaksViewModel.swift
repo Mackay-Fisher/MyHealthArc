@@ -224,8 +224,6 @@ struct StreaksView: View {
                 }
 
                 Divider()
-                    .overlay(Color.gray.opacity(0.6))
-                    .frame(height: 0)
 
                 if viewModel.isLoading {
                     ProgressView("Loading Streaks...")

@@ -15,16 +15,18 @@ struct ChatbotView: View {
     var body: some View {
         VStack {
             HStack {
-                Image(systemName: "lightbulb.fill")
+                Image(systemName: "lightbulb.max.fill")
                     .resizable()
                     .scaledToFit()
                     .padding(-2)
                     .frame(width: 15)
+                    .foregroundColor(.mhaYellow)
                 Text("Recipe Assistant")
-                    .font(.largeTitle)
+                    .font(.title)
                     .fontWeight(.bold)
                     .padding()
-            }.accentColor(.mhaGreen)
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+            }
             
             Divider()
 

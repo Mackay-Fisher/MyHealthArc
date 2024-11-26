@@ -25,6 +25,24 @@ struct User: Codable {
     var userHash: String
 }
 
+struct DismissingKeyboard: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .onTapGesture {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
+                                             to: nil,
+                                             from: nil,
+                                             for: nil)
+            }
+    }
+}
+
+extension View {
+    func dismissKeyboardOnTap() -> some View {
+        modifier(DismissingKeyboard())
+    }
+}
+
 struct SignUpView: View {
     @State private var name: String = ""
     @State private var email: String = ""
@@ -113,7 +131,13 @@ struct SignUpView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
+            VStack() {
+                Text("Sign Up")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
                 Form {
                     Section(header: Text("Personal Information")) {
                         TextField("Name", text: $name)
@@ -135,14 +159,17 @@ struct SignUpView: View {
                         VStack(alignment: .leading) {
                             SecureField("Password", text: $password)
                                 .textContentType(.newPassword)
+                        }
+                        VStack(alignment: .leading) {
                             SecureField("Re-Enter Password", text: $password2)
                                 .textContentType(.newPassword)
                             
-                            if !password.isEmpty && !password2.isEmpty && !passwordsMatch {
-                                Text("Passwords do not match")
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                            }
+                            
+                        }
+                        if !password.isEmpty && !password2.isEmpty && !passwordsMatch {
+                            Text("Passwords do not match")
+                                .font(.caption)
+                                .foregroundColor(.red)
                         }
                         
                         TextField("Age", text: $age)
@@ -158,6 +185,8 @@ struct SignUpView: View {
                         // Height Input with Validation
                         VStack(alignment: .leading) {
                             HStack {
+                                Text("Height")
+                                Spacer()
                                 TextField("Feet", text: $heightFeet)
                                     .keyboardType(.numberPad)
                                     .frame(width: 50)
@@ -178,7 +207,9 @@ struct SignUpView: View {
                         // Weight Input with Validation
                         VStack(alignment: .leading) {
                             HStack {
-                                TextField("Weight", text: $weight)
+                                Text("Weight")
+                                Spacer()
+                                TextField("Pounds", text: $weight)
                                     .keyboardType(.decimalPad)
                                 Text("lbs")
                             }
@@ -256,7 +287,21 @@ struct SignUpView: View {
                 }
             }
             .background(colorScheme == .dark ? Color.black : Color.lightbackground)
-            .navigationTitle("Sign Up")
+            //.navigationTitle("Sign Up")
+            .dismissKeyboardOnTap()  // Add this modifier to enable tap-to-dismiss
+                .toolbar {
+                    ToolbarItem(placement: .keyboard) {
+                        HStack {
+                            Spacer()
+                            Button("Done") {
+                                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
+                                                             to: nil,
+                                                             from: nil,
+                                                             for: nil)
+                            }
+                        }
+                    }
+                }
         }
     }
     

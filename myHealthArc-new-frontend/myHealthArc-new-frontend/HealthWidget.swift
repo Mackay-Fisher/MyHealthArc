@@ -17,7 +17,7 @@ struct HealthWidget: View {
     @State private var totalSleepHours: Double = 0
     private let healthStore = HKHealthStore()
     @State private var lastSleepHours: Double = 0
-    private let sleepStreak = 14
+    private let sleepStreak = 35
 @State private var sleepStages: [String: Double] = [
         "AWAKE": 0,
         "REM": 0,
@@ -45,13 +45,13 @@ struct HealthWidget: View {
                           
                           Text("Apple Health")
                               .font(.headline)
-                              .padding(.top)
+                              //.padding(.top)
                       }
                       
                       Spacer()
                       
                       Image(systemName: "chevron.right")
-                          .padding(.top)
+                          //.padding(.top)
                           .foregroundColor(colorScheme == .dark ? Color.lightbackground : Color.gray)
                   }
                   
@@ -64,7 +64,7 @@ struct HealthWidget: View {
                       HStack {
                           Image(systemName: "pin.fill")
                               .rotationEffect(.degrees(180))
-                              .foregroundColor(.blue)
+                              .foregroundColor(.mhaBlue)
                           Text("Sleep Goals")
                               .font(.subheadline)
                       }
@@ -75,10 +75,13 @@ struct HealthWidget: View {
                       
                       HStack(alignment: .center) {
                           Image(systemName: "flame.fill")
-                              .foregroundColor(.orange)
+                              .resizable()
+                              .scaledToFit()
+                              .foregroundColor(.mhaSalmon)
+                              .frame(width:30 ,height: 30)
                           
                           Text("\(sleepStreak) days")
-                              .foregroundColor(.green)
+                              .foregroundColor(.mhaGreen)
                               .fontWeight(.bold)
                           + Text(" of meeting\nyour sleep goal!")
                               .fontWeight(.regular)
@@ -94,22 +97,23 @@ struct HealthWidget: View {
                            VStack {
                                CircularSleepChart(hoursSlept: lastSleepHours, stages: sleepStages)
                                    .frame(width: 90, height: 90)
+                               Spacer()
                                Text("Last Sleep")
                                    .font(.caption)
-                           }
+                           }.padding(.leading, 10)
                            
                            VStack(alignment: .leading, spacing: 4) {
                                ForEach(sleepStages.sorted(by: { $0.key < $1.key }), id: \.key) { stage, hours in
-                                   HStack {
+                                   HStack{
                                        Circle()
                                            .fill(stageColor(for: stage))
                                            .frame(width: 8, height: 8)
                                        Text(stage)
                                            .font(.caption)
-                                       Spacer()
+                                       Spacer(minLength: 2)
                                        Text("\(Int(hours))h \(Int((hours.truncatingRemainder(dividingBy: 1) * 60)))m")
                                            .font(.caption)
-                                   }
+                                   }.padding(.horizontal, 14)
                                }
                            }
                            .padding(.leading)
@@ -125,16 +129,16 @@ struct HealthWidget: View {
            }
            .buttonStyle(PlainButtonStyle())
        }
-       .padding(.horizontal)
+       .padding(.horizontal, 4)
        .onAppear { fetchSleepData() }
    }
    
    private func stageColor(for stage: String) -> Color {
        switch stage {
-       case "AWAKE": return .yellow
-       case "REM": return .purple
-       case "CORE": return .blue
-       case "DEEP": return .green
+       case "AWAKE": return .mhaYellow
+       case "REM": return .mhaPurple
+       case "CORE": return .mhaGreen
+       case "DEEP": return .mhaBlue
        default: return .gray
        }
    }

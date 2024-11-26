@@ -6,11 +6,13 @@
 //  Created by Anjali Hole on 10/23/24.
 
 import SwiftUI
-
 import Foundation
+import SwiftKeychainWrapper  // Added this to match widget
 
 struct FormattedInteractionResponse: Codable {
-    var interactionsBySeverity: [String: [FormattedInteraction]]
+    var interactionsBySeverity: [String: [FormattedInteraction]]?
+    var error: Bool?
+    var reason: String?
 }
 
 struct FormattedInteraction: Codable {
@@ -22,16 +24,16 @@ struct FormattedInteraction: Codable {
 struct MedicationsView: View {
     @State private var medicationInput: String = ""
     @State private var addedMedications: [String] = []
-    @State private var selectedMedications: Set<String> = [] // Track selected medications
-    @State private var interactionResults: String = ""
+    @State private var selectedMedications: Set<String> = []
+    @State private var interactionResults: [String: [FormattedInteraction]] = [:]
     @State private var showInteraction: Bool = false
     @State private var showAddPopup: Bool = false
+    @State private var errorMessage: String = ""
     
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         ZStack {
-            // Input for new medication
             if showAddPopup {
                 VStack (spacing: 20) {
                     Text("Add Medications")
@@ -45,6 +47,7 @@ struct MedicationsView: View {
                         .padding(.horizontal)
                     
                     TextField("Enter medication name", text: $medicationInput)
+                        .textInputAutocapitalization(.words)
                         .padding(10)
                         .frame(maxWidth: 300)
                         .background(colorScheme == .dark ? Color.mhaGray : Color.white)
@@ -68,7 +71,6 @@ struct MedicationsView: View {
                     }
                     .frame(height: 45)
                     
-                    
                     Button(action: {
                         showAddPopup = false
                     }) {
@@ -86,10 +88,12 @@ struct MedicationsView: View {
                         .shadow(color: colorScheme == .dark ? Color.white.opacity(0.5) : Color.black.opacity(0.5), radius: 10)
                 )
                 .padding(30)
-                .zIndex(1)   
+                .zIndex(1)
             }
+            
             VStack {
-                HStack{Image ("pills")
+                HStack {
+                    Image("pills")
                         .resizable()
                         .scaledToFit()
                         .padding(-2)
@@ -101,13 +105,9 @@ struct MedicationsView: View {
                 }
                 
                 Divider()
-                    .overlay(
-                        (colorScheme == .dark ? Color.white : Color.gray)
-                    )
+                    
                 Spacer()
                     .frame(height:20)
-                
-                
                 
                 HStack {
                     Text("Your Medications")
@@ -122,11 +122,10 @@ struct MedicationsView: View {
                             .foregroundColor(.mhaPurple)
                     }
                 }
-                // List of added medications with checkboxes
+                
                 List {
                     ForEach(addedMedications, id: \.self) { medication in
                         HStack {
-                            // Checkbox for selecting medications
                             Button(action: {
                                 toggleSelection(for: medication)
                             }) {
@@ -144,30 +143,62 @@ struct MedicationsView: View {
                                         Image(systemName: "trash")
                                             .foregroundColor(.red)
                                     }
-                                    
                                 }
                             }
                         }
-                        
                     }
                     .onDelete(perform: removeMedication)
                 }
                 .listStyle(PlainListStyle())
 
                 if showInteraction {
-
-                    Text("Interaction Results:")
-                        .font(.headline)
-                        .padding()
-                    Divider()
-                        .overlay(colorScheme == .dark ? Color.white : Color.black)
-                        .frame(width: 200)
-                    Text(interactionResults)
-                        .padding()
-                    
+                    if !errorMessage.isEmpty {
+                        Text(errorMessage)
+                            .foregroundColor(errorMessage.contains("No known interactions") ? .primary : .red)
+                            .padding()
+                    } else if !interactionResults.isEmpty {
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Interaction Results:")
+                                    .font(.headline)
+                                    .padding()
+                                Spacer()
+                                Button(action: {
+                                    showInteraction = false
+                                    interactionResults = [:]
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.gray)
+                                        .font(.system(size: 24))
+                                }
+                                .padding(.trailing)
+                            }
+                            
+                            ScrollView {
+                                VStack(alignment: .leading, spacing: 15) {
+                                    ForEach(Array(interactionResults.keys.sorted()), id: \.self) { severity in
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            Text(severity)
+                                                .font(.headline)
+                                                .foregroundColor(severityColor(severity))
+                                            
+                                            ForEach(interactionResults[severity] ?? [], id: \.description) { interaction in
+                                                Text(interaction.description)
+                                                    .font(.subheadline)
+                                                    .padding(.leading)
+                                                    .fixedSize(horizontal: false, vertical: true)
+                                            }
+                                        }
+                                        .padding(.bottom, 5)
+                                    }
+                                }
+                                .padding()
+                            }
+                            .frame(maxHeight: 300)
+                        }
+                    }
                 }
                 
-                // Check interactions button
                 Button("Check Interactions") {
                     checkInteractions()
                 }
@@ -183,6 +214,20 @@ struct MedicationsView: View {
             .blur(radius: showAddPopup ? 10 : 0)
         }
     }
+
+    private func severityColor(_ severity: String) -> Color {
+        switch severity {
+        case "Serious - Use Alternative":
+            return .red
+        case "Monitor Closely":
+            return .orange
+        case "Minor":
+            return .green
+        default:
+            return .primary
+        }
+    }
+
     private func addMedication() {
         guard !medicationInput.isEmpty else { return }
         addedMedications.append(medicationInput)
@@ -191,7 +236,6 @@ struct MedicationsView: View {
     }
 
     private func removeMedication(at offsets: IndexSet) {
-        // Remove medications from the selectedMedications set if they are being deleted
         for index in offsets {
             let medicationToRemove = addedMedications[index]
             selectedMedications.remove(medicationToRemove)
@@ -201,32 +245,38 @@ struct MedicationsView: View {
 
     private func toggleSelection(for medication: String) {
         if selectedMedications.contains(medication) {
-            selectedMedications.remove(medication) // Deselect if already selected
+            selectedMedications.remove(medication)
         } else {
-            selectedMedications.insert(medication) // Select the medication
+            selectedMedications.insert(medication)
         }
     }
 
     private func checkInteractions() {
-//        // Placeholder for API call to check interactions
-//        if selectedMedications.count >= 2 {
-//            // Check interactions between selected medications
-//            interactionResults = "\(selectedMedications.joined(separator: ", ")) may interact with each other!"
-//        } else {
-//            interactionResults = "Select more medications to check for interactions."
-//        }
-//        showInteraction = true
-        
         guard selectedMedications.count >= 2 else {
-            interactionResults = "Select more medications to check for interactions."
+            errorMessage = "Select more medications to check for interactions."
+            interactionResults = [:]
             showInteraction = true
             return
         }
 
-        // Prepare the URL with query parameters
-        let baseURL = "\(AppConfig.baseURL)/medicationChecker/demoCheck"
+        // Get userHash from Keychain
+        guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
+            errorMessage = "Please log in to check interactions."
+            showInteraction = true
+            return
+        }
+
+        // Create array of medications and join them with comma
         let medicationsQuery = selectedMedications.joined(separator: ",")
-        guard let url = URL(string: "\(baseURL)?medications=\(medicationsQuery)") else { return }
+
+        // Prepare the URL with query parameters including user hash
+        let baseURL = "\(AppConfig.baseURL)/medicationChecker/check"
+        guard let encodedQuery = medicationsQuery.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "\(baseURL)?medications=\(encodedQuery)&userHash=\(userHash)") else {
+            errorMessage = "Error creating request."
+            showInteraction = true
+            return
+        }
 
         // Create the request
         var request = URLRequest(url: url)
@@ -234,53 +284,48 @@ struct MedicationsView: View {
 
         // Perform the API call
         URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Error: \(error)")
-                interactionResults = "Failed to check interactions."
-                showInteraction = true
-                return
-            }
-
-            guard let data = data else {
-                interactionResults = "No data received."
-                showInteraction = true
-                return
-            }
-
-            // Decode the response
-            do {
-                let decodedResponse = try JSONDecoder().decode(FormattedInteractionResponse.self, from: data)
-                DispatchQueue.main.async {
-                    // Format the interactions
-                    interactionResults = formatInteractions(decodedResponse)
+            DispatchQueue.main.async {
+                if let error = error {
+                    print("Network Error: \(error)")
+                    errorMessage = "Failed to check interactions."
                     showInteraction = true
+                    return
                 }
-            } catch {
-                print("Decoding error: \(error)")
-                DispatchQueue.main.async {
-                    interactionResults = "Error decoding response."
+
+                guard let data = data else {
+                    errorMessage = "No data received."
+                    showInteraction = true
+                    return
+                }
+
+                do {
+                    let decodedResponse = try JSONDecoder().decode(FormattedInteractionResponse.self, from: data)
+                    
+                    // Handle response based on content
+                    if let reason = decodedResponse.reason, reason.contains("Data corrupted") {
+                        // This seems to be the response when no interactions are found
+                        errorMessage = "No known interactions found between the selected medications."
+                        interactionResults = [:]
+                    } else if let interactions = decodedResponse.interactionsBySeverity {
+                        // We have found interactions
+                        interactionResults = interactions
+                        errorMessage = ""
+                    } else if let isError = decodedResponse.error, isError {
+                        // Handle other errors
+                        errorMessage = decodedResponse.reason ?? "Unknown error occurred"
+                        interactionResults = [:]
+                    }
+                    
+                    showInteraction = true
+                    
+                } catch {
+                    print("Decoding error: \(error)")
+                    errorMessage = "Error processing response."
                     showInteraction = true
                 }
             }
         }.resume()
-
     }
-    
-
-    // Helper function to format interactions
-    private func formatInteractions(_ response: FormattedInteractionResponse) -> String {
-        var result = "Interaction Results:\n"
-        
-        for (severity, interactions) in response.interactionsBySeverity {
-            result += "\n\(severity):\n"
-            for interaction in interactions {
-                result += "- \(interaction.description)\n"
-            }
-        }
-        
-        return result.isEmpty ? "No interactions found." : result
-    }
-
 }
 
 struct MedicationsView_Previews: PreviewProvider {
@@ -288,5 +333,3 @@ struct MedicationsView_Previews: PreviewProvider {
         MedicationsView()
     }
 }
-
-

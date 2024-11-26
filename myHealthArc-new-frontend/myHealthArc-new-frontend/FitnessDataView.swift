@@ -7,6 +7,7 @@
 
 import SwiftUI
 import HealthKit
+import SwiftKeychainWrapper
 
 struct FitnessDataView: View {
     @State private var stepCount: Int?
@@ -15,6 +16,8 @@ struct FitnessDataView: View {
     @State private var exerciseTime: Int? // in minutes
     @State private var flightsClimbed: Int? // in flights
     @State private var moveMinutes: Int? // Move minutes
+    @StateObject private var goalsManager = GoalsManager()
+    @State private var isLoading = true
     @Environment(\.colorScheme) var colorScheme
 
     private let healthStore = HKHealthStore()
@@ -24,105 +27,156 @@ struct FitnessDataView: View {
             VStack(spacing: 20) {
                 // Header
                 VStack {
-                    Text("🏃‍♂️ Apple Fitness Data")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-
+                    HStack {
+                        Image(systemName: "figure.run")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 25)
+                            .foregroundColor(.mhaGreen)
+                        
+                        Text("Apple Fitness")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                    }
+                    
                     Text("Summary")
                         .font(.headline)
                         .foregroundColor(.gray)
                 }
 
-                // Manage Goals Button
-                HStack {
-                    Text("Manage Goals")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .foregroundColor(.gray)
+                NavigationLink(destination: GoalsView()) {
+                    HStack {
+                        Image(systemName: "target")
+                            .foregroundColor(.mhaGreen)
+                        Text("Manage Goals")
+                            .foregroundColor(.mhaGreen)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.gray)
+                    }
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
+                    .frame(maxWidth: .infinity)
                 }
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(15)
 
-                // Data Widgets Grid
-                LazyVGrid(columns: [GridItem(.flexible(minimum: 150)), GridItem(.flexible(minimum: 150))], spacing: 20) {
-                    if let stepCount = stepCount, stepCount > 0 {
-                        FitnessWidget(
-                            title: "Step Count",
-                            value: "\(stepCount)",
-                            goal: "10,000",
-                            progress: Double(stepCount) / 10000,
-                            icon: "figure.walk",
-                            iconColor: .blue
-                        )
-                    }
+                if isLoading {
+                    ProgressView("Loading fitness data...")
+                } else {
+                    // Data Widgets Grid
+                    LazyVGrid(columns: [GridItem(.flexible(minimum: 150)), GridItem(.flexible(minimum: 150))], spacing: 20) {
+                        if let stepCount = stepCount {
+                            let goal = goalsManager.goals["step-count"] ?? 10000
+                            FitnessWidget(
+                                title: "Step Count",
+                                value: "\(stepCount)",
+                                goal: "\(goal)",
+                                progress: Double(stepCount) / Double(goal),
+                                icon: "figure.walk",
+                                iconColor: .mhaBlue
+                            )
+                        }
 
-                    if let caloriesBurned = caloriesBurned, caloriesBurned > 0 {
-                        FitnessWidget(
-                            title: "Calories Burned",
-                            value: "\(caloriesBurned) kcal",
-                            goal: "400 kcal",
-                            progress: Double(caloriesBurned) / 400,
-                            icon: "flame.fill",
-                            iconColor: .red
-                        )
-                    }
+                        if let caloriesBurned = caloriesBurned {
+                            let goal = goalsManager.goals["calories-burned"] ?? 400
+                            FitnessWidget(
+                                title: "Calories Burned",
+                                value: "\(caloriesBurned) kcal",
+                                goal: "\(goal) kcal",
+                                progress: Double(caloriesBurned) / Double(goal),
+                                icon: "flame.fill",
+                                iconColor: .mhaSalmon
+                            )
+                        }
 
-                    if let distance = distance, distance > 0 {
-                        FitnessWidget(
-                            title: "Distance",
-                            value: "\(String(format: "%.2f", distance)) mi",
-                            goal: "1.0 mi",
-                            progress: distance / 1.0,
-                            icon: "map.fill",
-                            iconColor: .green
-                        )
-                    }
+                        if let distance = distance {
+                            let goal = goalsManager.goals["distance-traveled"] ?? 1
+                            FitnessWidget(
+                                title: "Distance",
+                                value: String(format: "%.2f mi", distance),
+                                goal: "\(goal) mi",
+                                progress: distance / Double(goal),
+                                icon: "map.fill",
+                                iconColor: .mhaGreen
+                            )
+                        }
 
-                    if let exerciseTime = exerciseTime, exerciseTime > 0 {
-                        FitnessWidget(
-                            title: "Exercise Time",
-                            value: "\(exerciseTime) min",
-                            goal: "60 min",
-                            progress: Double(exerciseTime) / 60,
-                            icon: "dumbbell.fill",
-                            iconColor: .purple
-                        )
-                    }
+                        if let exerciseTime = exerciseTime {
+                            let goal = goalsManager.goals["exercise-minutes"] ?? 60
+                            FitnessWidget(
+                                title: "Exercise Time",
+                                value: "\(exerciseTime) min",
+                                goal: "\(goal) min",
+                                progress: Double(exerciseTime) / Double(goal),
+                                icon: "dumbbell.fill",
+                                iconColor: .mhaPurple
+                            )
+                        }
 
-                    if let flightsClimbed = flightsClimbed, flightsClimbed > 0 {
-                        FitnessWidget(
-                            title: "Flights Climbed",
-                            value: "\(flightsClimbed)",
-                            goal: "20",
-                            progress: Double(flightsClimbed) / 20,
-                            icon: "airplane.departure",
-                            iconColor: .orange
-                        )
-                    }
+                        if let flightsClimbed = flightsClimbed {
+                            let goal = goalsManager.goals["elevation-gained"] ?? 20
+                            FitnessWidget(
+                                title: "Flights Climbed",
+                                value: "\(flightsClimbed)",
+                                goal: "\(goal)",
+                                progress: Double(flightsClimbed) / Double(goal),
+                                icon: "airplane.departure",
+                                iconColor: .mhaOrange
+                            )
+                        }
 
-                    if let moveMinutes = moveMinutes, moveMinutes > 0 {
-                        FitnessWidget(
-                            title: "Move Minutes",
-                            value: "\(moveMinutes) min",
-                            goal: "30 min",
-                            progress: Double(moveMinutes) / 30,
-                            icon: "clock.fill",
-                            iconColor: .yellow
-                        )
+                        if let moveMinutes = moveMinutes {
+                            let goal = goalsManager.goals["time-asleep"] ?? 30
+                            FitnessWidget(
+                                title: "Move Minutes",
+                                value: "\(moveMinutes) min",
+                                goal: "\(goal) min",
+                                progress: Double(moveMinutes) / Double(goal),
+                                icon: "clock.fill",
+                                iconColor: .mhaYellow
+                            )
+                        }
                     }
                 }
             }
             .padding()
         }
-        .background(Color.black.edgesIgnoringSafeArea(.all))
+        .background(colorScheme == .dark ? Color.black.edgesIgnoringSafeArea(.all) : Color.white.edgesIgnoringSafeArea(.all))
         .onAppear {
-            fetchFitnessData()
+            isLoading = true
+            requestAuthorization()
+            let userId = KeychainWrapper.standard.string(forKey: "userHash") ?? ""
+            Task {
+                await fetchGoals(userId: userId)
+                isLoading = false
+            }
         }
     }
+
+    private func fetchGoals(userId: String) async {
+        await goalsManager.fetchGoals(from: "\(AppConfig.baseURL)/goals", userHash: userId)
+    }
+    // MARK: - Authorization
+        private func requestAuthorization() {
+            // Define the types we want to read
+            let typesToRead: Set<HKObjectType> = [
+                HKObjectType.quantityType(forIdentifier: .stepCount)!,
+                HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
+                HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!,
+                HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
+                HKObjectType.quantityType(forIdentifier: .flightsClimbed)!,
+                HKObjectType.quantityType(forIdentifier: .appleStandTime)!
+            ]
+            
+            healthStore.requestAuthorization(toShare: nil, read: typesToRead) { success, error in
+                if success {
+                    fetchFitnessData()
+                } else if let error = error {
+                    print("Authorization failed: \(error.localizedDescription)")
+                }
+            }
+        }
 
     // MARK: - Fetch Fitness Data
     private func fetchFitnessData() {
@@ -206,6 +260,31 @@ struct FitnessWidget: View {
     let progress: Double
     let icon: String
     let iconColor: Color
+    
+    // Helper function to extract numeric values
+    private func extractNumeric(from string: String) -> Double {
+        let numbers = string.components(separatedBy: CharacterSet.decimalDigits.inverted)
+            .joined()
+        return Double(numbers) ?? 0
+    }
+    
+    // Calculate remaining value
+    private var remainingValue: String {
+        let currentValue = extractNumeric(from: value)
+        let goalValue = extractNumeric(from: goal)
+        let remaining = max(0, goalValue - currentValue)
+        
+        // Handle different units based on the title
+        if title == "Calories Burned" {
+            return "\(Int(remaining)) kcal"
+        } else if title == "Distance" {
+            return String(format: "%.2f mi", remaining)
+        } else if title.contains("Time") || title == "Move Minutes" {
+            return "\(Int(remaining)) min"
+        } else {
+            return "\(Int(remaining))"
+        }
+    }
 
     var body: some View {
         VStack(spacing: 10) {
@@ -223,31 +302,38 @@ struct FitnessWidget: View {
                 Image(systemName: icon)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 40, height: 40) // Ensure the icon has a fixed size
+                    .frame(width: 40, height: 40)
                     .foregroundColor(iconColor)
             }
-            .frame(width: 100, height: 100) // Ensure the circle size is consistent
+            .frame(width: 100, height: 100)
 
             Text(title)
                 .font(.headline)
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
-                .frame(maxWidth: .infinity) // Make the text wrap if needed
+                .frame(maxWidth: .infinity)
 
             Text(value)
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
-
-            Text("To Go: \(goal)")
-                .font(.subheadline)
-                .foregroundColor(.gray)
-                .multilineTextAlignment(.center)
+                
+            HStack {
+                Image(systemName: "checkmark.arrow.trianglehead.counterclockwise")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 25)
+                    .foregroundColor(.mhaGreen)
+                Text("To Go: \(remainingValue)")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+            }
         }
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(15)
-        .frame(width: 170, height: 230) // Fixed size for the entire widget
+        .frame(width: 180, height: 230)
     }
 }
 

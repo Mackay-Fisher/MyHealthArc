@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftKeychainWrapper
 
 struct FitnessGoal: Identifiable {
     let id = UUID()
@@ -16,13 +17,13 @@ struct FitnessGoal: Identifiable {
 }
 
 struct GoalColors {
-    static let steps = Color.blue
-    static let exercise = Color.purple
+    static let steps = Color.mhaBlue
+    static let exercise = Color.mhaPurple
     static let calories = Color.pink
     static let sleep = Color.teal
-    static let water = Color.blue
-    static let workouts = Color.green
-    static let nutrition = Color.orange
+    static let water = Color.mhaBlue
+    static let workouts = Color.mhaGreen
+    static let nutrition = Color.mhaOrange
     static let elevation = Color.gray
     static let distance = Color.cyan
 }
@@ -33,7 +34,7 @@ struct StreakFlameView: View {
 
     private var flameSize: CGFloat {
         // Adjust size based on streak value
-        let baseSize: CGFloat = 30
+        let baseSize: CGFloat = 40
         let maxIncrease: CGFloat = 15
         let increase = min(CGFloat(streak.value) / 30.0, 1.0) * maxIncrease
         return baseSize + increase
@@ -90,43 +91,109 @@ struct StreakFlameView: View {
 class StreaksViewModel: ObservableObject {
     @Published var streaks: [FitnessGoal] = []
     @Published var isLoading: Bool = true
-
+    @Published var errorMessage: String? = nil
+    
     private let apiClient = APIClient()
     private let baseURL = "\(AppConfig.baseURL)/goals"
     private let userId = KeychainWrapper.standard.string(forKey: "userHash")
 
     func fetchStreaks() {
         isLoading = true
-        guard let streaksURL = URL(string: "\(baseURL)/streaks?userId=\(userId)") else { return }
-
+        errorMessage = nil
+        
+        // Define example streaks
+        let exampleStreaks = [
+            FitnessGoal(name: "Sleep", value: 35, color: .mhaOrange),
+        ]
+        
+        guard let userId = KeychainWrapper.standard.string(forKey: "userHash") else {
+            DispatchQueue.main.async {
+                self.isLoading = false
+                self.errorMessage = "User ID not found"
+                self.streaks = exampleStreaks  // Show example streaks even if user ID not found
+            }
+            return
+        }
+        
+        guard let streaksURL = URL(string: "\(baseURL)/streaks?userId=\(userId)") else {
+            DispatchQueue.main.async {
+                self.isLoading = false
+                self.errorMessage = "Invalid URL"
+                self.streaks = exampleStreaks  // Show example streaks even if URL invalid
+            }
+            return
+        }
+        
+        print("Fetching streaks from URL: \(streaksURL.absoluteString)")
+        
         URLSession.shared.dataTask(with: streaksURL) { [weak self] data, response, error in
-            if let data = data, let fetchedStreaks = try? JSONDecoder().decode([String: Int].self, from: data) {
-                DispatchQueue.main.async {
-                    self?.streaks = fetchedStreaks.map { key, value in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                self.isLoading = false
+                
+                if let error = error {
+                    self.errorMessage = "Network error: \(error.localizedDescription)"
+                    self.streaks = exampleStreaks  // Show example streaks on network error
+                    print("Network error: \(error)")
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    self.errorMessage = "Invalid response"
+                    self.streaks = exampleStreaks  // Show example streaks on invalid response
+                    return
+                }
+                
+                print("Response status code: \(httpResponse.statusCode)")
+                
+                guard (200...299).contains(httpResponse.statusCode) else {
+                    self.errorMessage = "Server error: \(httpResponse.statusCode)"
+                    self.streaks = exampleStreaks  // Show example streaks on server error
+                    return
+                }
+                
+                guard let data = data else {
+                    self.errorMessage = "No data received"
+                    self.streaks = exampleStreaks  // Show example streaks when no data
+                    return
+                }
+                
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("Raw response: \(responseString)")
+                }
+                
+                do {
+                    let fetchedStreaks = try JSONDecoder().decode([String: Int].self, from: data)
+                    print("Decoded streaks: \(fetchedStreaks)")
+                    
+                    let realStreaks = fetchedStreaks.map { key, value in
                         FitnessGoal(
-                            name: key.capitalized,
+                            name: key,
                             value: value,
-                            color: self?.goalColor(for: key) ?? GoalColors.nutrition
+                            color: self.goalColor(for: key)
                         )
                     }
-                    self?.isLoading = false
+                    
+                    // Combine real streaks with example streaks
+                    self.streaks = realStreaks + exampleStreaks
+                    
+                } catch {
+                    self.errorMessage = "Decoding error: \(error.localizedDescription)"
+                    self.streaks = exampleStreaks  // Show example streaks on decode error
+                    print("Decoding error: \(error)")
                 }
-            } else {
-                DispatchQueue.main.async {
-                    self?.isLoading = false
-                }
-                print("Error fetching streaks: \(error?.localizedDescription ?? "Unknown error")")
             }
         }.resume()
     }
 
     private func goalColor(for goal: String) -> Color {
-        switch goal {
+        switch goal.lowercased() {
         case "steps": return GoalColors.steps
         case "exercise": return GoalColors.exercise
-        case "caloriesBurned": return GoalColors.calories
+        case "caloriesburned": return GoalColors.calories
         case "sleep": return GoalColors.sleep
-        case "water": return GoalColors.water
+        case "water intake": return GoalColors.water
         case "workouts": return GoalColors.workouts
         case "elevation": return GoalColors.elevation
         case "distance": return GoalColors.distance
@@ -135,8 +202,6 @@ class StreaksViewModel: ObservableObject {
     }
 }
 
-import SwiftUI
-import SwiftKeychainWrapper
 
 struct StreaksView: View {
     @StateObject private var viewModel = StreaksViewModel()
@@ -146,11 +211,12 @@ struct StreaksView: View {
             VStack {
                 // Header
                 HStack {
-                    Image("goals")
+                    Image(systemName: "flame.fill")
                         .resizable()
                         .scaledToFit()
                         .padding(-2)
                         .frame(width: 30)
+                        .foregroundColor(.mhaOrange)
                     Text("Streaks")
                         .font(.largeTitle)
                         .fontWeight(.bold)
@@ -158,12 +224,32 @@ struct StreaksView: View {
                 }
 
                 Divider()
-                    .overlay(Color.gray.opacity(0.6))
-                    .frame(height: 0)
 
                 if viewModel.isLoading {
                     ProgressView("Loading Streaks...")
                         .padding()
+                } else if let errorMessage = viewModel.errorMessage {
+                    VStack {
+                        Text("Error loading streaks")
+                            .font(.headline)
+                            .foregroundColor(.red)
+                        Text(errorMessage)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                        Button("Retry") {
+                            viewModel.fetchStreaks()
+                        }
+                        .padding()
+                    }
+                } else if viewModel.streaks.isEmpty {
+                    VStack {
+                        Text("No streaks found")
+                            .font(.headline)
+                        Text("Start achieving your goals to build streaks!")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                    .padding()
                 } else {
                     ScrollView {
                         VStack(spacing: 0) {
@@ -183,7 +269,6 @@ struct StreaksView: View {
         }
     }
 }
-
 // Preview provider
 struct StreaksView_Previews: PreviewProvider {
     static var previews: some View {

@@ -23,6 +23,7 @@ struct BodyInfoView: View {
                 VStack(spacing: 20) {
                     // Gender Toggle
                     HStack(alignment: .center) {
+                        // Gender Toggle
                         VStack(alignment: .center, spacing: 8) {
                             HStack {
                                 GenderToggle(gender: $gender, selected: .male)
@@ -31,9 +32,10 @@ struct BodyInfoView: View {
                             }
                         }
                         .padding()
+                        .frame(minHeight: 100) // Set minimum height for consistency
                         .background(Color(.systemGray6))
                         .cornerRadius(15)
-                        
+
                         // Age Input
                         AgeInput(age: $age)
                     }
@@ -51,11 +53,11 @@ struct BodyInfoView: View {
                     }) {
                         Text("Calculate BMI")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(colorScheme == .dark ? .black : .white)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color.pink)
-                            .cornerRadius(15)
+                            .background(Color.mhaSalmon)
+                            .cornerRadius(20)
                     }
                     .padding()
                 }
@@ -72,7 +74,7 @@ struct BodyInfoView: View {
                         .edgesIgnoringSafeArea(.all)
                     ProgressView("Loading...")
                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .foregroundColor(.white)
+                        .foregroundColor(colorScheme == .dark ? .black : .white)
                 }
                 
                 // Popup Overlay
@@ -173,6 +175,7 @@ struct BodyInfoView: View {
 
 // MARK: - Subviews
 struct GenderToggle: View {
+    @Environment(\.colorScheme) var colorScheme
     @Binding var gender: BodyInfoView.Gender
     let selected: BodyInfoView.Gender
 
@@ -184,13 +187,13 @@ struct GenderToggle: View {
                     .scaledToFit()
                     .frame(width: 30, height: 30)
                     .padding()
-                    .background(gender == selected ? Color.pink : Color.gray.opacity(0.2))
+                    .background(gender == selected ? Color.mhaSalmon : Color.gray.opacity(0.2))
                     .clipShape(Circle())
-                    .foregroundColor(.white)
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
             }
             Text(selected == .male ? "Male" : "Female")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(colorScheme == .dark ? .white : .black)
                 .padding(.top, 5)
         }
     }
@@ -198,38 +201,33 @@ struct GenderToggle: View {
 
 struct AgeInput: View {
     @Binding var age: Int
-
+    @Environment(\.colorScheme) var colorScheme
     var body: some View {
         VStack(alignment: .center, spacing: 8) {
             Text("Age")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(colorScheme == .dark ? .white : .black)
                 .padding(.bottom)
             HStack(spacing: 10) {
                 Button(action: { if age > 1 { age -= 1 } }) {
-                    Text("-")
-                        .font(.title)
-                        .frame(width: 30, height: 30)
-                        .background(Color.pink)
-                        .foregroundColor(.white)
-                        .clipShape(Circle())
+                    Image(systemName: "minus.circle.fill")
+                        .foregroundColor(.mhaSalmon)
+                        .font(.title2)
                 }
 
                 Text("\(age)")
                     .font(.system(size: UIFontMetrics.default.scaledValue(for: 30), weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
 
                 Button(action: { age += 1 }) {
-                    Text("+")
-                        .font(.title)
-                        .frame(width: 30, height: 30)
-                        .background(Color.pink)
-                        .foregroundColor(.white)
-                        .clipShape(Circle())
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(.mhaSalmon)
+                        .font(.title2)
                 }
             }
         }
         .padding()
+        .frame(minHeight: 127)
         .background(Color(.systemGray6))
         .cornerRadius(15)
     }
@@ -239,16 +237,16 @@ struct SliderInput: View {
     let title: String
     @Binding var value: Double
     let range: ClosedRange<Double>
-
+    @Environment(\.colorScheme) var colorScheme
     var body: some View {
         VStack(alignment: .center, spacing: 8) {
             Text(title)
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(colorScheme == .dark ? .white : .black)
             Text("\(Int(value))")
                 .font(.system(size: UIFontMetrics.default.scaledValue(for: 40), weight: .bold, design: .rounded))
             Slider(value: $value, in: range, step: 1)
-                .accentColor(.green)
+                .accentColor(.mhaGreen)
         }
         .padding()
         .background(Color(.systemGray6))
@@ -259,11 +257,11 @@ struct SliderInput: View {
 struct PopupOverlay: View {
     let bmi: Double?
     let onClose: () -> Void
-
+    @Environment(\.colorScheme) var colorScheme
     var body: some View {
-        Color.black.opacity(0.5)
-            .edgesIgnoringSafeArea(.all)
-            .onTapGesture { onClose() }
+//        Color.black.opacity(0.12)
+//            .edgesIgnoringSafeArea(.all)
+//            .onTapGesture { onClose() }
 
         VStack(spacing: 15) {
             Text("Your BMI")
@@ -274,17 +272,23 @@ struct PopupOverlay: View {
                 Text(String(format: "%.2f kg/m²", calculatedBMI))
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundColor(calculatedBMI < 18.5 || calculatedBMI > 24.9 ? .red : .green)
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
+                    //.foregroundColor(calculatedBMI < 18.5 || calculatedBMI > 24.9 ? .red : .green)
 
                 Text(calculatedBMI < 18.5 ? "(Underweight)" :
                      calculatedBMI > 24.9 ? "(Overweight)" :
                      "(Normal)")
                     .font(.title3)
-                    .foregroundColor(.white)
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
+                    .padding(8)
+                    .background(
+                            calculatedBMI < 18.5 || calculatedBMI > 24.9 ? Color.red : Color.mhaGreen
+                        )
+                        .cornerRadius(10)
 
                 Text("A BMI of 18.5 - 24.9 indicates a healthy weight.")
                     .font(.subheadline)
-                    .foregroundColor(.white)
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
                     .multilineTextAlignment(.center)
                     .padding()
             } else {
@@ -300,12 +304,12 @@ struct PopupOverlay: View {
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background(Color.red)
-                    .cornerRadius(15)
+                    .cornerRadius(20)
             }
         }
         .padding()
         .frame(maxWidth: 300)
-        .background(Color.pink)
+        .background(Color.mhaSalmon)
         .cornerRadius(20)
         .shadow(radius: 10)
     }

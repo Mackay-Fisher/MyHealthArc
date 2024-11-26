@@ -38,17 +38,17 @@ struct FitnessWidgetView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 25)
-                                .foregroundColor(.green)
+                                .foregroundColor(.mhaGreen)
                             
                             Text("Apple Fitness")
                                 .font(.headline)
-                                .padding(.top)
+                                //.padding(.top)
                         }
                         
                         Spacer()
                         
                         Image(systemName: "chevron.right")
-                            .padding(.top)
+                            //.padding(.top)
                             .foregroundColor(colorScheme == .dark ? Color.lightbackground : Color.gray)
                     }
                     
@@ -64,17 +64,20 @@ struct FitnessWidgetView: View {
                                 Text("\(caloriesBurned ?? 0)")
                                     .font(.title)
                                     .fontWeight(.semibold)
+                                    .fontWeight(.semibold)
                                 Text("cal")
                                     .font(.caption)
                                     .foregroundColor(.gray)
                                     .padding(.bottom, 2)
                             }
                         }
-                        
+                        Divider() // Vertical divider
+                               .frame(height: 40)
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Exercise")
-                                .foregroundColor(.green)
+                                .foregroundColor(.mhaGreen)
                                 .font(.subheadline)
+                                .fontWeight(.semibold)
                             HStack(alignment: .bottom, spacing: 4) {
                                 Text("\(exerciseTime ?? 0)")
                                     .font(.title)
@@ -85,11 +88,13 @@ struct FitnessWidgetView: View {
                                     .padding(.bottom, 2)
                             }
                         }
-                        
+                        Divider() // Vertical divider
+                               .frame(height: 40)
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Stand")
-                                .foregroundColor(.blue)
+                                .foregroundColor(.mhaBlue)
                                 .font(.subheadline)
+                                .fontWeight(.semibold)
                             HStack(alignment: .bottom, spacing: 4) {
                                 Text("\(standHours ?? 0)")
                                     .font(.title)
@@ -114,23 +119,43 @@ struct FitnessWidgetView: View {
         }
         .padding(.horizontal)
         .onAppear {
-            fetchFitnessData()
+            requestAuthorization()
+        }
+    }
+    
+    // MARK: - Authorization
+    private func requestAuthorization() {
+        let typesToRead: Set<HKObjectType> = [
+            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
+            HKObjectType.quantityType(forIdentifier: .appleExerciseTime)!,
+            HKCategoryType.categoryType(forIdentifier: .appleStandHour)!
+        ]
+        
+        healthStore.requestAuthorization(toShare: nil, read: typesToRead) { success, error in
+            if success {
+                fetchFitnessData()
+            } else if let error = error {
+                print("Authorization failed: \(error.localizedDescription)")
+            }
         }
     }
     
     // MARK: - Fetch Fitness Data
     private func fetchFitnessData() {
+        let calendar = Calendar.current
         let now = Date()
-        let startDate = Calendar.current.startOfDay(for: now)
-        
-        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: now, options: .strictStartDate)
+        let startOfDay = calendar.startOfDay(for: now)
+        let predicate = HKQuery.predicateForSamples(withStart: startOfDay, end: now, options: .strictStartDate)
         
         // Fetch calories burned
         if let caloriesType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned) {
-            let query = HKStatisticsQuery(quantityType: caloriesType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in
-                DispatchQueue.main.async {
-                    let calories = result?.sumQuantity()?.doubleValue(for: HKUnit.kilocalorie())
-                    self.caloriesBurned = Int(calories ?? 0)
+            let query = HKStatisticsQuery(quantityType: caloriesType,
+                                        quantitySamplePredicate: predicate,
+                                        options: .cumulativeSum) { _, result, error in
+                if let sum = result?.sumQuantity() {
+                    DispatchQueue.main.async {
+                        self.caloriesBurned = Int(sum.doubleValue(for: HKUnit.kilocalorie()))
+                    }
                 }
             }
             healthStore.execute(query)
@@ -138,21 +163,33 @@ struct FitnessWidgetView: View {
         
         // Fetch exercise time
         if let exerciseType = HKQuantityType.quantityType(forIdentifier: .appleExerciseTime) {
-            let query = HKStatisticsQuery(quantityType: exerciseType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in
-                DispatchQueue.main.async {
-                    let minutes = result?.sumQuantity()?.doubleValue(for: HKUnit.minute())
-                    self.exerciseTime = Int(minutes ?? 0)
+            let query = HKStatisticsQuery(quantityType: exerciseType,
+                                        quantitySamplePredicate: predicate,
+                                        options: .cumulativeSum) { _, result, error in
+                if let sum = result?.sumQuantity() {
+                    DispatchQueue.main.async {
+                        self.exerciseTime = Int(sum.doubleValue(for: HKUnit.minute()))
+                    }
                 }
             }
             healthStore.execute(query)
         }
         
         // Fetch stand hours
-        if let standType = HKQuantityType.quantityType(forIdentifier: .appleStandTime) {
-            let query = HKStatisticsQuery(quantityType: standType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in
+        if let standType = HKCategoryType.categoryType(forIdentifier: .appleStandHour) {
+            let query = HKSampleQuery(
+                sampleType: standType,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: nil
+            ) { _, samples, error in
+                guard let samples = samples as? [HKCategorySample] else { return }
+                
+                // Filter for only the successful stand hours (value of 0 means stood, 1 means not stood)
+                let standHourCount = samples.filter { $0.value == HKCategoryValueAppleStandHour.stood.rawValue }.count
+                
                 DispatchQueue.main.async {
-                    let hours = (result?.sumQuantity()?.doubleValue(for: HKUnit.minute()) ?? 0) / 60.0
-                    self.standHours = Int(hours)
+                    self.standHours = standHourCount
                 }
             }
             healthStore.execute(query)

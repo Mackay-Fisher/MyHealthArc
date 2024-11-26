@@ -31,7 +31,10 @@ extension Color {
     static let mhaBlue = Color(hex: "#41B8D5")
     static let mhaOrange = Color(hex: "#F2A25C")
     static let mhaSalmon = Color(hex: "#FF7D79")
+    static let mhaYellow = Color(hex: "#FFCC00")
     static let lightbackground = Color(hex: "#f2f2f2")
+    static let darkGray = Color(hex: "#231F20")
+    
     
 }
 

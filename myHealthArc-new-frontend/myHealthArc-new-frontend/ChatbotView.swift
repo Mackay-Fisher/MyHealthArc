@@ -15,21 +15,21 @@ struct ChatbotView: View {
     var body: some View {
         VStack {
             HStack {
-                Image(systemName: "lightbulb.fill")
+                Image(systemName: "lightbulb.max.fill")
                     .resizable()
                     .scaledToFit()
                     .padding(-2)
                     .frame(width: 15)
+                    .foregroundColor(.mhaYellow)
                 Text("Recipe Assistant")
-                    .font(.largeTitle)
+                    .font(.title)
                     .fontWeight(.bold)
                     .padding()
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
             }
             
             Divider()
-                .overlay(
-                    (colorScheme == .dark ? Color.white : Color.gray)
-                )
+
             VStack {
                 MessagesListView(messages: viewModel.messages, viewModel: viewModel)
                 
@@ -40,6 +40,7 @@ struct ChatbotView: View {
                             handleDietaryOption(option: option)
                         }) {
                             Text(option)
+                                .foregroundColor(.mhaPurple)
                                 .font(.body)
                                 .padding(8)
                                 .cornerRadius(10)
@@ -47,6 +48,7 @@ struct ChatbotView: View {
                         .buttonStyle(PlainButtonStyle())
                         .padding(2)
                         .cornerRadius(12)
+                        .foregroundColor(.mhaPurple)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color.gray, lineWidth: 0.5)
@@ -76,12 +78,36 @@ struct ChatbotView: View {
 struct MessagesListView: View {
     var messages: [ChatMessage]
     var viewModel: ChatbotViewModel
+    @State private var scrollTarget: UUID?
     
     var body: some View {
-        List(messages) { message in
-            MessageRow(message: message, viewModel: viewModel)
-                .padding(.vertical, 5)
-                .listRowSeparator(.hidden)
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack {
+                    ForEach(messages) { message in
+                        MessageRow(message: message, viewModel: viewModel)
+                            .padding(.vertical, 5)
+                            .id(message.id)
+                    }
+                    // Invisible anchor view at the bottom
+                    Color.clear
+                        .frame(height: 1)
+                        .id("bottom")
+                }
+            }
+            .onChange(of: messages.count) { _ in
+                withAnimation {
+                    proxy.scrollTo("bottom", anchor: .bottom)
+                }
+            }
+            // Watch for changes in the messages array
+            .onReceive(viewModel.$messages) { _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    withAnimation {
+                        proxy.scrollTo("bottom", anchor: .bottom)
+                    }
+                }
+            }
         }
         .listStyle(PlainListStyle())
         .cornerRadius(10)
@@ -108,6 +134,7 @@ struct MessageRow: View {
                         .cornerRadius(20)
                         .shadow(radius: 5)
                         .multilineTextAlignment(.leading)
+                        .frame(maxWidth: UIScreen.main.bounds.width * 0.8, alignment: .trailing)
                 } else {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(message.message)
@@ -117,6 +144,7 @@ struct MessageRow: View {
                             .cornerRadius(20)
                             .shadow(radius: 5)
                             .multilineTextAlignment(.leading)
+                            .frame(maxWidth: UIScreen.main.bounds.width * 0.8, alignment: .leading)
                         
                         // Save Recipe Button
                         Button(action: {
@@ -129,8 +157,8 @@ struct MessageRow: View {
                             }
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .foregroundColor(.purple)
-                            .background(Color.purple.opacity(0.1))
+                            .foregroundColor(.mhaPurple)
+                            .background(Color.mhaPurple.opacity(0.1))
                             .cornerRadius(12)
                         }
                         .padding(.leading, 12)

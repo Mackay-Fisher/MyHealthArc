@@ -11,6 +11,9 @@ struct GoalsView: View {
     @StateObject private var goalsManager = GoalsManager()
     private let baseURL = "http://209.38.153.40:8080/goals"
     private let userId = KeychainWrapper.standard.string(forKey: "userHash") ?? ""
+    @State private var showingSaveConfirmation = false
+    @State private var isSaving = false
+    @State private var saveError: String?
 
     var body: some View {
         NavigationView {
@@ -28,8 +31,6 @@ struct GoalsView: View {
                 }
 
                 Divider()
-                    .overlay(Color.gray.opacity(0.6))
-                    .frame(height: 0)
 
                 // Main Content
                 if goalsManager.isLoading {
@@ -149,7 +150,7 @@ struct GoalsView: View {
                                     step: 5
                                 )
                                 GoalAdjusterView(
-                                    title: "Calories Consumed",
+                                    title: "Calorie Intake",
                                     value: Binding(
                                         get: { goalsManager.goals["calories-consumed"] ?? 0 },
                                         set: { goalsManager.goals["calories-consumed"] = $0 }
@@ -160,30 +161,102 @@ struct GoalsView: View {
                             }
                         }
                         .padding()
-                    }
-
-                    // Save Button
-                    Button(action: saveGoals) {
-                        Text("Save Goals")
+                        
+                        // Save Button
+                        Button(action: saveGoals) {
+                            HStack {
+                                if isSaving {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                        .padding(.trailing, 5)
+                                }
+                                Text(isSaving ? "Saving..." : "Save Goals")
+                            }
                             .font(.title2)
-                            .bold()
                             .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.green)
+                            .frame(maxWidth: 200)
+                            .background(isSaving ? Color.gray : Color.mhaGreen)
                             .foregroundColor(.white)
-                            .cornerRadius(10)
+                            .cornerRadius(50)
+                        }
+                        .disabled(isSaving)
+                        .padding()
                     }
-                    .padding()
                 }
             }
             .onAppear {
                 goalsManager.fetchGoals(from: baseURL, userHash: userId)
             }
+            .alert("Success!", isPresented: $showingSaveConfirmation) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Your goals have been successfully updated.")
+            }
+            .alert("Error Saving Goals", isPresented: .init(
+                get: { saveError != nil },
+                set: { if !$0 { saveError = nil } }
+            )) {
+                Button("OK", role: .cancel) { saveError = nil }
+            } message: {
+                if let error = saveError {
+                    Text(error)
+                }
+            }
         }
     }
 
     private func saveGoals() {
-        goalsManager.saveGoals(to: baseURL, userHash: userId)
+        isSaving = true
+        
+        // Create URL request
+        guard let requestURL = URL(string: "\(baseURL)/update") else {
+            saveError = "Invalid URL"
+            isSaving = false
+            return
+        }
+
+        var request = URLRequest(url: requestURL)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let requestBody = ["userId": userId, "goals": goalsManager.goals] as [String: Any]
+        
+        guard let httpBody = try? JSONSerialization.data(withJSONObject: requestBody) else {
+            saveError = "Failed to prepare data"
+            isSaving = false
+            return
+        }
+        
+        request.httpBody = httpBody
+
+        URLSession.shared.dataTask(with: request) { _, response, error in
+            DispatchQueue.main.async {
+                isSaving = false
+                
+                if let error = error {
+                    saveError = "Failed to save: \(error.localizedDescription)"
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    saveError = "Invalid server response"
+                    return
+                }
+                
+                switch httpResponse.statusCode {
+                case 200...299:
+                    showingSaveConfirmation = true
+                case 400:
+                    saveError = "Invalid data submitted"
+                case 401:
+                    saveError = "Unauthorized access"
+                case 500:
+                    saveError = "Server error. Please try again later"
+                default:
+                    saveError = "Failed to save goals (Error: \(httpResponse.statusCode))"
+                }
+            }
+        }.resume()
     }
 }
 
@@ -205,6 +278,7 @@ struct GoalAdjusterView: View {
     @Binding var value: Int
     let unit: String
     let step: Int
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         VStack(spacing: 10) {
@@ -215,7 +289,7 @@ struct GoalAdjusterView: View {
                     if value > 0 { value -= step }
                 }) {
                     Image(systemName: "minus.circle.fill")
-                        .foregroundColor(.black)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                         .font(.title2)
                 }
 
@@ -227,7 +301,7 @@ struct GoalAdjusterView: View {
                     value += step
                 }) {
                     Image(systemName: "plus.circle.fill")
-                        .foregroundColor(.black)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                         .font(.title2)
                 }
             }
@@ -237,11 +311,10 @@ struct GoalAdjusterView: View {
         }
         .padding()
         .background(Color(.systemGray6))
-        .cornerRadius(10)
+        .cornerRadius(20)
     }
 }
 
-// MARK: - Preview
 struct GoalsView_Previews: PreviewProvider {
     static var previews: some View {
         GoalsView()

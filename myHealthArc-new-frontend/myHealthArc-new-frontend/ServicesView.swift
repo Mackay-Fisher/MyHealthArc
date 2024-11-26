@@ -11,18 +11,19 @@ import SwiftKeychainWrapper
 struct ServicesView: View {
     @Binding var isLoggedIn: Bool
     @Binding var hasSignedUp: Bool
+    @StateObject private var servicesViewModel = ServicesViewModel.shared
     
-    //@AppStorage("isFaceIDEnabled") private var isFaceIDEnabled: Bool = false
     @AppStorage("hasShownAlert") var hasShownAlert = false
     @Binding var showAlert: Bool
 
-    @State private var selectedServices: Set<String> = []
     @Environment(\.colorScheme) var colorScheme
-    @State private var userName: String = "User Name" // Placeholder for user name
-    @State private var userEmail: String = "user@example.com" // Placeholder for user email
-    @State private var showProfile: Bool = false // To toggle
+    @State private var userName: String = "User Name"
+    @State private var userEmail: String = "user@example.com"
+    @State private var showProfile: Bool = false
     
     var services = ["Apple Health", "Apple Fitness", "Nutrition", "Prescriptions"]
+    private let userHash = KeychainWrapper.standard.string(forKey: "userHash") ?? "exampleUserHash"
+    private let baseURL = "\(AppConfig.baseURL)"
 
     let columns = [
         GridItem(.flexible()),
@@ -32,14 +33,12 @@ struct ServicesView: View {
     var body: some View {
         NavigationView {
             VStack {
-                
                 HStack {
                     Text("Select Your Services")
                         .font(.title)
                         .fontWeight(.bold)
                         .padding(.leading)
                     Spacer()
-                    // Profile icon
                     Button(action: {
                         showProfile.toggle()
                     }) {
@@ -55,7 +54,10 @@ struct ServicesView: View {
                 
                 LazyVGrid(columns: columns, spacing: 20) {
                     ForEach(services, id: \.self) { service in
-                        ServiceButton(service: service, isChecked: selectedServices.contains(service)) {
+                        ServiceButton(
+                            service: service,
+                            isChecked: servicesViewModel.selectedServices[service] ?? false
+                        ) {
                             toggleSelection(for: service)
                         }
                     }
@@ -65,8 +67,10 @@ struct ServicesView: View {
                 Spacer()
                 
                 Button(action: {
-                    isLoggedIn = true;
-                    
+                    Task {
+                        await updateAllServicesAsync()
+                        isLoggedIn = true
+                    }
                 }) {
                     Text("Continue")
                         .frame(width: 200, height: 50)
@@ -81,25 +85,20 @@ struct ServicesView: View {
                     showAlert = true
                     hasShownAlert = true
                 }
+                fetchServices()
             }
-            /*
-            .alert("Do you want to enable Face ID?", isPresented: $showAlert) {
-                Button("Yes") {
-                    enableFaceID()
-                    showAlert = false
-                }
-                Button("No", role: .cancel) {
-                    disableFaceID()
-                    showAlert = false
-                }
-            }
-            */
             .background(colorScheme == .dark ? Color.black : Color.white)
             .navigationBarHidden(true)
             .overlay(
                 Group {
                     if showProfile {
-                        UserProfileView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp, userName: userName, userEmail: userEmail, showProfile: $showProfile )
+                        UserProfileView(
+                            isLoggedIn: $isLoggedIn,
+                            hasSignedUp: $hasSignedUp,
+                            userName: userName,
+                            userEmail: userEmail,
+                            showProfile: $showProfile
+                        )
                     }
                 }
             )
@@ -107,53 +106,75 @@ struct ServicesView: View {
     }
     
     private func toggleSelection(for service: String) {
-        if selectedServices.contains(service) {
-            selectedServices.remove(service)
-        } else {
-            selectedServices.insert(service)
-        }
+        servicesViewModel.selectedServices[service] = !(servicesViewModel.selectedServices[service] ?? false)
     }
-    /*
-    private func enableFaceID() {
-        let context = LAContext()
-        var error: NSError?
-        print("Attempting to enable FaceID")
-
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            print("Biometrics are available")
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Enable FaceID") { success, authenticationError in
+    
+    private func fetchServices() {
+        guard let url = URL(string: "\(baseURL)/user-services/fetch?userHash=\(userHash)") else {
+            print("Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Failed to fetch services: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let data = data else {
+                print("No data received")
+                return
+            }
+            
+            do {
+                let response = try JSONDecoder().decode(ServiceResponse.self, from: data)
                 DispatchQueue.main.async {
-                    if success {
-                        isFaceIDEnabled = true
-                        print("FaceID enabled successfully")
-                        KeychainWrapper.standard.set(true, forKey: "isFaceIDEnabled")
-                        if let userHash = KeychainWrapper.standard.string(forKey: "userHash") {
-                            KeychainWrapper.standard.set(userHash, forKey: "userHash")
-                            print("KeychainWrapper: userHash saved")
-                        } else {
-                            print("KeychainWrapper: Failed to retrieve userHash")
-                        }
-                    } else {
-                        if let error = authenticationError {
-                            print("Authentication failed: \(error.localizedDescription)")
-                        }
-                        isFaceIDEnabled = false
+                    servicesViewModel.selectedServices = response.selectedServices
+                }
+            } catch {
+                print("Failed to decode services: \(error.localizedDescription)")
+                // Initialize default selections if fetch fails
+                DispatchQueue.main.async {
+                    services.forEach { service in
+                        servicesViewModel.selectedServices[service] = false
                     }
                 }
             }
-        } else {
-            if let error = error {
-                print("Biometrics not available: \(error.localizedDescription)")
+        }.resume()
+    }
+    
+    private func updateAllServicesAsync() async {
+        guard let url = URL(string: "\(baseURL)/user-services/update") else {
+            print("Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body = ServiceRequest(
+            userHash: userHash,
+            selectedServices: servicesViewModel.selectedServices,
+            isFaceIDEnabled: false
+        )
+        
+        do {
+            request.httpBody = try JSONEncoder().encode(body)
+            
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                print("Services updated successfully")
+            } else {
+                print("Failed to update services: \(response)")
             }
-            isFaceIDEnabled = false
+        } catch {
+            print("Failed to update services: \(error.localizedDescription)")
         }
     }
-
-    private func disableFaceID() {
-        KeychainWrapper.standard.removeObject(forKey: "isFaceIDEnabled")
-        isFaceIDEnabled = false
-    }
-    */
 }
 
 struct ServiceButton: View {
@@ -175,10 +196,8 @@ struct ServiceButton: View {
                         .offset(x:15)
                         .offset(y:20)
                     
-                        
                     Spacer()
                 }
-                
                 
                 Image(service) //custom icons
                     .resizable()

@@ -17,11 +17,17 @@ struct AppleHealthHomeView: View {
         GeometryReader { geometry in
             VStack(spacing: 20) {
                 // Header
-                Text("❤️ Apple Health Data")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-
+                HStack{
+                    Image(systemName: "heart.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 25)
+                        .foregroundColor(.pink)
+                    Text("Apple Health Data")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                }
                 // Horizontal Selector
                 HStack(spacing: 30) {
                     SectionButton(section: .bmi, isSelected: selectedSection == .bmi) {
@@ -40,12 +46,12 @@ struct AppleHealthHomeView: View {
                 // Highlighted Line with Indicator
                 ZStack {
                     Triangle()
-                        .fill(Color.pink)
+                        .fill(Color.mhaSalmon)
                         .frame(width: 20, height: 10)
                         .offset(x: indicatorPosition(for: selectedSection), y: -5)
 
                     Rectangle()
-                        .fill(Color.pink.opacity(0.8))
+                        .fill(Color.mhaSalmon)
                         .frame(height: 2)
                 }
                 .frame(maxWidth: .infinity)
@@ -121,6 +127,7 @@ struct Triangle: Shape {
 
 // Button for Section Selector
 struct SectionButton: View {
+    @Environment(\.colorScheme) var colorScheme
     let section: HealthSection
     let isSelected: Bool
     let action: () -> Void
@@ -132,13 +139,13 @@ struct SectionButton: View {
                 .scaledToFit()
                 .frame(width: 70, height: 70)
                 .padding(10)
-                .background(isSelected ? Color.pink : Color.gray.opacity(0.2))
+                .background(isSelected ? Color.mhaSalmon : Color(.systemGray6))
                 .clipShape(Circle())
                 .shadow(radius: isSelected ? 5 : 0)
 
             Text(section.title)
                 .font(.subheadline)
-                .foregroundColor(.white)
+                .foregroundColor(colorScheme == .dark ? .white : .black)
         }
         .onTapGesture(perform: action)
     }

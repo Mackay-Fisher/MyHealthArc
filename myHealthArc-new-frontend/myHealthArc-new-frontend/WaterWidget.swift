@@ -35,7 +35,7 @@ struct WaterWidget: View {
                     ZStack {
                         Circle()
                             .stroke(lineWidth: 10)
-                            .foregroundColor(.mhaGray.opacity(0.3))
+                            .foregroundColor(colorScheme == .dark ? Color.white.opacity(0.3) : Color.mhaGray.opacity(0.3))
                             .frame(width: 150, height: 150)
 
                         Circle()

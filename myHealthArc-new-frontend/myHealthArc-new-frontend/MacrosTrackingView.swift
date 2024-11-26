@@ -39,7 +39,7 @@ struct MacrosTrackingView: View {
         NavigationView {
             VStack(spacing: 20) {
                 HStack {
-                    Image("pills") // Change to macros image
+                    Image("macros")
                         .resizable()
                         .scaledToFit()
                         .padding(-2)
@@ -50,15 +50,13 @@ struct MacrosTrackingView: View {
                         .padding()
                 }
                 Divider()
-                    .overlay((colorScheme == .dark ? Color.white : Color.gray))
 
-                // Manage Goals Button
-                NavigationLink(destination: NutritionView()) {
+                NavigationLink(destination: GoalsView()) {
                     HStack {
                         Image(systemName: "target")
-                            .foregroundColor(.green)
+                            .foregroundColor(.mhaGreen)
                         Text("Manage Goals")
-                            .foregroundColor(.green)
+                            .foregroundColor(.mhaGreen)
                         Spacer()
                         Image(systemName: "chevron.right")
                             .foregroundColor(.gray)
@@ -69,16 +67,15 @@ struct MacrosTrackingView: View {
                 }
                 .padding(.horizontal)
 
-                // Progress Section
                 VStack(spacing: 20) {
                     HStack(spacing: 20) {
-                        MacroProgressView(macroName: "Protein", value: protein_left, unit: "g", color: .blue, progress: protein_progress_left)
-                        MacroProgressView(macroName: "Carbs", value: carbs_left, unit: "g", color: .orange, progress: carbs_progress_left)
+                        MacroProgressView(macroName: "Protein", value: protein_left, unit: "g", color: .mhaBlue, progress: protein_progress_left)
+                        MacroProgressView(macroName: "Carbs", value: carbs_left, unit: "g", color: .mhaOrange, progress: carbs_progress_left)
                     }
 
                     HStack(spacing: 20) {
-                        MacroProgressView(macroName: "Fats", value: fats_left, unit: "g", color: .red, progress: fats_progress_left)
-                        MacroProgressView(macroName: "Calories", value: calories_left, unit: "kcal", color: .green, progress: calories_progress_left)
+                        MacroProgressView(macroName: "Fats", value: fats_left, unit: "g", color: .mhaSalmon, progress: fats_progress_left)
+                        MacroProgressView(macroName: "Calories", value: calories_left, unit: "kcal", color: .mhaGreen, progress: calories_progress_left)
                     }
                 }
                 .padding()
@@ -89,21 +86,12 @@ struct MacrosTrackingView: View {
                 Button(action: { showSheet = true }) {
                     Spacer()
                     HStack {
-                        Image(systemName: "lightbulb.fill")
-                            .frame(width: 28, height: 28)
-                            .foregroundColor(.white)
-                        Text("Recipe Assistant")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
+                        Image("ai")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 55, height: 55)
                     }
-                    .padding(10)
-                    .background(Color.mhaPurple)
-                    .cornerRadius(12)
-                    .shadow(radius: 5)
-                    .padding(.leading, 20)
-                    .padding(.top, 20)
-                    .padding(.trailing, 20)
+                    .padding(20)
                     .sheet(isPresented: $showSheet) {
                         ChatbotView(viewModel: ChatbotViewModel(proteinLeft: protein_left, carbsLeft: carbs_left, fatsLeft: fats_left))
                     }
@@ -112,8 +100,43 @@ struct MacrosTrackingView: View {
             .background(Color(.systemBackground))
             .navigationBarHidden(true)
             .onAppear {
-                Task {
-                    await fetchGoalsAndBodyData()
+                loadData()
+            }
+        }
+    }
+    
+    private func loadData() {
+        Task {
+            await fetchGoalsAndBodyData()
+            // Force an immediate fetch of meals after goals
+            fetchMealsForDay { meals in
+                var totalProtein: Double = 0
+                var totalFats: Double = 0
+                var totalCarbs: Double = 0
+                var totalCalories: Double = 0
+
+                for meal in meals {
+                    totalProtein += Double(meal.totalProtein.value) ?? 0
+                    totalFats += Double(meal.totalFats.value) ?? 0
+                    totalCarbs += Double(meal.totalCarbs.value) ?? 0
+                    totalCalories += Double(meal.totalCalories.value) ?? 0
+                }
+
+                DispatchQueue.main.async {
+                    if let proteinGoal = self.goalsManager.goals["protein-goal"],
+                       let carbsGoal = self.goalsManager.goals["carbs-goal"],
+                       let fatsGoal = self.goalsManager.goals["fat-goal"] {
+                        
+                        protein_left = Double(proteinGoal) - totalProtein
+                        fats_left = Double(fatsGoal) - totalFats
+                        carbs_left = Double(carbsGoal) - totalCarbs
+                        calories_left = dailyCaloricGoal - totalCalories
+
+                        protein_progress_left = totalProtein / Double(proteinGoal)
+                        fats_progress_left = totalFats / Double(fatsGoal)
+                        carbs_progress_left = totalCarbs / Double(carbsGoal)
+                        calories_progress_left = totalCalories / dailyCaloricGoal
+                    }
                 }
             }
         }
@@ -129,42 +152,11 @@ struct MacrosTrackingView: View {
                let fatsGoal = goalsManager.goals["fat-goal"],
                let caloriesGoal = goalsManager.goals["calories-consumed"] {
                 dailyCaloricGoal = Double(caloriesGoal)
-                DispatchQueue.main.async {
-                    self.calculateMacros(proteinGoal: Double(proteinGoal), carbsGoal: Double(carbsGoal), fatsGoal: Double(fatsGoal))
-                }
             } else {
                 print("DEBUG - Missing goals in response, using defaults")
             }
         } catch {
             print("DEBUG - Error fetching goals: \(error.localizedDescription)")
-        }
-    }
-
-    private func calculateMacros(proteinGoal: Double, carbsGoal: Double, fatsGoal: Double) {
-        fetchMealsForDay { meals in
-            var totalProtein: Double = 0
-            var totalFats: Double = 0
-            var totalCarbs: Double = 0
-            var totalCalories: Double = 0
-
-            for meal in meals {
-                totalProtein += Double(meal.totalProtein.value) ?? 0
-                totalFats += Double(meal.totalFats.value) ?? 0
-                totalCarbs += Double(meal.totalCarbs.value) ?? 0
-                totalCalories += Double(meal.totalCalories.value) ?? 0
-            }
-
-            DispatchQueue.main.async {
-                protein_left = proteinGoal - totalProtein
-                fats_left = fatsGoal - totalFats
-                carbs_left = carbsGoal - totalCarbs
-                calories_left = dailyCaloricGoal - totalCalories
-
-                protein_progress_left = totalProtein / proteinGoal
-                fats_progress_left = totalFats / fatsGoal
-                carbs_progress_left = totalCarbs / carbsGoal
-                calories_progress_left = totalCalories / dailyCaloricGoal
-            }
         }
     }
 
@@ -225,10 +217,10 @@ struct MacroProgressView: View {
                 .padding(.bottom)
             ZStack {
                 Circle()
-                    .stroke(Color(.systemGray5), lineWidth: 17)
+                    .stroke(Color(.systemGray5), lineWidth: 8)
                 Circle()
-                    .trim(from: 0, to: progress) // Adjust for progress
-                    .stroke(color, lineWidth: 17)
+                    .trim(from: 0, to: progress)
+                    .stroke(color, lineWidth: 8)
                     .rotationEffect(.degrees(-90))
                 
                 VStack {
@@ -240,17 +232,16 @@ struct MacroProgressView: View {
                         .foregroundColor(.gray)
                 }
             }
-            .frame(width: 80, height: 80)
+            .frame(width: 90, height: 90)
             .padding(.bottom)
         }
         .padding()
         .frame(width: 175, height: 175)
         .background(Color(.systemGray6))
-        .cornerRadius(10)
+        .cornerRadius(20)
     }
 }
 
-// Preview
 struct MacrosTrackingView_Previews: PreviewProvider {
     static var previews: some View {
         MacrosTrackingView()

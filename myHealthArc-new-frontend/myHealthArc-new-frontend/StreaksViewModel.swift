@@ -208,63 +208,65 @@ struct StreaksView: View {
 
     var body: some View {
         NavigationView {
-            VStack {
-                // Header
-                HStack {
-                    Image(systemName: "flame.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .padding(-2)
-                        .frame(width: 30)
-                        .foregroundColor(.mhaOrange)
-                    Text("Streaks")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding()
-                }
-
-                Divider()
-
-                if viewModel.isLoading {
-                    ProgressView("Loading Streaks...")
-                        .padding()
-                } else if let errorMessage = viewModel.errorMessage {
-                    VStack {
-                        Text("Error loading streaks")
-                            .font(.headline)
-                            .foregroundColor(.red)
-                        Text(errorMessage)
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                        Button("Retry") {
-                            viewModel.fetchStreaks()
+            ScrollView{
+                VStack {
+                    // Header
+                    HStack {
+                        Image(systemName: "flame.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(-2)
+                            .frame(width: 30)
+                            .foregroundColor(.mhaOrange)
+                        Text("Streaks")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .padding()
+                    }
+                    
+                    Divider()
+                    
+                    if viewModel.isLoading {
+                        ProgressView("Loading Streaks...")
+                            .padding()
+                    } else if let errorMessage = viewModel.errorMessage {
+                        VStack {
+                            Text("Error loading streaks")
+                                .font(.headline)
+                                .foregroundColor(.red)
+                            Text(errorMessage)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            Button("Retry") {
+                                viewModel.fetchStreaks()
+                            }
+                            .padding()
+                        }
+                    } else if viewModel.streaks.isEmpty {
+                        VStack {
+                            Text("No streaks found")
+                                .font(.headline)
+                            Text("Start achieving your goals to build streaks!")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
                         }
                         .padding()
-                    }
-                } else if viewModel.streaks.isEmpty {
-                    VStack {
-                        Text("No streaks found")
-                            .font(.headline)
-                        Text("Start achieving your goals to build streaks!")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    }
-                    .padding()
-                } else {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                                ForEach(viewModel.streaks) { streak in
-                                    StreakFlameView(streak: streak)
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
+                                    ForEach(viewModel.streaks) { streak in
+                                        StreakFlameView(streak: streak)
+                                    }
                                 }
                             }
+                            .padding()
                         }
-                        .padding()
                     }
                 }
-            }
-            .onAppear {
-                viewModel.fetchStreaks()
+                .onAppear {
+                    viewModel.fetchStreaks()
+                }
             }
         }
     }

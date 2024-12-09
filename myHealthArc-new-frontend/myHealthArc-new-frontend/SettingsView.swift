@@ -109,10 +109,10 @@ struct SettingsView: View {
     }
     
     private func updateAllServicesAsync() async {
-        guard !servicesViewModel.selectedServices.isEmpty else {
-            print("No services selected. Skipping update.")
-            return
-        }
+//        guard !servicesViewModel.selectedServices.isEmpty else {
+//            print("No services selected. Skipping update.")
+//            return
+//        }
         
         guard let url = URL(string: "\(baseURL)/user-services/update") else {
             print("Invalid URL")

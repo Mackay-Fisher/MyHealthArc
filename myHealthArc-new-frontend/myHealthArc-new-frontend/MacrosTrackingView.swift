@@ -42,70 +42,69 @@ struct MacrosTrackingView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
-                HStack {
-                    Image("macros")
-                        .resizable()
-                        .scaledToFit()
-                        .padding(-2)
-                        .frame(width: 30)
-                    Text("Macros Tracking")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding()
-                }
-                Divider()
-
-                NavigationLink(destination: GoalsView()) {
-                    HStack {
-                        Image(systemName: "target")
-                            .foregroundColor(.mhaGreen)
-                        Text("Manage Goals")
-                            .foregroundColor(.mhaGreen)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.gray)
-                    }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
-                }
-                .padding(.horizontal)
-
+            ScrollView{
                 VStack(spacing: 20) {
-                    HStack(spacing: 20) {
-                        MacroProgressView(macroName: "Protein", value: protein_current, remaining: protein_left, unit: "g", color: .mhaBlue, progress: protein_progress_left)
-                        MacroProgressView(macroName: "Carbs", value: carbs_current, remaining: carbs_left, unit: "g", color: .mhaOrange, progress: carbs_progress_left)
-                    }
-
-                    HStack(spacing: 20) {
-                        MacroProgressView(macroName: "Fats", value: fats_current, remaining: fats_left, unit: "g", color: .mhaSalmon, progress: fats_progress_left)
-                        MacroProgressView(macroName: "Calories", value: calories_current, remaining: calories_left, unit: "kcal", color: .mhaGreen, progress: calories_progress_left)
-                    }
-                }
-                .padding()
-
-                Spacer()
-                    .frame(height: 30)
-
-                Button(action: { showSheet = true }) {
-                    Spacer()
                     HStack {
-                        Image("ai")
+                        Image("macros")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 55, height: 55)
+                            .padding(-2)
+                            .frame(width: 30)
+                        Text("Macros Tracking")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .padding()
                     }
-                    .padding(20)
-                    .sheet(isPresented: $showSheet) {
-                        ChatbotView(viewModel: ChatbotViewModel(proteinLeft: protein_left, carbsLeft: carbs_left, fatsLeft: fats_left))
+                    Divider()
+                    
+                    NavigationLink(destination: GoalsView()) {
+                        HStack {
+                            Image(systemName: "target")
+                                .foregroundColor(.mhaGreen)
+                            Text("Manage Goals")
+                                .foregroundColor(.mhaGreen)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.gray)
+                        }
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(10)
+                    }
+                    .padding(.horizontal)
+                    
+                    VStack(spacing: 20) {
+                        HStack(spacing: 20) {
+                            MacroProgressView(macroName: "Protein", value: protein_current, remaining: protein_left, unit: "g", color: .mhaBlue, progress: protein_progress_left)
+                            MacroProgressView(macroName: "Carbs", value: carbs_current, remaining: carbs_left, unit: "g", color: .mhaOrange, progress: carbs_progress_left)
+                        }
+                        
+                        HStack(spacing: 20) {
+                            MacroProgressView(macroName: "Fats", value: fats_current, remaining: fats_left, unit: "g", color: .mhaSalmon, progress: fats_progress_left)
+                            MacroProgressView(macroName: "Calories", value: calories_current, remaining: calories_left, unit: "kcal", color: .mhaGreen, progress: calories_progress_left)
+                        }
+                    }
+                    .padding()
+                    
+                    Button(action: { showSheet = true }) {
+                        Spacer()
+                        HStack {
+                            Image("ai")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 55, height: 55)
+                        }
+                        .padding(20)
+                        .sheet(isPresented: $showSheet) {
+                            ChatbotView(viewModel: ChatbotViewModel(proteinLeft: protein_left, carbsLeft: carbs_left, fatsLeft: fats_left))
+                        }
                     }
                 }
-            }
-            .background(Color(.systemBackground))
-            .navigationBarHidden(true)
-            .onAppear {
-                loadData()
+                .background(Color(.systemBackground))
+                .navigationBarHidden(true)
+                .onAppear {
+                    loadData()
+                }
             }
         }
     }

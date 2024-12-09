@@ -17,65 +17,67 @@ struct RecipesView: View {
     
     var body: some View {
         VStack {
-            // Header
-            HStack {
-                Image(systemName: "book.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .padding(-2)
-                    .frame(width: 30)
-                    .foregroundColor(.mhaSalmon)
-                
-                Text("Recipes")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding()
-            }
-            
-            Divider()
-            
-            // Content
-            if isLoading {
-                ProgressView()
-                    .padding()
-            } else if recipes.isEmpty {
-                VStack(spacing: 20) {
-                    Image(systemName: "bookmark.slash")
-                        .font(.system(size: 50))
-                        .foregroundColor(.gray)
+            ScrollView{
+                // Header
+                HStack {
+                    Image(systemName: "book.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(-2)
+                        .frame(width: 30)
+                        .foregroundColor(.mhaSalmon)
                     
-                    Text("No Recipes Saved")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    
-                    Text("Your saved recipes will appear here.\nUse the Recipe Assistant to generate and save recipes!")
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(.gray)
-                        .padding(.horizontal)
+                    Text("Recipes")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .padding()
                 }
-                .frame(maxHeight: .infinity)
-            } else {
-                // Recipes List
-                ScrollView {
-                    VStack(spacing: 15) {
-                        ForEach(recipes) { recipe in
-                            Button(action: {
-                                selectedRecipe = recipe
-                                showRecipeDetail = true
-                            }) {
-                                RecipeRowView(recipe: recipe)
+                
+                Divider()
+                
+                // Content
+                if isLoading {
+                    ProgressView()
+                        .padding()
+                } else if recipes.isEmpty {
+                    VStack(spacing: 20) {
+                        Image(systemName: "bookmark.slash")
+                            .font(.system(size: 50))
+                            .foregroundColor(.gray)
+                        
+                        Text("No Recipes Saved")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                        
+                        Text("Your saved recipes will appear here.\nUse the Recipe Assistant to generate and save recipes!")
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.gray)
+                            .padding(.horizontal)
+                    }
+                    .frame(maxHeight: .infinity)
+                } else {
+                    // Recipes List
+                    ScrollView {
+                        VStack(spacing: 15) {
+                            ForEach(recipes) { recipe in
+                                Button(action: {
+                                    selectedRecipe = recipe
+                                    showRecipeDetail = true
+                                }) {
+                                    RecipeRowView(recipe: recipe)
+                                }
                             }
                         }
+                        .padding()
                     }
-                    .padding()
-                }
-                .sheet(item: $selectedRecipe) { recipe in
-                    RecipeDetailView(recipe: recipe)
+                    .sheet(item: $selectedRecipe) { recipe in
+                        RecipeDetailView(recipe: recipe)
+                    }
                 }
             }
-        }
-        .onAppear {
-            fetchRecipes()
+            .onAppear {
+                fetchRecipes()
+            }
         }
     }
     

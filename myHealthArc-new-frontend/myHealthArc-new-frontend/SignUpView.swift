@@ -25,24 +25,6 @@ struct User: Codable {
     var userHash: String
 }
 
-struct DismissingKeyboard: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .onTapGesture {
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
-                                             to: nil,
-                                             from: nil,
-                                             for: nil)
-            }
-    }
-}
-
-extension View {
-    func dismissKeyboardOnTap() -> some View {
-        modifier(DismissingKeyboard())
-    }
-}
-
 struct SignUpView: View {
     @State private var name: String = ""
     @State private var email: String = ""
@@ -130,179 +112,167 @@ struct SignUpView: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack() {
-                Text("Sign Up")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                Form {
-                    Section(header: Text("Personal Information")) {
-                        TextField("Name", text: $name)
-                            .textContentType(.name)
+        // NavigationView {
+        VStack() {
+            Text("Sign Up")
+                .font(.title)
+                .fontWeight(.bold)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Form {
+                Section(header: Text("Personal Information")) {
+                    TextField("Name", text: $name)
+                        .textContentType(.name)
+                    
+                    VStack(alignment: .leading) {
+                        TextField("Email", text: $email)
+                            .keyboardType(.emailAddress)
+                            .textContentType(.emailAddress)
+                            .autocapitalization(.none)
                         
-                        VStack(alignment: .leading) {
-                            TextField("Email", text: $email)
-                                .keyboardType(.emailAddress)
-                                .textContentType(.emailAddress)
-                                .autocapitalization(.none)
-                            
-                            if !email.isEmpty && !isValidEmail(email) {
-                                Text("Please enter a valid email address")
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                            }
-                        }
-                        
-                        VStack(alignment: .leading) {
-                            SecureField("Password", text: $password)
-                                .textContentType(.newPassword)
-                        }
-                        VStack(alignment: .leading) {
-                            SecureField("Re-Enter Password", text: $password2)
-                                .textContentType(.newPassword)
-                            
-                            
-                        }
-                        if !password.isEmpty && !password2.isEmpty && !passwordsMatch {
-                            Text("Passwords do not match")
+                        if !email.isEmpty && !isValidEmail(email) {
+                            Text("Please enter a valid email address")
                                 .font(.caption)
                                 .foregroundColor(.red)
                         }
+                    }
+                    
+                    VStack(alignment: .leading) {
+                        SecureField("Password", text: $password)
+                            .textContentType(.newPassword)
+                    }
+                    VStack(alignment: .leading) {
+                        SecureField("Re-Enter Password", text: $password2)
+                            .textContentType(.newPassword)
                         
-                        TextField("Age", text: $age)
-                            .keyboardType(.numberPad)
-                            
-                        // Gender Selection
-                        Picker("Gender", selection: $gender) {
-                            ForEach(genderOptions, id: \.self) {
-                                Text($0)
-                            }
-                        }
                         
-                        // Height Input with Validation
-                        VStack(alignment: .leading) {
-                            HStack {
-                                Text("Height")
-                                Spacer()
-                                TextField("Feet", text: $heightFeet)
-                                    .keyboardType(.numberPad)
-                                    .frame(width: 50)
-                                Text("ft")
-                                TextField("Inches", text: $heightInches)
-                                    .keyboardType(.numberPad)
-                                    .frame(width: 50)
-                                Text("in")
-                            }
-                            
-                            if !heightFeet.isEmpty && !heightInches.isEmpty && !heightIsValid {
-                                Text(heightErrorMessage)
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                            }
-                        }
-                        
-                        // Weight Input with Validation
-                        VStack(alignment: .leading) {
-                            HStack {
-                                Text("Weight")
-                                Spacer()
-                                TextField("Pounds", text: $weight)
-                                    .keyboardType(.decimalPad)
-                                Text("lbs")
-                            }
-                            
-                            if !weight.isEmpty && !weightIsValid {
-                                Text(weightErrorMessage)
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                            }
-                        }
-                            
-                        Button(action: {
-                            showDatePicker.toggle()
-                        }) {
-                            HStack {
-                                Text("Date of Birth")
-                                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                                Spacer()
-                                Text(dob, style: .date)
-                                    .foregroundColor(.gray)
-                            }
-                        }
-                        
-                        if showDatePicker {
-                            DatePicker("", selection: $dob, displayedComponents: .date)
-                                .datePickerStyle(.wheel)
+                    }
+                    if !password.isEmpty && !password2.isEmpty && !passwordsMatch {
+                        Text("Passwords do not match")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                    
+                    TextField("Age", text: $age)
+                        .keyboardType(.numberPad)
+                    
+                    // Gender Selection
+                    Picker("Gender", selection: $gender) {
+                        ForEach(genderOptions, id: \.self) {
+                            Text($0)
                         }
                     }
                     
-                    HStack {
-                        Image(systemName: ageVerified ? "checkmark.square" : "square")
-                            .foregroundColor(ageVerified ? Color.mhaGreen : .gray)
-                            .onTapGesture {
-                                ageVerified.toggle()
-                            }
-                        Text("I confirm I am above 18 years of age")
-                    }
-                    
-                    Section {
+                    // Height Input with Validation
+                    VStack(alignment: .leading) {
                         HStack {
-                            Image(systemName: acceptedTerms ? "checkmark.square" : "square")
-                                .foregroundColor(acceptedTerms ? Color.mhaGreen : .gray)
-                                .onTapGesture {
-                                    acceptedTerms.toggle()
-                                }
-                            NavigationLink(destination: TermsAndConditionsView(acceptedTerms: $acceptedTerms)) {
-                                Text("I have read the Terms & Conditions")
-                                    .foregroundColor(.blue)
-                            }
+                            Text("Height")
+                            Spacer()
+                            TextField("Feet", text: $heightFeet)
+                                .keyboardType(.numberPad)
+                                .frame(width: 50)
+                            Text("ft")
+                            TextField("Inches", text: $heightInches)
+                                .keyboardType(.numberPad)
+                                .frame(width: 50)
+                            Text("in")
                         }
+                        
+                        if !heightFeet.isEmpty && !heightInches.isEmpty && !heightIsValid {
+                            Text(heightErrorMessage)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                        }
+                    }
+                    
+                    // Weight Input with Validation
+                    VStack(alignment: .leading) {
+                        HStack {
+                            Text("Weight")
+                            Spacer()
+                            TextField("Pounds", text: $weight)
+                                .keyboardType(.decimalPad)
+                                .multilineTextAlignment(.trailing)
+                            Text("lbs")
+                        }
+                        
+                        if !weight.isEmpty && !weightIsValid {
+                            Text(weightErrorMessage)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                        }
+                    }
+                    
+                    Button(action: {
+                        showDatePicker.toggle()
+                    }) {
+                        HStack {
+                            Text("Date of Birth")
+                                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                            Spacer()
+                            Text(dob, style: .date)
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    
+                    if showDatePicker {
+                        DatePicker("", selection: $dob, displayedComponents: .date)
+                            .datePickerStyle(.wheel)
                     }
                 }
                 
-                if formIsValid {
-                    NavigationLink(destination: ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp, showAlert: $showAlert), isActive: $navigateToServicesView) {
-                        EmptyView()
+                HStack {
+                    Image(systemName: ageVerified ? "checkmark.square" : "square")
+                        .foregroundColor(ageVerified ? Color.mhaGreen : .gray)
+                        .onTapGesture {
+                            ageVerified.toggle()
+                        }
+                    Text("I confirm I am above 18 years of age")
+                }
+                
+                Section {
+                    HStack {
+                        Image(systemName: acceptedTerms ? "checkmark.square" : "square")
+                            .foregroundColor(acceptedTerms ? Color.mhaGreen : .gray)
+                            .onTapGesture {
+                                acceptedTerms.toggle()
+                            }
+                        NavigationLink(destination: TermsAndConditionsView(acceptedTerms: $acceptedTerms)) {
+                            Text("I have read the Terms & Conditions")
+                                .foregroundColor(.mhaPurple)
+                        }
                     }
-                    Button(action: {
-                        signUp()
-                    }) {
-                        Text("Sign Up")
-                            .frame(width: 200, height: 30)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.mhaPurple)
-                            .cornerRadius(50)
-                    }
-                } else {
+                }
+            }
+            
+            if formIsValid {
+                NavigationLink(destination: ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp, showAlert: $showAlert), isActive: $navigateToServicesView) {
+                    EmptyView()
+                }
+                Button(action: {
+                    signUp()
+                }) {
                     Text("Sign Up")
                         .frame(width: 200, height: 30)
                         .foregroundColor(.white)
                         .padding()
-                        .background(Color.gray)
+                        .background(Color.mhaPurple)
                         .cornerRadius(50)
                 }
+            } else {
+                Text("Sign Up")
+                    .frame(width: 200, height: 30)
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.gray)
+                    .cornerRadius(50)
             }
-            .background(colorScheme == .dark ? Color.black : Color.lightbackground)
-            //.navigationTitle("Sign Up")
-            .dismissKeyboardOnTap()  // Add this modifier to enable tap-to-dismiss
-                .toolbar {
-                    ToolbarItem(placement: .keyboard) {
-                        HStack {
-                            Spacer()
-                            Button("Done") {
-                                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
-                                                             to: nil,
-                                                             from: nil,
-                                                             for: nil)
-                            }
-                        }
-                    }
-                }
         }
+        .background(colorScheme == .dark ? Color.black : Color.lightbackground)
+        .accentColor(.mhaPurple)
+        //.navigationTitle("Sign Up")
+    //}
     }
     
     private func signUp() {

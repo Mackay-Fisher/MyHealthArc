@@ -3,9 +3,19 @@ import SwiftUI
 import SwiftKeychainWrapper
 
 // Service View Model
+//class ServicesViewModel: ObservableObject {
+//    @Published var selectedServices: [String: Bool] = [:]
+//    static let shared = ServicesViewModel()
+//}
 class ServicesViewModel: ObservableObject {
-    @Published var selectedServices: [String: Bool] = [:]
+    @Published var selectedServices: [String: Bool] = [
+        "Apple Health": false,
+        "Apple Fitness": false,
+        "Nutrition": false,
+        "Prescriptions": false
+    ]
     static let shared = ServicesViewModel()
+    private init() {} // Ensures singleton pattern
 }
 
 struct ContentView: View {
@@ -99,40 +109,42 @@ struct ContentView: View {
         }
     }
     private func fetchInitialServices() {
-            guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
-                print("Invalid userHash")
-                return
-            }
-            
-            guard let url = URL(string: "\(AppConfig.baseURL)/user-services/fetch?userHash=\(userHash)") else {
-                print("Invalid URL")
-                return
-            }
-            
-            var request = URLRequest(url: url)
-            request.httpMethod = "GET"
-            
-            URLSession.shared.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    print("Failed to fetch services: \(error.localizedDescription)")
-                    return
-                }
-                
-                guard let data = data else {
-                    print("No data received")
-                    return
-                }
-                
-                do {
-                    let response = try JSONDecoder().decode(ServiceResponse.self, from: data)
-                    DispatchQueue.main.async {
-                        self.servicesViewModel.selectedServices = response.selectedServices
-                    }
-                } catch {
-                    print("Failed to decode services: \(error.localizedDescription)")
-                }
-            }.resume()
+        guard let userHash = KeychainWrapper.standard.string(forKey: "userHash") else {
+            print("Invalid userHash")
+            return
         }
+        
+        guard let url = URL(string: "\(AppConfig.baseURL)/user-services/fetch?userHash=\(userHash)") else {
+            print("Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Failed to fetch services: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let data = data else {
+                print("No data received")
+                return
+            }
+            
+            do {
+                let response = try JSONDecoder().decode(ServiceResponse.self, from: data)
+                print("Services being fetched:", response.selectedServices) // Debug print
+                DispatchQueue.main.async {
+                    self.servicesViewModel.selectedServices = response.selectedServices
+                    print("Services after update:", self.servicesViewModel.selectedServices) // Debug print
+                }
+            } catch {
+                print("Failed to decode services: \(error.localizedDescription)")
+            }
+        }.resume()
+    }
 }
 
 // User Profile View

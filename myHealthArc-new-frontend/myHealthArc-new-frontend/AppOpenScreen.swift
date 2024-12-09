@@ -49,6 +49,7 @@ struct AppOpenScreen: View {
                 Spacer()
             }
         }
+        .accentColor(.mhaPurple)
     }
 }
 

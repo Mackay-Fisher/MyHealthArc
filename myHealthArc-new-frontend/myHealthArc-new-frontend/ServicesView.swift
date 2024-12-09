@@ -162,17 +162,20 @@ struct ServicesView: View {
             isFaceIDEnabled: false
         )
         
+        print("Sending services to update:", body.selectedServices) // Debug print
+        
         do {
             request.httpBody = try JSONEncoder().encode(body)
             
-            let (_, response) = try await URLSession.shared.data(for: request)
-            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-                print("Services updated successfully")
-            } else {
-                print("Failed to update services: \(response)")
+            let (data, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse {
+                print("Response status code:", httpResponse.statusCode)
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("Response data:", responseString)
+                }
             }
         } catch {
-            print("Failed to update services: \(error.localizedDescription)")
+            print("Failed to update services: \(error)")
         }
     }
 }
@@ -227,3 +230,4 @@ struct ServicesView_Previews: PreviewProvider {
         ServicesView(isLoggedIn: $isLoggedIn, hasSignedUp: $hasSignedUp, showAlert: $showAlert)
     }
 }
+

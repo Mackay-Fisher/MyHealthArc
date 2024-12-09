@@ -260,6 +260,7 @@ struct FitnessWidget: View {
     let progress: Double
     let icon: String
     let iconColor: Color
+    @Environment(\.colorScheme) var colorScheme
     
     // Helper function to extract numeric values
     private func extractNumeric(from string: String) -> Double {
@@ -273,6 +274,8 @@ struct FitnessWidget: View {
         let currentValue = extractNumeric(from: value)
         let goalValue = extractNumeric(from: goal)
         let remaining = max(0, goalValue - currentValue)
+        
+        
         // Handle different units based on the title
         if title == "Calories Burned" {
             return "\(Int(remaining)) kcal"
@@ -311,14 +314,14 @@ struct FitnessWidget: View {
 
             Text(title)
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
 
             Text(value)
                 .font(.title2)
                 .fontWeight(.bold)
-                .foregroundColor(.white)
+                .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 
             HStack {
                 Image(systemName: "checkmark.arrow.trianglehead.counterclockwise")

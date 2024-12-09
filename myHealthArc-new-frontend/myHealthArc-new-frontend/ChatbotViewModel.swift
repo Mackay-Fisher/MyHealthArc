@@ -21,11 +21,12 @@ final class ChatbotViewModel: ObservableObject {
         self.carbsLeft = carbsLeft
         self.fatsLeft = fatsLeft
         // retrieve the API key from the environment variable
-        if let apiKeyFromEnv = ProcessInfo.processInfo.environment["OPENAI_KEY"] {
-            self.apiKey = apiKeyFromEnv
-        } else {
-            self.apiKey = AppConfig.OPENAI_KEY
-        }
+//        if let apiKeyFromEnv = ProcessInfo.processInfo.environment["OPENAI_KEY"] {
+//            self.apiKey = apiKeyFromEnv
+//        } else {
+//            self.apiKey = AppConfig.OPENAI_KEY
+//        }
+        self.apiKey = AppConfig.OPENAI_KEY
     }
     
     func sendDefaultMessage() {

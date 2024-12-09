@@ -32,6 +32,11 @@ struct MacrosTrackingView: View {
     private let proteinPercentage: Double = 0.30
     private let fatsPercentage: Double = 0.25
     private let carbsPercentage: Double = 0.45
+    
+    @State private var protein_current: Double = 0
+    @State private var carbs_current: Double = 0
+    @State private var fats_current: Double = 0
+    @State private var calories_current: Double = 0
 
     @StateObject private var goalsManager = GoalsManager()
     
@@ -69,13 +74,13 @@ struct MacrosTrackingView: View {
 
                 VStack(spacing: 20) {
                     HStack(spacing: 20) {
-                        MacroProgressView(macroName: "Protein", value: protein_left, unit: "g", color: .mhaBlue, progress: protein_progress_left)
-                        MacroProgressView(macroName: "Carbs", value: carbs_left, unit: "g", color: .mhaOrange, progress: carbs_progress_left)
+                        MacroProgressView(macroName: "Protein", value: protein_current, remaining: protein_left, unit: "g", color: .mhaBlue, progress: protein_progress_left)
+                        MacroProgressView(macroName: "Carbs", value: carbs_current, remaining: carbs_left, unit: "g", color: .mhaOrange, progress: carbs_progress_left)
                     }
 
                     HStack(spacing: 20) {
-                        MacroProgressView(macroName: "Fats", value: fats_left, unit: "g", color: .mhaSalmon, progress: fats_progress_left)
-                        MacroProgressView(macroName: "Calories", value: calories_left, unit: "kcal", color: .mhaGreen, progress: calories_progress_left)
+                        MacroProgressView(macroName: "Fats", value: fats_current, remaining: fats_left, unit: "g", color: .mhaSalmon, progress: fats_progress_left)
+                        MacroProgressView(macroName: "Calories", value: calories_current, remaining: calories_left, unit: "kcal", color: .mhaGreen, progress: calories_progress_left)
                     }
                 }
                 .padding()
@@ -127,11 +132,19 @@ struct MacrosTrackingView: View {
                        let carbsGoal = self.goalsManager.goals["carbs-goal"],
                        let fatsGoal = self.goalsManager.goals["fat-goal"] {
                         
+                        // Set current values
+                        protein_current = totalProtein
+                        fats_current = totalFats
+                        carbs_current = totalCarbs
+                        calories_current = totalCalories
+
+                        // remaining calculations
                         protein_left = Double(proteinGoal) - totalProtein
                         fats_left = Double(fatsGoal) - totalFats
                         carbs_left = Double(carbsGoal) - totalCarbs
                         calories_left = dailyCaloricGoal - totalCalories
 
+                        // progress calculations
                         protein_progress_left = totalProtein / Double(proteinGoal)
                         fats_progress_left = totalFats / Double(fatsGoal)
                         carbs_progress_left = totalCarbs / Double(carbsGoal)
@@ -207,14 +220,24 @@ struct MacrosTrackingView: View {
 struct MacroProgressView: View {
     var macroName: String
     var value: Double
+    var remaining: Double
     var unit: String
     var color: Color
     var progress: Double
     
+    // Calculate the remaining value
+//    private var remaining: Double {
+//        let total = value / progress // Calculate total goal
+//        return max(0, total - value)
+//    }
+    
     var body: some View {
         VStack {
+            Spacer()
             Text(macroName)
+                .bold()
                 .padding(.bottom)
+            
             ZStack {
                 Circle()
                     .stroke(Color(.systemGray5), lineWidth: 8)
@@ -233,15 +256,28 @@ struct MacroProgressView: View {
                 }
             }
             .frame(width: 90, height: 90)
-            .padding(.bottom)
+            Spacer()
+
+            HStack {
+
+                Image(systemName: "checkmark.arrow.trianglehead.counterclockwise")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 20)
+                    .foregroundColor(.mhaGreen)
+                Text("To Go: \(String(format: "%.1f", remaining)) \(unit)")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+
+            }
+            Spacer()
         }
-        .padding()
-        .frame(width: 175, height: 175)
+        .frame(width: 175, height: 200)
         .background(Color(.systemGray6))
         .cornerRadius(20)
     }
 }
-
 struct MacrosTrackingView_Previews: PreviewProvider {
     static var previews: some View {
         MacrosTrackingView()

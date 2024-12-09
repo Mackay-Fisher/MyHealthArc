@@ -312,7 +312,7 @@ struct SleepGraphView: View {
    
    private var dayFormatter: DateFormatter {
        let formatter = DateFormatter()
-       formatter.dateFormat = "EEEE"
+       formatter.dateFormat = "E"
        return formatter
    }
    

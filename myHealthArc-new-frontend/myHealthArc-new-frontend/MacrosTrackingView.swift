@@ -112,7 +112,6 @@ struct MacrosTrackingView: View {
     private func loadData() {
         Task {
             await fetchGoalsAndBodyData()
-            // Force an immediate fetch of meals after goals
             fetchMealsForDay { meals in
                 var totalProtein: Double = 0
                 var totalFats: Double = 0
@@ -131,23 +130,23 @@ struct MacrosTrackingView: View {
                        let carbsGoal = self.goalsManager.goals["carbs-goal"],
                        let fatsGoal = self.goalsManager.goals["fat-goal"] {
                         
-                        // Set current values
                         protein_current = totalProtein
                         fats_current = totalFats
                         carbs_current = totalCarbs
                         calories_current = totalCalories
 
-                        // remaining calculations
                         protein_left = Double(proteinGoal) - totalProtein
                         fats_left = Double(fatsGoal) - totalFats
                         carbs_left = Double(carbsGoal) - totalCarbs
                         calories_left = dailyCaloricGoal - totalCalories
 
-                        // progress calculations
                         protein_progress_left = totalProtein / Double(proteinGoal)
                         fats_progress_left = totalFats / Double(fatsGoal)
                         carbs_progress_left = totalCarbs / Double(carbsGoal)
                         calories_progress_left = totalCalories / dailyCaloricGoal
+
+                        // Call the new function to update streak if goals are met
+                        self.updateMacroStreakIfNeeded()
                     }
                 }
             }
@@ -171,6 +170,59 @@ struct MacrosTrackingView: View {
             print("DEBUG - Error fetching goals: \(error.localizedDescription)")
         }
     }
+    
+    private func updateMacroStreakIfNeeded() {
+        // Check if all macro goals are met
+        guard let proteinGoal = self.goalsManager.goals["protein-goal"],
+              let carbsGoal = self.goalsManager.goals["carbs-goal"],
+              let fatsGoal = self.goalsManager.goals["fat-goal"],
+              protein_current >= Double(proteinGoal),
+              carbs_current >= Double(carbsGoal),
+              fats_current >= Double(fatsGoal) else {
+            print("DEBUG - Not all macro goals are met or goals are missing.")
+            return
+        }
+
+        print("DEBUG - All macro goals met. Updating streak...")
+
+        let userId = KeychainWrapper.standard.string(forKey: "userHash") ?? "" 
+        let urlString = "\(AppConfig.baseURL)/goals/streakgoalmatch"
+
+        guard let url = URL(string: urlString) else {
+            print("DEBUG - Invalid URL for streak update.")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let payload: [String: String] = [
+            "userId": userId,
+            "streakKey": "nutrition"
+        ]
+
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: payload, options: [])
+            request.httpBody = jsonData
+
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("DEBUG - Error updating streak: \(error)")
+                    return
+                }
+
+                if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                    print("DEBUG - Macro streak updated successfully!")
+                } else {
+                    print("DEBUG - Failed to update macro streak. Response: \(String(describing: response))")
+                }
+            }.resume()
+        } catch {
+            print("DEBUG - Error creating JSON payload: \(error)")
+        }
+    }
+
 
     private func fetchMealsForDay(completion: @escaping ([Meal]) -> Void) {
         let baseURL = "\(AppConfig.baseURL)/nutrition/meals"

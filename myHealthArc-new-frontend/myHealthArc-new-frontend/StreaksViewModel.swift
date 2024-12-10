@@ -101,16 +101,10 @@ class StreaksViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         
-        // Define example streaks
-        let exampleStreaks = [
-            FitnessGoal(name: "Sleep", value: 35, color: .mhaOrange),
-        ]
-        
         guard let userId = KeychainWrapper.standard.string(forKey: "userHash") else {
             DispatchQueue.main.async {
                 self.isLoading = false
                 self.errorMessage = "User ID not found"
-                self.streaks = exampleStreaks  // Show example streaks even if user ID not found
             }
             return
         }
@@ -119,7 +113,6 @@ class StreaksViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.isLoading = false
                 self.errorMessage = "Invalid URL"
-                self.streaks = exampleStreaks  // Show example streaks even if URL invalid
             }
             return
         }
@@ -134,58 +127,46 @@ class StreaksViewModel: ObservableObject {
                 
                 if let error = error {
                     self.errorMessage = "Network error: \(error.localizedDescription)"
-                    self.streaks = exampleStreaks  // Show example streaks on network error
                     print("Network error: \(error)")
                     return
                 }
                 
-                guard let httpResponse = response as? HTTPURLResponse else {
-                    self.errorMessage = "Invalid response"
-                    self.streaks = exampleStreaks  // Show example streaks on invalid response
-                    return
-                }
-                
-                print("Response status code: \(httpResponse.statusCode)")
-                
-                guard (200...299).contains(httpResponse.statusCode) else {
-                    self.errorMessage = "Server error: \(httpResponse.statusCode)"
-                    self.streaks = exampleStreaks  // Show example streaks on server error
+                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                    self.errorMessage = "Server error"
                     return
                 }
                 
                 guard let data = data else {
                     self.errorMessage = "No data received"
-                    self.streaks = exampleStreaks  // Show example streaks when no data
                     return
-                }
-                
-                if let responseString = String(data: data, encoding: .utf8) {
-                    print("Raw response: \(responseString)")
                 }
                 
                 do {
                     let fetchedStreaks = try JSONDecoder().decode([String: Int].self, from: data)
                     print("Decoded streaks: \(fetchedStreaks)")
                     
-                    let realStreaks = fetchedStreaks.map { key, value in
+                    if fetchedStreaks.isEmpty {
+                        // Handle case where no goals are set
+                        self.errorMessage = nil
+                        self.streaks = [] // Set streaks to empty to trigger "No streaks set" message
+                        return
+                    }
+                    
+                    self.streaks = fetchedStreaks.map { key, value in
                         FitnessGoal(
                             name: key,
                             value: value,
                             color: self.goalColor(for: key)
                         )
                     }
-                    
-                    // Combine real streaks with example streaks
-                    self.streaks = realStreaks + exampleStreaks
-                    
                 } catch {
                     self.errorMessage = "Decoding error: \(error.localizedDescription)"
-                    self.streaks = exampleStreaks  // Show example streaks on decode error
                     print("Decoding error: \(error)")
                 }
             }
         }.resume()
     }
+
 
     private func goalColor(for goal: String) -> Color {
         switch goal.lowercased() {

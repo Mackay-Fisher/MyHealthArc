@@ -63,6 +63,10 @@ struct WaterWidget: View {
                         Button(action: {
                             if cupsFilled < waterGoal {
                                 cupsFilled += 1
+                                // Check and update streak if the goal is met
+                                if cupsFilled >= waterGoal {
+                                    checkAndUpdateStreak()
+                                }
                             }
                         }) {
                             Text("Add Cup")
@@ -77,6 +81,10 @@ struct WaterWidget: View {
                         Button(action: {
                             if cupsFilled > 0 {
                                 cupsFilled -= 1
+                                // Optional: Reset streak logic if progress decreases below the goal
+                                if cupsFilled < waterGoal {
+                                    print("Progress reduced below the goal")
+                                }
                             }
                         }) {
                             Text("Remove Cup")
@@ -150,10 +158,50 @@ struct WaterWidget: View {
         }
     }
 
+    private func checkAndUpdateStreak() {
+        guard cupsFilled >= waterGoal else { return }
+        print("Updating streak...")
 
+        let userId = KeychainWrapper.standard.string(forKey: "userHash") ?? ""
+        let urlString = "\(AppConfig.baseURL)/goals/streakgoalmatch"
 
+        guard let url = URL(string: urlString) else {
+            print("Invalid URL")
+            return
+        }
 
-}
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        // Payload for updating the streak
+        let payload: [String: String] = [
+            "userId": userId,
+            "streakKey": "water-intake" // Replace with the appropriate streak key if needed
+        ]
+
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: payload, options: [])
+            request.httpBody = jsonData
+
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Error updating streak: \(error)")
+                    return
+                }
+
+                if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                    print("Streak updated successfully!")
+                } else {
+                    print("Failed to update streak. Response: \(String(describing: response))")
+                }
+            }.resume()
+        } catch {
+            print("Error creating JSON payload: \(error)")
+        }
+    }
+    }
+
 
 struct WaterWidget_Previews: PreviewProvider {
     static var previews: some View {

@@ -8,6 +8,7 @@ struct GoalsController: RouteCollection {
         goals.post("update", use: updateUserGoals)
         goals.post("streaks", use: updateUserStreaks)
         goals.get("streaks", use: fetchUserStreaks)
+        goals.post("streakgoalmatch", use: streakGoalMatch) // New endpoint
     }
 
     // MARK: - Get User Goals
@@ -189,5 +190,40 @@ func fetchUserStreaks(req: Request) async throws -> [String: Int] {
     }
 }
 
+func streakGoalMatch(req: Request) async throws -> HTTPStatus {
+    // Decode the payload into a dictionary
+    let payload = try req.content.decode([String: String].self)
+
+    // Extract and validate `userId` and `streakKey`
+    guard let userId = payload["userId"] else {
+        throw Abort(.badRequest, reason: "'userId' must be provided.")
+    }
+    guard let streakKey = payload["streakKey"] else {
+        throw Abort(.badRequest, reason: "'streakKey' must be provided.")
+    }
+
+    // Fetch or create user streaks
+    var userStreaks = try await UserStreaks.query(on: req.db)
+        .filter(\.$userId == userId)
+        .first() ?? UserStreaks(userId: userId, streaks: [:], lastUpdated: Date())
+
+    // Update the specified streak to 1
+    userStreaks.streaks[streakKey] = 1
+
+    // Save the updated streaks
+    userStreaks.lastUpdated = Date()
+    try await userStreaks.save(on: req.db)
+
+    return .ok
+}
+
+
+
 
 }
+
+struct GoalProgressPayload: Content {
+    let userId: String
+    let waterIntake: Int?
+}
+

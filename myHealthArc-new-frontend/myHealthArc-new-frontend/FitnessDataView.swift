@@ -177,6 +177,74 @@ struct FitnessDataView: View {
                 }
             }
         }
+    
+    private func updateFitnessStreakIfNeeded() {
+        // Iterate over all goals and check if they are met
+        for (key, goalValue) in goalsManager.goals {
+            var currentValue: Double = 0
+
+            // Match the key to the respective fitness data
+            switch key {
+            case "step-count":
+                currentValue = Double(stepCount ?? 0)
+            case "calories-burned":
+                currentValue = Double(caloriesBurned ?? 0)
+            case "distance-traveled":
+                currentValue = distance ?? 0
+            case "exercise-minutes":
+                currentValue = Double(exerciseTime ?? 0)
+            case "elevation-gained":
+                currentValue = Double(flightsClimbed ?? 0)
+            case "time-asleep": // Assuming time-asleep refers to move minutes
+                currentValue = Double(moveMinutes ?? 0)
+            default:
+                continue
+            }
+
+            // Check if the goal is met
+            if currentValue >= Double(goalValue) {
+                print("DEBUG - Goal met for \(key). Updating streak...")
+
+                let userId = KeychainWrapper.standard.string(forKey: "userHash") ?? ""
+                let urlString = "\(AppConfig.baseURL)/goals/streakgoalmatch"
+
+                guard let url = URL(string: urlString) else {
+                    print("DEBUG - Invalid URL for streak update.")
+                    continue
+                }
+
+                var request = URLRequest(url: url)
+                request.httpMethod = "POST"
+                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+                let payload: [String: String] = [
+                    "userId": userId,
+                    "streakKey": key
+                ]
+
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: payload, options: [])
+                    request.httpBody = jsonData
+
+                    URLSession.shared.dataTask(with: request) { data, response, error in
+                        if let error = error {
+                            print("DEBUG - Error updating streak for \(key): \(error)")
+                            return
+                        }
+
+                        if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                            print("DEBUG - Streak updated successfully for \(key)!")
+                        } else {
+                            print("DEBUG - Failed to update streak for \(key). Response: \(String(describing: response))")
+                        }
+                    }.resume()
+                } catch {
+                    print("DEBUG - Error creating JSON payload for \(key): \(error)")
+                }
+            }
+        }
+    }
+
 
     // MARK: - Fetch Fitness Data
     private func fetchFitnessData() {
@@ -230,8 +298,10 @@ struct FitnessDataView: View {
 
         dispatchGroup.notify(queue: .main) {
             print("All fitness data updated.")
+            self.updateFitnessStreakIfNeeded() // Call the new function here
         }
     }
+
 
     // MARK: - Helper to Fetch Quantity
     private func fetchQuantity(for identifier: HKQuantityTypeIdentifier, unit: HKUnit, predicate: NSPredicate, completion: @escaping (Double) -> Void) {

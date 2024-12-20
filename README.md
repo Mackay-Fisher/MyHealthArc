@@ -1,4 +1,4 @@
-# MyHealthArc
+# myHealthArc
 
 ## Repository Overview
 
